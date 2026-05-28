@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>UCU - Repositorio de Clases</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --pastel-blue: #ebf4f6; --accent-blue: #b2d8d8; --text-color: #555; }
+        body { font-family: 'Quicksand', sans-serif; background-color: var(--pastel-blue); color: var(--text-color); }
+        .hero { background: white; padding: 40px 0; border-bottom: 5px solid var(--accent-blue); text-align: center; }
+        .course-card { background: white; border: none; border-radius: 20px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); height: 100%; }
+        .course-card:hover { transform: translateY(-5px); }
+        .btn-pastel { background-color: var(--accent-blue); color: white; border-radius: 50px; text-decoration: none; padding: 10px 20px; display: inline-block; margin-top: 15px; }
+            footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+	</style>
+</head>
+<body>
+
+    <header class="hero mb-5">
+        <div class="container">
+            <i class="fas fa-laptop-code fa-3x mb-3" style="color: var(--accent-blue);"></i>
+            <h1 class="fw-bold">SQL para Analistas</h1>
+            <p class="lead">Portal de Contenidos Interactivos</p>
+			<p class="small text-muted">El presente material contiene las presentaciones interactivas utilizadas en los encuentros virtuales del curso.</p>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card course-card p-4 text-center">
+                    <i class="fas fa-cubes fa-2x mb-3 text-warning"></i>
+                    <h5>Clase 1</h5>
+                    <p class="small text-muted">Presentacion. Conceptos de Bases de Datos relacionales.</p>
+                    <a href="Clase1/index.html" class="btn-pastel">Entrar</a>
+                </div>
+            </div>
+			<div class="col-md-4">
+                <div class="card course-card p-4 text-center">
+                    <i class="fas fa-sitemap fa-2x mb-3 text-warning"></i>
+                    <h5>Clase 2</h5>
+                    <p class="small text-muted">Conceptos de BBDD relacionales(cont.). SQL.</p>
+                    <a href="Clase2/index.html" class="btn-pastel">Entrar</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card course-card p-4 text-center">
+                    <i class="fas fa-file-contract fa-2x mb-3 text-warning"></i>
+                    <h5>Clase 3</h5>
+                    <p class="small text-muted">SQL (cont.). Manipulación de datos</p>
+                    <a href="Clase3/index.html" class="btn-pastel">Entrar</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card course-card p-4 text-center" style="border: 2px solid var(--accent-blue);">
+                    <i class="fas fa-drafting-compass fa-2x mb-3 text-warning"></i>
+                    <h5>Modulo 4</h5>
+                    <p class="small text-muted">Diseño + Diagramas de Comunicación.</p>
+                    <a href="Modulo4/index.html" class="btn-pastel">Entrar</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card course-card p-4 text-center" style="border: 2px solid var(--accent-blue);">
+                    <i class="fas fa-drafting-compass fa-2x mb-3 text-warning"></i>
+                    <h5>Módulo 5</h5>
+                    <p class="small text-muted">Diseño: GRASP + Visibilidad.</p>
+                    <a href="Modulo5/index.html" class="btn-pastel">Entrar</a>
+                </div>
+        </div>
+		<div class="col-md-4">
+                <div class="card course-card p-4 text-center" style="border: 2px solid var(--accent-blue);">
+                    <i class="fas fa-drafting-compass fa-2x mb-3 text-warning"></i>
+                    <h5>Modulo 6</h5>
+                    <p class="small text-muted">Diseño: Guías · Estructura · Patrones</p>
+                    <a href="Modulo6/index.html" class="btn-pastel">Entrar</a>
+                </div>
+        </div>
+				<div class="col-md-4">
+                <div class="card course-card p-4 text-center" style="border: 2px solid var(--accent-blue);">
+                    <i class="fas fa-laptop-code fa-2x mb-3 text-warning"></i>
+                    <h5>Módulo 7</h5>
+                    <p class="small text-muted">Implementación: Objetos · Colecciones</p>
+                    <a href="Modulo7/index.html" class="btn-pastel">Entrar</a>
+                </div>
+        </div>
+				<div class="col-md-4">
+                <div class="card course-card p-4 text-center" style="border: 2px solid var(--accent-blue);">
+                    <i class="fas fa-laptop-code fa-2x mb-3 text-warning"></i>
+                    <h5>Modulo 8</h5>
+                    <p class="small text-muted">Conceptos básicos II · Implementación: Interfaces · Patrones de diseño</p>
+                    <a href="Modulo8/index.html" class="btn-pastel">Entrar</a>
+                </div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2026 - UDELAR | FING | INCO | CENUR LN<br>Material diseñado para estudiantes de Programación 4.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BBDD IA - Presentación interactiva</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --bg:#fbf7ff; --ink:#2e2b3f; --muted:#6f6a80; --lilac:#d9c8ff; --mint:#c9f2df; --sky:#cdeeff;
+      --peach:#ffd8c7; --lemon:#fff0b8; --rose:#ffd6e8; --card:#ffffffcc; --accent:#7d6bff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(135deg,var(--bg),#f4fffb);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;overflow:hidden}
+    .deck{height:100vh;width:100vw;position:relative}
+    .slide{height:100vh;width:100vw;display:none;padding:72px 7vw 82px;position:absolute;inset:0;overflow:auto}
+    .slide.active{display:block}
+    .glass{background:var(--card);border:1px solid rgba(125,107,255,.15);box-shadow:0 18px 45px rgba(88,74,130,.12);backdrop-filter: blur(10px);border-radius:28px}
+    .title{font-weight:800;letter-spacing:-.03em;font-size:clamp(2.5rem,6vw,5.8rem);line-height:.95}
+    .subtitle{font-size:clamp(1rem,1.6vw,1.35rem);color:var(--muted)}
+    .slide h2{font-size:clamp(2rem,4vw,3.8rem);font-weight:800;letter-spacing:-.03em;margin-bottom:1rem}
+    .lead{font-size:clamp(1.05rem,1.8vw,1.5rem)}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;padding:.55rem .9rem;background:#fff;border:1px solid rgba(0,0,0,.06);font-weight:700;color:#5a5280}
+    .blob{position:absolute;border-radius:999px;filter:blur(2px);opacity:.75;z-index:-1}.b1{width:260px;height:260px;background:var(--lilac);right:8%;top:7%}.b2{width:210px;height:210px;background:var(--mint);left:5%;bottom:7%}.b3{width:150px;height:150px;background:var(--peach);right:20%;bottom:10%}
+    .nav{position:fixed;z-index:20;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.75rem;background:#ffffffd9;border:1px solid rgba(0,0,0,.06);border-radius:999px;padding:.55rem .8rem;box-shadow:0 10px 30px rgba(0,0,0,.10);backdrop-filter: blur(10px)}
+    .nav button{border:0;border-radius:999px;background:var(--accent);color:#fff;width:42px;height:42px}.nav button:disabled{opacity:.35}.progress{position:fixed;top:0;left:0;width:100%;height:8px;z-index:30;border-radius:0;background:#eee}.progress-bar{background:linear-gradient(90deg,#7d6bff,#59c8c3,#ffd166)}
+    .mini{font-size:.92rem;color:var(--muted)}.iconbubble{width:70px;height:70px;border-radius:24px;display:grid;place-items:center;font-size:1.8rem;background:#fff;box-shadow:0 12px 26px rgba(0,0,0,.08)}
+    .timeline{position:relative}.timeline::before{content:"";position:absolute;left:32px;top:15px;bottom:15px;width:5px;background:linear-gradient(var(--lilac),var(--mint),var(--peach));border-radius:99px}.titem{position:relative;margin-left:72px;margin-bottom:1rem;padding:1rem 1.2rem;background:#fff;border-radius:22px;border:1px solid rgba(0,0,0,.05)}.titem::before{content:"";position:absolute;left:-54px;top:22px;width:24px;height:24px;background:var(--accent);border:6px solid #fff;border-radius:50%;box-shadow:0 0 0 2px rgba(125,107,255,.2)}
+    .schema{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.schema .box{padding:1.2rem;border-radius:24px;background:#fff;min-height:190px;border:1px solid rgba(0,0,0,.05)}
+    .comparison td,.comparison th{vertical-align:middle}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f5f1ff;padding:.2rem .45rem;border-radius:.45rem}
+    .quiz-option{cursor:pointer;border:2px solid transparent;transition:.2s}.quiz-option:hover{transform:translateY(-2px);border-color:var(--accent)}.quiz-option.selected{border-color:var(--accent);background:#f4f0ff}.quiz-option.correct{border-color:#42b883;background:#e8fff4}.quiz-option.wrong{border-color:#ff6b6b;background:#fff0f0}
+    @media (max-width: 768px){.slide{padding:58px 5vw 88px}.schema{grid-template-columns:1fr}.title{font-size:3rem}.timeline::before{left:20px}.titem{margin-left:55px}.titem::before{left:-45px}.nav{width:92%;justify-content:center}}
+  </style>
+</head>
+<body>
+<div class="progress"><div id="bar" class="progress-bar" style="width:0%"></div></div>
+<div class="deck">
+  <section class="slide active animate__animated animate__fadeIn" data-title="Inicio">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="row align-items-center h-100 g-5">
+      <div class="col-lg-7">
+        <span class="pill mb-4"><i class="fa-solid fa-database"></i> Bases de Datos + IA</span>
+        <h1 class="title">Del dato guardado al dato inteligente</h1>
+        <p class="subtitle mt-4">Evolución, organización, modelos de bases de datos y cómo se conectan con soluciones de Inteligencia Artificial.</p>
+        <button class="btn btn-lg btn-primary rounded-pill mt-3" onclick="go(1)"><i class="fa-solid fa-play me-2"></i>Comenzar</button>
+      </div>
+      <div class="col-lg-5">
+        <div class="glass p-4 text-center animate__animated animate__pulse animate__infinite animate__slower">
+          <i class="fa-solid fa-brain fa-6x mb-4" style="color:var(--accent)"></i>
+          <h3>Idea central</h3>
+          <p class="mb-0">Una IA aprende, predice o recomienda mejor cuando los datos están bien almacenados, estructurados, protegidos y consultables.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Introducción">
+    <h2><i class="fa-solid fa-scroll me-3"></i>¿Por qué hablamos de bases de datos?</h2>
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-6"><div class="glass p-4 h-100"><p class="lead">Desde registros manuales en arcilla, papiros o libros, la humanidad buscó conservar información. Con las tarjetas perforadas y luego las computadoras, el almacenamiento pasó de ser físico y manual a ser digital, procesable y consultable.</p><p>Hoy, una base de datos no es solo “guardar datos”: también define cómo se organizan, cómo se validan y cómo se accede a ellos.</p></div></div>
+      <div class="col-lg-6"><div class="glass p-4 h-100"><h4><i class="fa-solid fa-lightbulb"></i> Relación con IA</h4><p>La Inteligencia Artificial necesita datos históricos, limpios y disponibles. Por eso, una mala base de datos puede generar modelos de IA con errores, sesgos o resultados poco útiles.</p><button class="btn btn-outline-primary rounded-pill" onclick="tip('La IA no reemplaza a la base de datos: la consume, la analiza y aprende patrones a partir de ella.')">Dato clave</button></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Evolución">
+    <h2><i class="fa-solid fa-clock-rotate-left me-3"></i>Evolución de las BBDD</h2>
+    <div class="timeline">
+      <div class="titem"><strong>1ª generación · 1970-1980</strong><br>Modelos jerárquicos y de red. Estructuras rígidas, navegación entre registros y mantenimiento complejo.</div>
+      <div class="titem"><strong>2ª generación · 1970-1990</strong><br>Modelo relacional, SQL, integridad referencial, normalización y transacciones ACID.</div>
+      <div class="titem"><strong>3ª generación · 1990-actualidad</strong><br>Bases orientadas a objetos y NoSQL para datos no estructurados, flexibilidad y escalabilidad.</div>
+      <div class="titem"><strong>4ª generación · 2010-actualidad</strong><br>NewSQL y bases de datos en la nube: ACID + escalabilidad + alta disponibilidad gestionada.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Organización">
+    <h2><i class="fa-solid fa-sitemap me-3"></i>Organización de una BBDD</h2>
+    <div class="schema">
+      <div class="box"><div class="iconbubble mb-3" style="background:var(--lilac)"><i class="fa-solid fa-layer-group"></i></div><h4>Estructuras</h4><p>Definen tipos, formatos, entidades, atributos, relaciones y métodos de acceso.</p></div>
+      <div class="box"><div class="iconbubble mb-3" style="background:var(--mint)"><i class="fa-solid fa-shield-halved"></i></div><h4>Reglas de integridad</h4><p>Indican qué condiciones deben cumplir los datos para ser aceptados y registrados.</p></div>
+      <div class="box"><div class="iconbubble mb-3" style="background:var(--peach)"><i class="fa-solid fa-code"></i></div><h4>Operadores</h4><p>Permiten consultar, insertar, modificar, eliminar y administrar datos y estructuras.</p></div>
+    </div>
+    <div class="alert alert-light border rounded-4 mt-4"><i class="fa-solid fa-robot me-2"></i>Para IA, estas tres partes impactan directamente en la calidad del dataset usado para entrenar o consultar modelos.</div>
+  </section>
+
+  <section class="slide" data-title="Primeros modelos">
+    <h2><i class="fa-solid fa-network-wired me-3"></i>Modelos jerárquico y de red</h2>
+    <div class="row g-4">
+      <div class="col-md-6"><div class="glass p-4 h-100"><h3>Jerárquico</h3><p>Organiza los datos como árboles: un nodo padre puede tener muchos hijos, pero la navegación ocurre en una dirección.</p><div class="text-center fs-1">🌳</div><p class="mini">Ejemplo: Facultad → Carrera → Materia → Estudiante.</p></div></div>
+      <div class="col-md-6"><div class="glass p-4 h-100"><h3>De red</h3><p>Permite vínculos más complejos: un nodo hijo puede tener más de un padre y representar relaciones muchos a muchos.</p><div class="text-center fs-1">🕸️</div><p class="mini">Ejemplo: Estudiante cursa varias materias y cada materia tiene muchos estudiantes.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Relacional">
+    <h2><i class="fa-solid fa-table me-3"></i>Modelo relacional y SQL</h2>
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-5"><div class="glass p-4"><p class="lead">El modelo relacional representa la información mediante tablas. Cada fila es un registro y cada columna representa un atributo.</p><p>SQL permite consultar y manipular la información, mientras que ACID favorece transacciones confiables.</p></div></div>
+      <div class="col-lg-7"><div class="table-responsive glass p-3"><table class="table table-hover align-middle mb-0"><thead><tr><th>Cédula</th><th>Nombre</th><th>Edad</th><th>Preferencia</th></tr></thead><tbody><tr><td>1.111.111-1</td><td>Ana</td><td>21</td><td>Vegetariano</td></tr><tr><td>2.222.222-2</td><td>Bruno</td><td>24</td><td>Café</td></tr><tr><td>3.333.333-3</td><td>Carla</td><td>20</td><td>Sin gluten</td></tr></tbody></table></div><p class="mini mt-2">Regla: una celda debe contener un solo valor y cada columna debe respetar su dominio.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="NoSQL, NewSQL y nube">
+    <h2><i class="fa-solid fa-cloud me-3"></i>NoSQL, NewSQL y DBaaS</h2>
+    <div class="glass p-4">
+      <div class="table-responsive"><table class="table comparison"><thead><tr><th>Enfoque</th><th>Cuándo conviene</th><th>Ejemplos de uso</th></tr></thead><tbody><tr><td><strong>NoSQL</strong></td><td>Datos flexibles, grandes volúmenes o estructuras variables.</td><td>Logs, documentos JSON, chats, catálogos, sensores.</td></tr><tr><td><strong>NewSQL</strong></td><td>Se necesita SQL y consistencia, pero con escalabilidad distribuida.</td><td>Pagos, reservas, sistemas críticos con mucho tráfico.</td></tr><tr><td><strong>DBaaS</strong></td><td>Se busca delegar instalación, respaldo, escalado y alta disponibilidad.</td><td>Aplicaciones web, startups, sistemas educativos en la nube.</td></tr></tbody></table></div>
+    </div>
+    <button class="btn btn-outline-primary rounded-pill mt-3" onclick="tip('BASE suele asociarse a NoSQL: prioriza disponibilidad y escalabilidad, aceptando consistencia eventual en ciertos escenarios.')"><i class="fa-solid fa-circle-info me-2"></i>ACID vs BASE</button>
+  </section>
+
+  <section class="slide" data-title="Ejemplo real">
+    <h2><i class="fa-solid fa-mug-hot me-3"></i>Ejemplo real: cantina inteligente</h2>
+    <div class="row g-4">
+      <div class="col-lg-6"><div class="glass p-4 h-100"><h3>Contexto</h3><p>La cantina del campus registra clientes, fecha de nacimiento, preferencias de alimentos y bebidas, ventas realizadas, producto, cantidad, importe y medio de pago.</p><h5>Entidades posibles</h5><span class="pill m-1">Cliente</span><span class="pill m-1">Producto</span><span class="pill m-1">Venta</span><span class="pill m-1">MedioPago</span><span class="pill m-1">Preferencia</span></div></div>
+      <div class="col-lg-6"><div class="glass p-4 h-100"><h3>Uso con IA</h3><p>Con datos históricos se puede construir un sistema de recomendación:</p><ol><li>Detecta productos favoritos por perfil.</li><li>Predice demanda por hora o día.</li><li>Recomienda combos personalizados.</li><li>Reduce desperdicio ajustando stock.</li></ol><button class="btn btn-primary rounded-pill" onclick="tip('Ejemplo: si muchos estudiantes compran café y medialuna los lunes a las 8:00, el sistema puede sugerir preparar más stock antes de esa hora.')">Ver ejemplo</button></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="De datos a IA">
+    <h2><i class="fa-solid fa-wand-magic-sparkles me-3"></i>Flujo: de BBDD a IA</h2>
+    <div class="row g-3 text-center">
+      <div class="col-md"><div class="glass p-4 h-100"><i class="fa-solid fa-database fa-3x mb-3" style="color:#7d6bff"></i><h5>1. Registrar</h5><p class="mini">Datos de clientes, ventas y productos.</p></div></div>
+      <div class="col-md"><div class="glass p-4 h-100"><i class="fa-solid fa-broom fa-3x mb-3" style="color:#50bfa5"></i><h5>2. Limpiar</h5><p class="mini">Evitar duplicados, nulos y errores.</p></div></div>
+      <div class="col-md"><div class="glass p-4 h-100"><i class="fa-solid fa-chart-line fa-3x mb-3" style="color:#f0ad4e"></i><h5>3. Analizar</h5><p class="mini">Buscar patrones y relaciones.</p></div></div>
+      <div class="col-md"><div class="glass p-4 h-100"><i class="fa-solid fa-brain fa-3x mb-3" style="color:#e56aa6"></i><h5>4. Predecir</h5><p class="mini">Recomendar, clasificar o anticipar demanda.</p></div></div>
+    </div>
+    <div class="alert alert-light border rounded-4 mt-4"><strong>Mensaje clave:</strong> no hay IA útil sin datos confiables, trazables y bien modelados.</div>
+  </section>
+
+  <section class="slide" data-title="Quiz">
+    <h2><i class="fa-solid fa-circle-question me-3"></i>Quiz final</h2>
+    <div class="glass p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3"><span class="pill" id="qcount">Pregunta 1/5</span><span class="pill"><i class="fa-solid fa-star"></i> Puntaje: <span id="score">0</span></span></div>
+      <h3 id="question" class="mb-4"></h3>
+      <div id="options" class="row g-3"></div>
+      <div class="mt-4 d-flex gap-2"><button class="btn btn-primary rounded-pill" id="checkBtn" onclick="checkAnswer()">Responder</button><button class="btn btn-outline-secondary rounded-pill" onclick="resetQuiz()">Reiniciar</button></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Cierre">
+    <div class="row h-100 align-items-center g-5">
+      <div class="col-lg-7"><h2>Conclusión</h2><p class="lead">Las bases de datos evolucionaron desde estructuras rígidas hasta plataformas relacionales, NoSQL, NewSQL y en la nube. Para IA, el objetivo no es solo almacenar: es disponer de datos correctos, consistentes y útiles para tomar mejores decisiones.</p><button class="btn btn-lg btn-primary rounded-pill" onclick="go(0)"><i class="fa-solid fa-rotate-left me-2"></i>Volver al inicio</button></div>
+      <div class="col-lg-5"><div class="glass p-5 text-center"><i class="fa-solid fa-graduation-cap fa-6x mb-4" style="color:var(--accent)"></i><h3>Hasta la próxima</h3><p class="mini">Bases de Datos I · Semana 1 · Unidad 1</p></div></div>
+    </div>
+  </section>
+</div>
+
+<div class="nav"><button id="prev" onclick="prev()"><i class="fa-solid fa-chevron-left"></i></button><span id="pos" class="fw-bold px-2">1 / 11</span><button id="next" onclick="next()"><i class="fa-solid fa-chevron-right"></i></button><button onclick="menu()" title="Índice"><i class="fa-solid fa-list"></i></button></div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];let current=0;
+function update(){slides.forEach((s,i)=>{s.classList.toggle('active',i===current); if(i===current){s.classList.remove('animate__fadeIn'); void s.offsetWidth; s.classList.add('animate__animated','animate__fadeIn')}});document.getElementById('pos').textContent=`${current+1} / ${slides.length}`;document.getElementById('bar').style.width=`${((current+1)/slides.length)*100}%`;document.getElementById('prev').disabled=current===0;document.getElementById('next').disabled=current===slides.length-1;}
+function go(i){current=Math.max(0,Math.min(slides.length-1,i));update()} function next(){go(current+1)} function prev(){go(current-1)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next(); if(e.key==='ArrowLeft')prev();});
+function tip(text){Swal.fire({title:'Dato para recordar',text,icon:'info',confirmButtonText:'Entendido',confirmButtonColor:'#7d6bff',background:'#fffafd'});}
+function menu(){Swal.fire({title:'Índice de la presentación',html:slides.map((s,i)=>`<button class="btn btn-light w-100 my-1 text-start" onclick="Swal.close(); go(${i})">${i+1}. ${s.dataset.title}</button>`).join(''),showConfirmButton:false,background:'#fffafd'});}
+const quiz=[
+ {q:'¿Qué modelo organiza los datos como una estructura de árbol padre-hijo?',o:['Relacional','Jerárquico','Documental','NewSQL'],a:1},
+ {q:'¿Qué lenguaje se asocia principalmente al modelo relacional?',o:['HTML','SQL','CSS','NoCode'],a:1},
+ {q:'¿Qué aporta una regla de integridad?',o:['Define colores de la interfaz','Evita que se registren datos inválidos','Acelera el teclado','Reemplaza las tablas'],a:1},
+ {q:'¿Qué tipo de BBDD suele usarse para datos flexibles o no estructurados?',o:['NoSQL','Jerárquica pura','Archivo plano manual','Solo planillas'],a:0},
+ {q:'En un proyecto con IA, ¿por qué importa una buena base de datos?',o:['Porque elimina la necesidad de programar','Porque mejora la calidad y disponibilidad de los datos para el modelo','Porque impide consultar datos','Porque solo sirve para guardar imágenes'],a:1}
+];let qi=0,score=0,selected=null,answered=false;
+function renderQ(){const q=quiz[qi];selected=null;answered=false;document.getElementById('qcount').textContent=`Pregunta ${qi+1}/5`;document.getElementById('score').textContent=score;document.getElementById('question').textContent=q.q;document.getElementById('checkBtn').textContent='Responder';document.getElementById('options').innerHTML=q.o.map((op,i)=>`<div class="col-md-6"><div class="quiz-option glass p-3 h-100" onclick="selectOpt(${i})" data-i="${i}"><strong>${String.fromCharCode(65+i)}.</strong> ${op}</div></div>`).join('');}
+function selectOpt(i){if(answered)return;selected=i;document.querySelectorAll('.quiz-option').forEach(el=>el.classList.toggle('selected',Number(el.dataset.i)===i));}
+function checkAnswer(){if(answered){ if(qi<quiz.length-1){qi++;renderQ();} else {Swal.fire({title:'Resultado final',html:`Obtuviste <b>${score} de ${quiz.length}</b> respuestas correctas.`,icon:score>=4?'success':'info',confirmButtonColor:'#7d6bff'});} return;} if(selected===null){tip('Selecciona una opción antes de responder.'); return;} answered=true;const correct=quiz[qi].a;document.querySelectorAll('.quiz-option').forEach(el=>{const i=Number(el.dataset.i); if(i===correct)el.classList.add('correct'); if(i===selected&&i!==correct)el.classList.add('wrong');}); if(selected===correct){score++;document.getElementById('score').textContent=score;Swal.fire({title:'¡Correcto!',icon:'success',timer:1100,showConfirmButton:false});} else {Swal.fire({title:'A revisar',text:`La respuesta correcta era: ${quiz[qi].o[correct]}`,icon:'warning',confirmButtonColor:'#7d6bff'});} document.getElementById('checkBtn').textContent=qi<quiz.length-1?'Siguiente':'Ver resultado';}
+function resetQuiz(){qi=0;score=0;renderQ();}
+renderQ();update();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
