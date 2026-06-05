@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Warehouse | SQL para Analistas de Ciencia de Datos e IA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --ink:#22304a; --muted:#64748b; --blue:#bfe9ff; --mint:#c9f7e8; --pink:#ffd6e7;
+      --peach:#ffd9c7; --lav:#ded3ff; --yellow:#fff0b8; --bg:#fbfaf8; --line:#dbe6f1;
+      --shadow:0 18px 45px rgba(31,41,55,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; background:linear-gradient(135deg,#fffdf9,#f3f9ff); color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;}
+    body{overflow:hidden}
+    .deck{height:100vh; width:100vw; position:relative; overflow:hidden;}
+    .slide{display:none; height:100vh; overflow-y:auto; padding:48px clamp(22px,6vw,90px) 104px; scroll-behavior:smooth;}
+    .slide.active{display:block;}
+    .kicker{display:inline-flex;gap:.6rem;align-items:center;background:#fff;border-radius:999px;padding:.62rem 1rem;box-shadow:var(--shadow);font-weight:800;color:#486584;margin-bottom:1.2rem}
+    h1{font-size:clamp(2.4rem,5.6vw,5rem);line-height:.98;font-weight:900;letter-spacing:-.055em;margin:0 0 1.3rem}
+    h2{font-size:clamp(2rem,4.4vw,4.2rem);line-height:1.02;font-weight:900;letter-spacing:-.045em;margin-bottom:1.35rem}
+    h3{font-weight:900;letter-spacing:-.025em}.lead{font-size:clamp(1.05rem,1.7vw,1.35rem);color:#405168;line-height:1.55}.muted{color:var(--muted)}
+    .top-label{position:fixed;right:5vw;top:28px;font-weight:900;letter-spacing:.08em;color:#516c88;z-index:20}.progress-line{position:fixed;left:0;bottom:0;height:8px;background:#55c7df;width:0;z-index:40;transition:.35s}
+    .navbtn{position:fixed;bottom:28px;z-index:45;width:58px;height:58px;border:0;border-radius:50%;background:#fff;box-shadow:var(--shadow);color:var(--ink);font-size:1.2rem}.navbtn:hover{transform:translateY(-2px)}
+    #prev{right:112px}#next{right:36px}#home{left:36px}.counter{position:fixed;bottom:45px;left:112px;z-index:45;font-weight:800;color:#6b7280}
+    .card-soft{border:0;border-radius:28px;padding:28px;box-shadow:var(--shadow);height:100%;background:#fff}.bg-blue{background:var(--blue)}.bg-mint{background:var(--mint)}.bg-pink{background:var(--pink)}.bg-peach{background:var(--peach)}.bg-lav{background:var(--lav)}.bg-yellow{background:var(--yellow)}
+    .icon-bubble{width:64px;height:64px;display:grid;place-items:center;border-radius:20px;background:#fff;font-size:1.6rem;margin-bottom:1rem;box-shadow:0 10px 25px rgba(31,41,55,.09)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:26px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.table-wrap{overflow:auto;border-radius:24px;box-shadow:var(--shadow);background:#fff}.table{margin:0}.table th{background:#e9f8ff;color:#23324b}.code{background:#142033;color:#eaf6ff;border-radius:24px;padding:22px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.95rem}.pill{display:inline-block;border-radius:999px;background:#fff;padding:.45rem .8rem;font-weight:800;margin:.2rem;box-shadow:0 8px 18px rgba(31,41,55,.08)}
+    .flow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.flow .node{flex:1;min-width:150px;text-align:center;border-radius:24px;padding:22px;background:#fff;box-shadow:var(--shadow);font-weight:900}.flow .arrow{font-size:1.8rem;color:#6b85a0}.quiz-option{cursor:pointer;border:2px solid transparent}.quiz-option:hover{border-color:#55c7df;transform:translateY(-2px)}.mini{font-size:.95rem;color:#52647c}.badge-soft{background:#fff;border-radius:18px;padding:.8rem 1rem;font-weight:800;box-shadow:0 8px 18px rgba(31,41,55,.08);display:inline-block;margin:.25rem}.checklist li{margin-bottom:.65rem}.small-note{font-size:.98rem;color:#52647c;line-height:1.45}
+    @media (max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.slide{padding-top:72px}.top-label{font-size:.8rem}}
+    @media (max-width:720px){.slide{padding:78px 18px 102px}.grid-3,.grid-4{grid-template-columns:1fr}.flow{display:block}.flow .node{margin-bottom:12px}.flow .arrow{display:block;text-align:center;transform:rotate(90deg);margin:4px}.navbtn{width:50px;height:50px}#prev{right:92px}#next{right:28px}#home{left:20px}.counter{left:84px}.top-label{right:18px;top:18px}h1{font-size:2.55rem}h2{font-size:2.1rem}.card-soft{padding:22px}.code{font-size:.82rem}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="top-label" id="sectionLabel">DATA WAREHOUSE</div>
+  <div class="progress-line" id="progress"></div>
+  <button class="navbtn" id="home" title="Inicio"><i class="fa-solid fa-house"></i></button>
+  <button class="navbtn" id="prev" title="Anterior"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="navbtn" id="next" title="Siguiente"><i class="fa-solid fa-arrow-right"></i></button>
+  <div class="counter"><span id="current">1</span> / <span id="total"></span></div>
+
+  <section class="slide active" data-label="Introducción">
+    <span class="kicker"><i class="fa-solid fa-database"></i> SQL para Analistas de Ciencia de Datos e IA</span>
+    <h1>Data Warehouse</h1>
+    <p class="lead col-lg-9">Un <strong>Data Warehouse</strong> es una base de datos analítica pensada para integrar datos históricos de distintas fuentes, organizarlos con criterios de negocio y facilitar consultas, tableros, reportes, ciencia de datos e inteligencia artificial.</p>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-layer-group"></i></div><h3>Integra</h3><p>Une datos de ventas, clientes, pagos, logística, web, sensores, archivos y sistemas externos.</p></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-clock-rotate-left"></i></div><h3>Historiza</h3><p>Conserva la evolución del negocio para comparar períodos, tendencias y comportamientos.</p></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-brain"></i></div><h3>Prepara para IA</h3><p>Organiza datasets confiables para predicción, segmentación, recomendación y automatización.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Concepto central">
+    <span class="kicker"><i class="fa-solid fa-circle-nodes"></i> Definición práctica</span>
+    <h2>¿Qué problema resuelve?</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-peach"><h3>Sin Data Warehouse</h3><p class="lead">Los datos están dispersos. Cada área usa planillas, sistemas o bases diferentes. Las respuestas no coinciden y el análisis consume tiempo limpiando datos.</p></div>
+      <div class="card-soft bg-mint"><h3>Con Data Warehouse</h3><p class="lead">Los datos se integran, limpian, documentan y estructuran. El analista consulta una fuente común y puede construir indicadores, datasets y modelos.</p></div>
+    </div>
+    <div class="mt-4 flow">
+      <div class="node">Fuentes operativas</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">ETL / ELT</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Data Warehouse</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">BI / IA</div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="OLTP vs OLAP">
+    <span class="kicker"><i class="fa-solid fa-scale-balanced"></i> Comparación esencial</span>
+    <h2>OLTP vs OLAP</h2>
+    <div class="table-wrap">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Aspecto</th><th>OLTP: Base operacional</th><th>OLAP: Data Warehouse</th></tr></thead>
+        <tbody>
+          <tr><td>Objetivo</td><td>Registrar operaciones diarias</td><td>Analizar información histórica</td></tr>
+          <tr><td>Ejemplo</td><td>Alta de una venta, pago o cliente</td><td>Ventas mensuales por zona, producto y canal</td></tr>
+          <tr><td>Consultas</td><td>Cortas, frecuentes, transaccionales</td><td>Agregadas, complejas, multidimensionales</td></tr>
+          <tr><td>Diseño</td><td>Normalizado para evitar redundancia</td><td>Modelos dimensionales para consultar rápido</td></tr>
+          <tr><td>Usuario típico</td><td>Sistema, cajero, operador</td><td>Analista, gerente, científico de datos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Arquitectura">
+    <span class="kicker"><i class="fa-solid fa-diagram-project"></i> Arquitectura típica</span>
+    <h2>Capas de un Data Warehouse</h2>
+    <div class="grid-4">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-plug"></i></div><h3>Fuentes</h3><p>ERP, CRM, archivos CSV, APIs, logs, sensores, bases SQL o NoSQL.</p></div>
+      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-filter"></i></div><h3>Staging</h3><p>Zona temporal para copiar, validar y transformar datos antes de consolidarlos.</p></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-warehouse"></i></div><h3>Warehouse</h3><p>Repositorio integrado, histórico y orientado al análisis del negocio.</p></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-chart-line"></i></div><h3>Consumo</h3><p>Dashboards, consultas SQL, notebooks, modelos de IA y reportes.</p></div>
+    </div>
+    <p class="lead mt-4">En un curso de SQL para IA, esta arquitectura permite practicar consultas reales sobre datos preparados, trazables y reutilizables.</p>
+  </section>
+
+  <section class="slide" data-label="ETL y ELT">
+    <span class="kicker"><i class="fa-solid fa-arrows-spin"></i> Movimiento de datos</span>
+    <h2>ETL y ELT</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-blue"><h3>ETL</h3><p><strong>Extract, Transform, Load.</strong> Primero se extraen los datos, luego se transforman y finalmente se cargan al warehouse. Es útil cuando se quiere controlar la limpieza antes de cargar.</p></div>
+      <div class="card-soft bg-mint"><h3>ELT</h3><p><strong>Extract, Load, Transform.</strong> Primero se cargan los datos y luego se transforman dentro del motor analítico. Es frecuente en soluciones modernas en la nube y grandes volúmenes.</p></div>
+    </div>
+    <div class="code mt-4">-- Ejemplo simple de transformación para análisis
+CREATE VIEW vw_ventas_mensuales AS
+SELECT
+  DATE_TRUNC('month', fecha_venta) AS mes,
+  id_producto,
+  SUM(cantidad) AS unidades,
+  SUM(importe) AS facturacion
+FROM ventas
+GROUP BY DATE_TRUNC('month', fecha_venta), id_producto;</div>
+  </section>
+
+  <section class="slide" data-label="Modelo dimensional">
+    <span class="kicker"><i class="fa-solid fa-cubes"></i> Diseño para análisis</span>
+    <h2>Modelo dimensional</h2>
+    <p class="lead col-lg-10">El modelo dimensional organiza los datos para responder preguntas de negocio de forma rápida y comprensible. La decisión más importante es definir el <strong>grano</strong>: qué representa exactamente cada fila de la tabla de hechos.</p>
+    <div class="grid-4 mt-3">
+      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-ruler"></i></div><h3>Grano</h3><p>Nivel de detalle de cada fila: una venta, una línea de venta, una visita web, un pago.</p></div>
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-table-cells"></i></div><h3>Hechos</h3><p>Eventos medibles: ventas, reservas, pagos, clics, reclamos. Incluyen claves a dimensiones.</p></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-tags"></i></div><h3>Dimensiones</h3><p>Contexto del hecho: cliente, producto, fecha, sucursal, canal, promoción.</p></div>
+      <div class="card-soft bg-pink"><div class="icon-bubble"><i class="fa-solid fa-calculator"></i></div><h3>Métricas</h3><p>Valores agregables: cantidad, importe, costo, descuento, duración, conteos.</p></div>
+    </div>
+    <div class="grid-2 mt-4">
+      <div class="card-soft bg-lav"><h3>Ejemplo</h3><p><strong>fact_ventas</strong>: id_fecha, id_cliente, id_producto, id_sucursal, cantidad, importe_total.</p><p><strong>dim_cliente</strong>: segmento, edad, barrio. <strong>dim_producto</strong>: categoría, marca, precio_lista.</p></div>
+      <div class="card-soft bg-peach"><h3>Relación con IA</h3><p>Desde estas tablas se generan variables como gasto promedio, frecuencia de compra, productos favoritos, estacionalidad y probabilidad de recompra.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Esquemas">
+    <span class="kicker"><i class="fa-solid fa-sitemap"></i> Esquemas comunes</span>
+    <h2>Estrella vs Copo de nieve</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-lav"><h3>Esquema estrella</h3><p>Una tabla de hechos central conectada directamente con dimensiones. Es simple, legible y suele ser rápido para consultas analíticas.</p><div class="flow mt-3"><div class="node">Dim Cliente</div><div class="node bg-yellow">Hecho Venta</div><div class="node">Dim Producto</div><div class="node">Dim Tiempo</div></div></div>
+      <div class="card-soft bg-blue"><h3>Esquema copo de nieve</h3><p>Las dimensiones se normalizan en varias tablas. Reduce redundancia, pero puede hacer más complejas las consultas y los JOIN.</p><div class="flow mt-3"><div class="node">Producto</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Categoría</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">Hecho</div></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="DW, Data Lake y Lakehouse">
+    <span class="kicker"><i class="fa-solid fa-water"></i> Comparaciones modernas</span>
+    <h2>Data Warehouse, Data Lake y Lakehouse</h2>
+    <div class="table-wrap">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Tipo</th><th>Qué almacena</th><th>Fortaleza</th><th>Riesgo típico</th></tr></thead>
+        <tbody>
+          <tr><td>Data Warehouse</td><td>Datos estructurados y curados</td><td>SQL, BI, calidad, consistencia</td><td>Menos flexible para datos crudos</td></tr>
+          <tr><td>Data Lake</td><td>Datos crudos estructurados y no estructurados</td><td>Escala, flexibilidad, archivos, logs, imágenes</td><td>Puede convertirse en “pantano de datos” si no hay gobierno</td></tr>
+          <tr><td>Lakehouse</td><td>Combina lake + capacidades analíticas</td><td>IA, analítica avanzada y bajo costo relativo</td><td>Mayor complejidad de arquitectura</td></tr>
+          <tr><td>Data Mart</td><td>Subconjunto temático del warehouse</td><td>Enfoque por área: ventas, finanzas, marketing</td><td>Duplicación si no se gobierna bien</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Calidad y gobierno">
+    <span class="kicker"><i class="fa-solid fa-shield-halved"></i> Buenas prácticas</span>
+    <h2>Calidad de datos para IA</h2>
+    <p class="lead col-lg-10">Un modelo de IA no mejora mágicamente datos malos. El Data Warehouse debe asegurar que las consultas generen información confiable, reproducible y auditada.</p>
+    <div class="grid-4 mt-3">
+      <div class="card-soft bg-mint"><h3>Completitud</h3><p>Evitar valores faltantes críticos o documentar cómo se imputan.</p><span class="badge-soft">NULL controlado</span></div>
+      <div class="card-soft bg-blue"><h3>Consistencia</h3><p>Unificar formatos, monedas, unidades, códigos y nombres de categorías.</p><span class="badge-soft">Catálogos</span></div>
+      <div class="card-soft bg-yellow"><h3>Trazabilidad</h3><p>Saber origen, fecha de carga, reglas aplicadas y versión del dato.</p><span class="badge-soft">Linaje</span></div>
+      <div class="card-soft bg-pink"><h3>Privacidad</h3><p>Controlar accesos, anonimizar identificadores y proteger datos sensibles.</p><span class="badge-soft">Gobierno</span></div>
+    </div>
+    <div class="grid-2 mt-4">
+      <div class="card-soft bg-lav"><h3>Reglas típicas</h3><ul class="checklist mb-0"><li>Validar claves foráneas y duplicados.</li><li>Rechazar importes negativos cuando no correspondan.</li><li>Normalizar fechas, zonas horarias y monedas.</li><li>Registrar errores de carga para revisión.</li></ul></div>
+      <div class="card-soft bg-peach"><h3>Impacto en IA</h3><p>Mejores datos reducen sesgos accidentales, errores de entrenamiento y conclusiones contradictorias entre reportes, dashboards y modelos.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="SQL analítico">
+    <span class="kicker"><i class="fa-solid fa-code"></i> SQL aplicado</span>
+    <h2>Consultas típicas para analistas</h2>
+    <div class="code">-- Ticket promedio y cantidad de compras por cliente
+SELECT
+  c.id_cliente,
+  c.segmento,
+  COUNT(v.id_venta) AS compras,
+  SUM(v.importe) AS gasto_total,
+  AVG(v.importe) AS ticket_promedio,
+  MAX(v.fecha_venta) AS ultima_compra
+FROM fact_ventas v
+JOIN dim_cliente c ON c.id_cliente = v.id_cliente
+GROUP BY c.id_cliente, c.segmento
+HAVING COUNT(v.id_venta) >= 3
+ORDER BY gasto_total DESC;</div>
+    <p class="lead mt-4">Este tipo de consulta puede alimentar un dashboard o generar variables para un modelo de predicción de abandono, recomendación o segmentación.</p>
+  </section>
+
+  <section class="slide" data-label="Ejemplo real">
+    <span class="kicker"><i class="fa-solid fa-mug-saucer"></i> Caso de vida real</span>
+    <h2>Cantina inteligente del campus</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-peach"><h3>Contexto</h3><p>La cantina registra ventas, productos, medios de pago, horarios, clientes frecuentes y promociones. También recibe datos de clima y calendario académico.</p></div>
+      <div class="card-soft bg-mint"><h3>Objetivo analítico</h3><p>Predecir demanda diaria, detectar productos más vendidos, segmentar clientes y recomendar promociones.</p></div>
+    </div>
+    <div class="mt-4 flow">
+      <div class="node">Ventas POS</div><div class="arrow"><i class="fa-solid fa-plus"></i></div><div class="node">Clima</div><div class="arrow"><i class="fa-solid fa-plus"></i></div><div class="node">Calendario</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">DW</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-lav">Modelo IA</div>
+    </div>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-blue"><h3>Pregunta BI</h3><p>¿Qué productos se venden más los lunes lluviosos?</p></div>
+      <div class="card-soft bg-yellow"><h3>Dataset IA</h3><p>Fecha, clima, evento académico, producto, stock, ventas históricas.</p></div>
+      <div class="card-soft bg-pink"><h3>Decisión</h3><p>Ajustar compras, stock, turnos y promociones antes de que ocurra la demanda.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Aplicaciones IA">
+    <span class="kicker"><i class="fa-solid fa-robot"></i> De SQL a IA</span>
+    <h2>¿Cómo se conecta con Inteligencia Artificial?</h2>
+    <p class="lead col-lg-10">El Data Warehouse no entrena modelos por sí solo, pero entrega datos históricos, limpios y explicables para construir variables, entrenar, evaluar y monitorear soluciones de IA.</p>
+    <div class="flow mt-3">
+      <div class="node bg-blue">SQL analítico</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">Features</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-mint">Dataset</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-lav">Modelo IA</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-pink">Monitoreo</div>
+    </div>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-blue"><h3>Features</h3><p>Frecuencia de compra, ticket promedio, antigüedad, estacionalidad, reclamos, última interacción.</p></div>
+      <div class="card-soft bg-yellow"><h3>Cuidados</h3><p>Evitar fuga de información: no usar datos que en la vida real no existirían al momento de predecir.</p></div>
+      <div class="card-soft bg-mint"><h3>Monitoreo</h3><p>Comparar predicciones contra resultados reales y detectar cambios de comportamiento o pérdida de precisión.</p></div>
+    </div>
+    <div class="card-soft mt-4"><h3>Ejemplos de modelos</h3><span class="pill">Predicción de demanda</span><span class="pill">Churn</span><span class="pill">Recomendadores</span><span class="pill">Detección de fraude</span><span class="pill">Segmentación</span></div>
+  </section>
+
+  <section class="slide" data-label="Resumen">
+    <span class="kicker"><i class="fa-solid fa-map"></i> Mapa de estudio</span>
+    <h2>Qué recordar</h2>
+    <div class="grid-3">
+      <div class="card-soft bg-lav"><h3>Conceptos</h3><p>Data Warehouse, OLTP, OLAP, ETL, ELT, Staging, Data Mart, Data Lake, Lakehouse, tabla de hechos y dimensiones.</p></div>
+      <div class="card-soft bg-mint"><h3>Habilidades SQL</h3><p>JOIN, GROUP BY, HAVING, agregaciones, vistas, limpieza de datos, filtros, variables analíticas y consultas reproducibles.</p></div>
+      <div class="card-soft bg-blue"><h3>Criterio analítico</h3><p>Antes de consultar, definir pregunta, granularidad, período, fuente, métrica y regla de negocio.</p></div>
+    </div>
+    <div class="grid-2 mt-4">
+      <div class="card-soft bg-yellow"><h3>Errores comunes</h3><ul class="checklist mb-0"><li>Confundir base transaccional con base analítica.</li><li>No definir el grano de la tabla de hechos.</li><li>Usar datos sin validar calidad, origen o fecha de carga.</li><li>Entrenar IA con variables que producen fuga de información.</li></ul></div>
+      <div class="card-soft bg-peach"><h3>Ruta sugerida</h3><ol class="checklist mb-0"><li>Entender el negocio.</li><li>Identificar fuentes.</li><li>Modelar hechos y dimensiones.</li><li>Consultar con SQL.</li><li>Construir indicadores y variables para IA.</li></ol></div>
+    </div>
+    <div class="card-soft bg-pink mt-4"><p class="lead mb-0"><strong>Idea final:</strong> un Data Warehouse transforma datos operativos en conocimiento analítico; ese conocimiento puede convertirse en decisiones, tableros o modelos de IA.</p></div>
+  </section>
+
+  <section class="slide" data-label="Quiz">
+    <span class="kicker"><i class="fa-solid fa-circle-question"></i> Evaluación rápida</span>
+    <h2>Quiz: 5 preguntas</h2>
+    <div id="quiz" class="grid-2"></div>
+    <button class="btn btn-lg btn-primary mt-4 rounded-pill px-4" onclick="checkQuiz()"><i class="fa-solid fa-check me-2"></i>Corregir quiz</button>
+  </section>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let idx=0;const total=document.getElementById('total'),cur=document.getElementById('current'),label=document.getElementById('sectionLabel'),prog=document.getElementById('progress');total.textContent=slides.length;
+function show(i){idx=(i+slides.length)%slides.length;slides.forEach((s,n)=>{s.classList.toggle('active',n===idx); if(n===idx){s.scrollTop=0;s.classList.remove('animate__animated','animate__fadeIn');void s.offsetWidth;s.classList.add('animate__animated','animate__fadeIn')}});cur.textContent=idx+1;label.textContent=slides[idx].dataset.label||'DATA WAREHOUSE';prog.style.width=((idx+1)/slides.length*100)+'%'}
+document.getElementById('next').onclick=()=>show(idx+1);document.getElementById('prev').onclick=()=>show(idx-1);document.getElementById('home').onclick=()=>show(0);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(idx+1);if(e.key==='ArrowLeft')show(idx-1);if(e.key==='Home')show(0)});show(0);
+const questions=[
+ {q:'¿Cuál es el objetivo principal de un Data Warehouse?',opts:['Registrar transacciones diarias','Integrar datos históricos para análisis','Reemplazar todos los sistemas operativos'],a:1},
+ {q:'¿Qué tipo de sistema se asocia más con consultas analíticas?',opts:['OLTP','OLAP','DNS'],a:1},
+ {q:'En un modelo dimensional, ¿qué contiene una tabla de hechos?',opts:['Eventos medibles como ventas','Solo nombres de clientes','Permisos de usuarios'],a:0},
+ {q:'¿Cuál es una diferencia entre Data Lake y Data Warehouse?',opts:['El Data Lake suele guardar datos crudos y flexibles','El Data Warehouse no usa SQL nunca','El Data Lake solo guarda tablas normalizadas'],a:0},
+ {q:'¿Por qué la calidad de datos es importante para IA?',opts:['Porque los modelos dependen de datos confiables','Porque evita usar SQL','Porque elimina la necesidad de entrenar modelos'],a:0}
+];
+const quiz=document.getElementById('quiz');questions.forEach((qq,i)=>{const card=document.createElement('div');card.className='card-soft bg-blue';card.innerHTML=`<h3>${i+1}. ${qq.q}</h3>`+qq.opts.map((o,j)=>`<label class="d-block mt-2 p-3 rounded-4 bg-white quiz-option"><input type="radio" name="q${i}" value="${j}" class="me-2"> ${o}</label>`).join('');quiz.appendChild(card)});
+function checkQuiz(){let ok=0;questions.forEach((qq,i)=>{const chosen=document.querySelector(`input[name=q${i}]:checked`);if(chosen&&Number(chosen.value)===qq.a)ok++});Swal.fire({title:`Resultado: ${ok}/5`,text: ok===5?'¡Excelente! Dominás los conceptos principales.': ok>=3?'Muy bien. Repasá las preguntas fallidas para consolidar.':'Conviene repasar OLTP/OLAP, modelo dimensional y DW vs Data Lake.',icon: ok>=3?'success':'info',confirmButtonText:'Continuar',confirmButtonColor:'#55c7df',background:'#fffdf9',color:'#22304a'});}
+</script>
+</body>
+</html>

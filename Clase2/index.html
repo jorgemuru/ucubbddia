@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SQL para Analistas de Ciencia de Datos e IA | Modelado de Datos</title>
+  <title>SQL para Analistas de Ciencia de Datos e IA | Modelado, SQL y BBDD Relacionales</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
@@ -12,27 +12,29 @@
     :root{
       --bg:#fbf7f4; --ink:#273043; --muted:#6b7280; --blue:#a7d8f2; --lav:#d9ccff;
       --mint:#cdeedd; --peach:#ffd8c7; --yellow:#fff0b8; --rose:#ffd6e7; --line:#e8dfd8;
-      --accent:#70b7d8; --dark:#23324a;
+      --accent:#70b7d8; --dark:#23324a; --ok:#9ee6bd; --warn:#ffd6a5;
     }
     *{box-sizing:border-box}
+    html,body{min-height:100%;}
     body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(135deg,var(--bg),#f6fbff); color:var(--ink); overflow-x:hidden; overflow-y:auto;}
     .deck{min-height:100vh; width:100%; position:relative; overflow:visible;}
-    .slide{display:none; min-height:100vh; padding:54px 7vw 120px; position:relative; overflow:visible;}
+    .slide{display:none; min-height:100vh; padding:54px 7vw 126px; position:relative; overflow:visible;}
     .slide.active{display:block;}
     .brand{position:absolute; top:24px; right:34px; color:#17466f; font-weight:800; letter-spacing:.08em; opacity:.75}
     .progress-wrap{position:fixed; left:0; right:0; bottom:0; height:9px; background:#f1e7df; z-index:20;}
     .progress-barx{height:9px; width:0; background:linear-gradient(90deg,var(--accent),var(--lav),var(--mint)); transition:width .35s ease;}
     .navbtn{position:fixed; bottom:24px; border:0; border-radius:999px; width:48px; height:48px; background:white; box-shadow:0 12px 28px #0001; color:var(--dark); z-index:30}
-    .prev{right:92px}.next{right:32px}.home{left:32px}
+    .navbtn:disabled{opacity:.45}
+    .prev{right:92px}.next{right:32px}.home{left:32px}.list{left:150px}
     .counter{position:fixed; bottom:36px; left:92px; color:var(--muted); font-weight:700; z-index:30;}
     h1{font-size:clamp(2.7rem,6vw,5.7rem); line-height:.95; font-weight:900; letter-spacing:-.05em;}
     h2{font-size:clamp(2.1rem,4vw,4rem); font-weight:900; letter-spacing:-.04em; margin-bottom:20px;}
     h3{font-weight:850; letter-spacing:-.025em;}
-    p,li{font-size:clamp(1rem,1.55vw,1.35rem); line-height:1.45;}
+    p,li{font-size:clamp(1rem,1.48vw,1.25rem); line-height:1.45;}
     .kicker{display:inline-flex; gap:10px; align-items:center; padding:8px 14px; border-radius:999px; background:white; box-shadow:0 10px 24px #00000012; color:#48637f; font-weight:800; margin-bottom:18px;}
     .hero-card{background:rgba(255,255,255,.78); border:1px solid #fff; border-radius:32px; box-shadow:0 24px 60px #00000012; padding:36px; backdrop-filter:blur(8px);}
     .pastel{border-radius:26px; padding:26px; box-shadow:0 18px 42px #00000010; border:1px solid #fff;}
-    .b-blue{background:var(--blue)}.b-mint{background:var(--mint)}.b-lav{background:var(--lav)}.b-peach{background:var(--peach)}.b-yellow{background:var(--yellow)}.b-rose{background:var(--rose)}
+    .b-blue{background:var(--blue)}.b-mint{background:var(--mint)}.b-lav{background:var(--lav)}.b-peach{background:var(--peach)}.b-yellow{background:var(--yellow)}.b-rose{background:var(--rose)}.b-ok{background:var(--ok)}.b-warn{background:var(--warn)}
     .icon-big{font-size:4rem; color:#244b6a; opacity:.8}
     .pill{display:inline-block; padding:8px 14px; background:white; border-radius:999px; font-weight:800; color:#43516a; margin:4px;}
     .timeline{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:20px;}
@@ -46,55 +48,54 @@
     .er-oval{border:3px solid #273043; background:white; border-radius:50%; padding:13px 22px; display:inline-block; font-weight:700;}
     .er-diamond{width:120px; height:120px; background:white; border:3px solid #273043; transform:rotate(45deg); display:flex; align-items:center; justify-content:center; margin:auto;}
     .er-diamond span{transform:rotate(-45deg); font-weight:900;}
-    .sqlbox{background:#243044; color:#f9fafb; border-radius:24px; padding:24px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:1.06rem; box-shadow:0 22px 55px #0002;}
-    .keyword{color:#ffd6a5}.tablex{color:#caffbf}.field{color:#9bf6ff}.comment{color:#bdb2ff}
+    .sqlbox{background:#243044; color:#f9fafb; border-radius:24px; padding:24px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:1.02rem; box-shadow:0 22px 55px #0002; overflow:auto; white-space:pre;}
+    .keyword{color:#ffd6a5}.tablex{color:#caffbf}.field{color:#9bf6ff}.comment{color:#bdb2ff}.str{color:#fdffb6}
     .quiz-option{cursor:pointer; background:white; border:2px solid transparent; border-radius:18px; padding:14px 18px; margin:10px 0; transition:.2s; font-weight:700; box-shadow:0 10px 22px #0000000d;}
     .quiz-option:hover{transform:translateY(-2px); border-color:#9ed2ed;}
-    .decor{position:absolute; border-radius:999px; opacity:.35; filter:blur(.2px)}
+    .quiz-option.selected{border-color:#25324a; background:#f8fbff;}
+    .quiz-option.correct{border-color:#2fb36e; background:#e9fff3;}
+    .quiz-option.wrong{border-color:#dc3545; background:#fff0f2;}
+    .decor{position:absolute; border-radius:999px; opacity:.35; filter:blur(.2px); pointer-events:none;}
     .d1{width:220px;height:220px;background:var(--lav);right:-60px;top:90px}.d2{width:170px;height:170px;background:var(--mint);left:-50px;bottom:130px}.d3{width:90px;height:90px;background:var(--peach);right:180px;bottom:70px}
     .badge-ai{background:#25324a;color:white;border-radius:18px;padding:8px 12px;font-weight:900;display:inline-flex;gap:8px;align-items:center}
     .table-pastel{background:white; border-radius:22px; overflow:auto; box-shadow:0 16px 36px #0001; max-width:100%;}
     .table-pastel th{background:#e7f5fb!important; color:#26384f;}
-    .table-pastel td,.table-pastel th{font-size:1.05rem; padding:14px!important;}
+    .table-pastel td,.table-pastel th{font-size:1.02rem; padding:13px!important; vertical-align:middle;}
+    .rel-line{height:4px; background:#273043; flex:1; min-width:50px; border-radius:99px; position:relative;}
+    .rel-label{font-weight:900; background:white; border-radius:999px; padding:6px 12px; box-shadow:0 8px 18px #0001;}
+    .smallcode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace; background:#fff; padding:.2rem .45rem; border-radius:.45rem; font-size:.95rem;}
 
     @media(max-height:820px){
       .slide{padding-top:38px; padding-bottom:118px;}
-      h1{font-size:clamp(2.3rem,5vw,4.6rem)}
-      h2{font-size:clamp(1.9rem,3.4vw,3.3rem); margin-bottom:14px;}
-      p,li{font-size:clamp(.95rem,1.3vw,1.12rem)}
-      .pastel{padding:22px;}
-      .timeline{gap:16px;}
-      .step{min-height:180px;}
-      .icon-big{font-size:3.1rem;}
-      .table-pastel td,.table-pastel th{font-size:.96rem; padding:11px!important;}
+      h1{font-size:clamp(2.3rem,5vw,4.6rem)} h2{font-size:clamp(1.9rem,3.4vw,3.3rem); margin-bottom:14px;}
+      p,li{font-size:clamp(.95rem,1.3vw,1.12rem)} .pastel{padding:22px;} .timeline{gap:16px;} .step{min-height:180px;} .icon-big{font-size:3.1rem;}
+      .table-pastel td,.table-pastel th{font-size:.96rem; padding:11px!important;} .sqlbox{font-size:.92rem;}
     }
-    @media(max-width:1200px){
-      .slide{padding-left:5vw; padding-right:5vw;}
-      .table-pastel{margin-bottom:28px;}
-    }
-    @media(max-width:900px){.slide{padding:38px 5vw 110px}.timeline{grid-template-columns:1fr}.flow{justify-content:flex-start}.brand{display:none}h1{font-size:clamp(2.2rem,12vw,4rem)}h2{font-size:clamp(1.9rem,10vw,3.2rem)}.pastel{padding:20px}.table-pastel{overflow-x:auto}.table-pastel table{min-width:620px}}
+    @media(max-width:1200px){.slide{padding-left:5vw; padding-right:5vw;} .table-pastel{margin-bottom:28px;}}
+    @media(max-width:900px){.slide{padding:38px 5vw 110px}.timeline{grid-template-columns:1fr}.flow{justify-content:flex-start}.brand{display:none}h1{font-size:clamp(2.2rem,12vw,4rem)}h2{font-size:clamp(1.9rem,10vw,3.2rem)}.pastel{padding:20px}.table-pastel{overflow-x:auto}.table-pastel table{min-width:680px}.list{display:none}.counter{left:92px}.node{min-width:130px}.rel-line{display:none}}
   </style>
 </head>
 <body>
 <div class="deck">
   <button class="navbtn home" onclick="goTo(0)" title="Inicio"><i class="fa-solid fa-house"></i></button>
-  <button class="navbtn prev" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i></button>
-  <button class="navbtn next" onclick="nextSlide()"><i class="fa-solid fa-arrow-right"></i></button>
+  <button class="navbtn list" onclick="openMenu()" title="Índice"><i class="fa-solid fa-list"></i></button>
+  <button class="navbtn prev" id="prevBtn" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="navbtn next" id="nextBtn" onclick="nextSlide()"><i class="fa-solid fa-arrow-right"></i></button>
   <div class="counter" id="counter"></div><div class="progress-wrap"><div class="progress-barx" id="progress"></div></div>
 
-  <section class="slide active">
+  <section class="slide active" data-title="Inicio">
     <div class="decor d1"></div><div class="decor d2"></div><div class="decor d3"></div><div class="brand">UCU · BBDD + IA</div>
     <div class="row h-100 align-items-center">
       <div class="col-lg-8">
         <span class="kicker animate__animated animate__fadeInDown"><i class="fa-solid fa-database"></i> SQL para Analistas de Ciencia de Datos e IA</span>
-        <h1 class="animate__animated animate__fadeInUp">Modelando la realidad para convertirla en datos</h1>
-        <p class="lead mt-4 animate__animated animate__fadeInUp animate__delay-1s">De los requerimientos al Modelo Entidad–Relación: cómo diseñar bases de datos que luego puedan ser consultadas, analizadas y usadas por modelos de IA.</p>
-        <button class="btn btn-dark btn-lg rounded-pill mt-3" onclick="Swal.fire('Objetivo', 'Comprender cómo el análisis, el diseño conceptual y el MER ayudan a transformar una realidad en datos confiables para SQL, Ciencia de Datos e IA.', 'info')"><i class="fa-solid fa-bullseye me-2"></i>Ver objetivo</button>
+        <h1 class="animate__animated animate__fadeInUp">Del modelo de datos a SQL útil para IA</h1>
+        <p class="lead mt-4 animate__animated animate__fadeInUp animate__delay-1s">Modelado conceptual, bases de datos relacionales, ACID, integridad, MySQL y operaciones CRUD como base para construir datasets confiables.</p>
+        <button class="btn btn-dark btn-lg rounded-pill mt-3" onclick="Swal.fire('Objetivo', 'Comprender cómo pasar de una realidad analizada a un modelo relacional implementable en un DBMS, usando SQL para consultar y preparar datos para Ciencia de Datos e IA.', 'info')"><i class="fa-solid fa-bullseye me-2"></i>Ver objetivo</button>
       </div>
     </div>
   </section>
 
-  <section class="slide"><div class="brand">Semana 2 · Unidad 2</div>
+  <section class="slide" data-title="Punto de partida"><div class="brand">Semana 2 · Unidad 2</div>
     <span class="kicker"><i class="fa-solid fa-route"></i> Punto de partida</span><h2>¿Dónde estamos en el proceso?</h2>
     <div class="row g-4 align-items-stretch">
       <div class="col-md-6"><div class="pastel b-blue h-100"><i class="fa-solid fa-people-group icon-big"></i><h3 class="mt-3">Metodologías de desarrollo</h3><p>Organizan equipos, tareas y entregables. Pueden ser tradicionales —cascada, prototipado, espiral, incremental— o ágiles —Scrum, Kanban, XP—.</p></div></div>
@@ -103,7 +104,7 @@
     <div class="flow"><div class="node">Planificación</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Análisis</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Diseño</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Implementación SQL</div></div>
   </section>
 
-  <section class="slide"><div class="brand">Dato · Información · Base de Datos</div>
+  <section class="slide" data-title="Conceptos base"><div class="brand">Dato · Información · Base de Datos</div>
     <span class="kicker"><i class="fa-solid fa-layer-group"></i> Conceptos base</span><h2>Del mundo real a una base consultable</h2>
     <div class="timeline">
       <div class="pastel b-yellow step"><span class="num">1</span><i class="fa-solid fa-cubes icon-big"></i><h3>Datos</h3><p>Valores simples: importe, fecha, edad, peso, categoría, resultado.</p></div>
@@ -113,7 +114,7 @@
     <p class="mt-4"><span class="badge-ai"><i class="fa-solid fa-robot"></i> En IA</span> un modelo aprende de datos históricos; si los datos están mal modelados, las consultas, métricas y predicciones también se degradan.</p>
   </section>
 
-  <section class="slide"><div class="brand">Análisis y diseño</div>
+  <section class="slide" data-title="Análisis y diseño"><div class="brand">Análisis y diseño</div>
     <span class="kicker"><i class="fa-solid fa-ear-listen"></i> Modelando la realidad</span><h2>Análisis vs. Diseño</h2>
     <div class="row g-4">
       <div class="col-md-6"><div class="pastel b-rose h-100"><h3><i class="fa-solid fa-question me-2"></i>Análisis</h3><p>Busca entender qué se necesita. Es el momento de escuchar, observar, entrevistar, relevar documentos, hacer preguntas y detectar reglas del negocio.</p><span class="pill">¿Qué problema resolvemos?</span><span class="pill">¿Qué datos importan?</span></div></div>
@@ -122,14 +123,14 @@
     <button class="btn btn-outline-dark rounded-pill mt-4" onclick="Swal.fire('Clave para IA', 'Un buen análisis evita datasets incompletos, entidades mezcladas, atributos ambiguos y relaciones que luego dificultan consultas SQL o entrenamiento de modelos.', 'success')"><i class="fa-solid fa-lightbulb me-2"></i>Conexión con IA</button>
   </section>
 
-  <section class="slide"><div class="brand">Proceso de modelado</div>
+  <section class="slide" data-title="Proceso de modelado"><div class="brand">Proceso de modelado</div>
     <span class="kicker"><i class="fa-solid fa-repeat"></i> Refinamiento iterativo</span><h2>De la realidad al modelo de datos</h2>
     <p>El modelado es un proceso iterativo que busca un modelo completo, correcto, mínimo, expresivo, legible, autoexplicativo, extensible y normalizado.</p>
     <div class="flow mt-5"><div class="node b-peach">Contexto real<br><span class="mini">personas, procesos, reglas</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-mint">Diseño conceptual<br><span class="mini">MER</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-blue">Diseño lógico<br><span class="mini">tablas y claves</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-lav">Diseño físico<br><span class="mini">DBMS, índices, tipos</span></div></div>
     <div class="pastel b-yellow mt-5"><strong>Para analistas de datos:</strong> este camino define qué columnas existirán, cómo se unen las tablas y qué calidad tendrá el dataset que luego se analiza con SQL o IA.</div>
   </section>
 
-  <section class="slide"><div class="brand">Diseño conceptual</div>
+  <section class="slide" data-title="Diseño conceptual"><div class="brand">Diseño conceptual</div>
     <span class="kicker"><i class="fa-solid fa-diagram-project"></i> Modelo Entidad–Relación</span><h2>MER: el mapa conceptual de los datos</h2>
     <div class="row g-4 align-items-center">
       <div class="col-lg-5"><p>El diseño conceptual se concentra en <strong>qué información se necesita</strong> y <strong>cómo se relaciona</strong>, sin preocuparse todavía por el DBMS o la implementación.</p><p>Su resultado principal es el <strong>Modelo Entidad–Relación</strong>.</p></div>
@@ -137,7 +138,7 @@
     </div>
   </section>
 
-  <section class="slide"><div class="brand">Elementos MER</div>
+  <section class="slide" data-title="Elementos MER"><div class="brand">Elementos MER</div>
     <span class="kicker"><i class="fa-solid fa-shapes"></i> Elementos fundamentales</span><h2>Entidades, atributos, relaciones y cardinalidad</h2>
     <div class="row g-4">
       <div class="col-md-3"><div class="pastel b-blue h-100"><h3>Entidad</h3><p>Objeto o concepto distinguible: Persona, Cliente, Venta, Producto.</p></div></div>
@@ -148,61 +149,192 @@
     <div class="mt-4 table-pastel"><table class="table mb-0"><thead><tr><th>Tipo</th><th>Lectura</th><th>Ejemplo en datos</th></tr></thead><tbody><tr><td>1:1</td><td>Uno con uno</td><td>Persona — Documento único</td></tr><tr><td>1:N</td><td>Uno con varios</td><td>Cliente — Ventas</td></tr><tr><td>N:N</td><td>Varios con varios</td><td>Alumno — Curso</td></tr></tbody></table></div>
   </section>
 
-  <section class="slide"><div class="brand">MER avanzado</div>
-    <span class="kicker"><i class="fa-solid fa-sitemap"></i> Generalización / Especialización</span><h2>Cuando una entidad tiene subtipos</h2>
-    <div class="row g-4 align-items-center">
-      <div class="col-lg-6"><div class="pastel b-rose"><h3>Ejemplo conceptual</h3><p><strong>Funcionario</strong> puede especializarse en <strong>Médico</strong>, <strong>Enfermero</strong> o <strong>Administrativo</strong>. Todos comparten datos generales, pero cada subtipo puede tener atributos propios.</p><button class="btn btn-dark rounded-pill" onclick="Swal.fire('Ejemplo IA', 'En un hospital, todos los funcionarios pueden participar en análisis de turnos, pero solo los médicos tendrían especialidad clínica como atributo relevante para ciertos modelos predictivos.', 'info')">Ver ejemplo IA</button></div></div>
-      <div class="col-lg-6"><div class="pastel b-blue text-center"><div class="er-box">FUNCIONARIO</div><div style="font-size:3rem">△</div><div class="d-flex gap-3 justify-content-center flex-wrap"><div class="er-box">MÉDICO</div><div class="er-box">ENFERMERO</div><div class="er-box">ADMIN.</div></div></div></div>
+  <section class="slide" data-title="Bases relacionales"><div class="brand">Bases de datos relacionales</div>
+    <span class="kicker"><i class="fa-solid fa-table"></i> Modelo relacional</span><h2>Bases de datos relacionales</h2>
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-5"><div class="pastel b-blue h-100"><h3>Idea principal</h3><p>La información se organiza en <strong>tablas</strong>. Cada tabla representa una entidad o relación importante del contexto.</p><p>Las filas son registros; las columnas son atributos; las claves permiten identificar registros y relacionar tablas.</p></div></div>
+      <div class="col-lg-7"><div class="pastel b-mint h-100"><h3>Ejemplo claro: clientes y ventas</h3><div class="d-flex align-items-center gap-3 flex-wrap justify-content-center mt-4"><div class="er-box">CLIENTE</div><div class="rel-label">1</div><div class="rel-line"></div><div class="rel-label">N</div><div class="er-box">VENTA</div></div><p class="mt-4 mb-0">Lectura: un cliente puede realizar muchas ventas, pero cada venta pertenece a un único cliente.</p></div></div>
     </div>
   </section>
 
-  <section class="slide"><div class="brand">Caso real</div>
+  <section class="slide" data-title="Ejemplo relacional"><div class="brand">Tablas relacionadas</div>
+    <span class="kicker"><i class="fa-solid fa-link"></i> Ejemplo con dos tablas</span><h2>Dos tablas relacionadas entre sí</h2>
+    <div class="row g-4">
+      <div class="col-lg-6"><div class="table-pastel"><table class="table mb-0"><thead><tr><th colspan="4">CLIENTE</th></tr><tr><th>id_cliente</th><th>nombre</th><th>edad</th><th>preferencia</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>Ana</td><td>21</td><td>Vegetariano</td></tr><tr><td><strong>2</strong></td><td>Bruno</td><td>24</td><td>Café</td></tr><tr><td><strong>3</strong></td><td>Carla</td><td>20</td><td>Sin gluten</td></tr></tbody></table></div></div>
+      <div class="col-lg-6"><div class="table-pastel"><table class="table mb-0"><thead><tr><th colspan="5">VENTA</th></tr><tr><th>id_venta</th><th>fecha</th><th>importe</th><th>medio_pago</th><th>id_cliente</th></tr></thead><tbody><tr><td>101</td><td>2026-04-10</td><td>180</td><td>Débito</td><td><strong>1</strong></td></tr><tr><td>102</td><td>2026-04-10</td><td>95</td><td>Efectivo</td><td><strong>2</strong></td></tr><tr><td>103</td><td>2026-04-11</td><td>210</td><td>Débito</td><td><strong>1</strong></td></tr></tbody></table></div></div>
+    </div>
+    <div class="pastel b-yellow mt-4"><strong>Clave:</strong> <span class="smallcode">VENTA.id_cliente</span> referencia a <span class="smallcode">CLIENTE.id_cliente</span>. Gracias a esa relación, SQL puede unir datos personales y comportamiento de compra.</div>
+  </section>
+
+  <section class="slide" data-title="PK, FK e integridad"><div class="brand">Integridad de datos</div>
+    <span class="kicker"><i class="fa-solid fa-shield-halved"></i> Reglas de integridad</span><h2>PK, FK y reglas que protegen los datos</h2>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="pastel b-ok h-100"><h3>PK · Primary Key</h3><p>Identifica de forma única cada fila de una tabla. No debe repetirse y no debería ser nula.</p><span class="pill">cliente.id_cliente</span></div></div>
+      <div class="col-md-4"><div class="pastel b-blue h-100"><h3>FK · Foreign Key</h3><p>Permite relacionar una tabla con otra, asegurando que el valor exista en la tabla referenciada.</p><span class="pill">venta.id_cliente</span></div></div>
+      <div class="col-md-4"><div class="pastel b-peach h-100"><h3>Constraints</h3><p>Reglas como <strong>NOT NULL</strong>, <strong>UNIQUE</strong>, <strong>CHECK</strong> y <strong>DEFAULT</strong> reducen errores en los datos.</p></div></div>
+    </div>
+    <button class="btn btn-dark rounded-pill mt-4" onclick="Swal.fire('Relación con IA', 'Si una venta queda asociada a un cliente inexistente, los reportes y datasets para IA pierden trazabilidad. La integridad referencial evita este tipo de inconsistencias.', 'info')"><i class="fa-solid fa-robot me-2"></i>Impacto en IA</button>
+  </section>
+
+  <section class="slide" data-title="Normalización"><div class="brand">Tablas, relaciones y normalización</div>
+    <span class="kicker"><i class="fa-solid fa-broom"></i> Diseño lógico</span><h2>Normalización: evitar redundancia y anomalías</h2>
+    <div class="row g-4">
+      <div class="col-lg-5"><div class="pastel b-rose h-100"><h3>¿Para qué sirve?</h3><p>La normalización organiza los datos en tablas relacionadas para evitar duplicación innecesaria, inconsistencias y problemas al insertar, actualizar o borrar registros.</p><p class="mb-0"><strong>Idea didáctica:</strong> cada dato debe vivir en el lugar correcto.</p></div></div>
+      <div class="col-lg-7"><div class="table-pastel"><table class="table mb-0"><thead><tr><th>Forma</th><th>Objetivo inicial</th><th>Ejemplo simple</th></tr></thead><tbody><tr><td>1FN</td><td>Valores atómicos, sin listas en una celda.</td><td>No guardar “café, té, agua” en una sola columna.</td></tr><tr><td>2FN</td><td>Evitar dependencias parciales en claves compuestas.</td><td>Separar datos del producto del detalle de venta.</td></tr><tr><td>3FN</td><td>Evitar dependencias transitivas.</td><td>No repetir datos de localidad dentro de cada cliente si hay tabla Localidad.</td></tr></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="ACID y transacciones"><div class="brand">ACID · Transacciones</div>
+    <span class="kicker"><i class="fa-solid fa-lock"></i> Confiabilidad</span><h2>ACID y transacciones</h2>
+    <p>Una <strong>transacción</strong> es un conjunto de operaciones que debe ejecutarse como una unidad lógica. En una venta, por ejemplo, registrar la venta y actualizar el stock deberían confirmarse juntos.</p>
+    <div class="row g-4">
+      <div class="col-md-3"><div class="pastel b-blue h-100"><h3>A</h3><p><strong>Atomicidad:</strong> todo se realiza o nada se realiza.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-mint h-100"><h3>C</h3><p><strong>Consistencia:</strong> los datos pasan de un estado válido a otro válido.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-yellow h-100"><h3>I</h3><p><strong>Aislamiento:</strong> transacciones simultáneas no deberían interferir incorrectamente.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-lav h-100"><h3>D</h3><p><strong>Durabilidad:</strong> al confirmar, los cambios persisten.</p></div></div>
+    </div>
+    <div class="sqlbox mt-4"><span class="keyword">START TRANSACTION</span>;
+<span class="keyword">INSERT INTO</span> <span class="tablex">venta</span>(id_cliente, fecha, importe) <span class="keyword">VALUES</span> (1, CURRENT_DATE, 180);
+<span class="keyword">UPDATE</span> <span class="tablex">producto</span> <span class="keyword">SET</span> stock = stock - 1 <span class="keyword">WHERE</span> id_producto = 10;
+<span class="keyword">COMMIT</span>; <span class="comment">-- o ROLLBACK si ocurre un error</span></div>
+  </section>
+
+  <section class="slide" data-title="DBMS MySQL"><div class="brand">DBMS · MySQL</div>
+    <span class="kicker"><i class="fa-solid fa-server"></i> Motor de base de datos</span><h2>DBMS: el caso de MySQL</h2>
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-6"><div class="pastel b-blue h-100"><h3>¿Qué hace un DBMS?</h3><ul><li>Almacena y administra datos.</li><li>Controla usuarios, permisos y seguridad.</li><li>Ejecuta consultas SQL.</li><li>Mantiene integridad y transacciones.</li><li>Gestiona índices, respaldos y concurrencia.</li></ul></div></div>
+      <div class="col-lg-6"><div class="pastel b-yellow h-100"><h3>MySQL</h3><p>Es un DBMS relacional ampliamente usado en aplicaciones web, sistemas académicos, comercio electrónico y análisis inicial de datos.</p><p>Para el curso, permite practicar diseño físico, creación de tablas, claves, restricciones y consultas CRUD.</p><button class="btn btn-dark rounded-pill" onclick="Swal.fire('MySQL + IA', 'MySQL puede ser la fuente transaccional desde la cual se extraen datos para análisis, dashboards o modelos de IA. En proyectos grandes, esos datos suelen integrarse luego a un Data Warehouse o Data Lake.', 'info')">Uso en IA</button></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="SQL y CRUD"><div class="brand">SQL · Conceptos básicos</div>
+    <span class="kicker"><i class="fa-solid fa-code"></i> CRUD</span><h2>SQL básico: crear, leer, actualizar y borrar datos</h2>
+    <div class="row g-4">
+      <div class="col-md-6"><div class="pastel b-mint h-100"><h3>DDL</h3><p>Define estructura: bases, tablas, restricciones, vistas e índices.</p><div class="sqlbox"><span class="keyword">CREATE TABLE</span> <span class="tablex">cliente</span> (
+  <span class="field">id_cliente</span> INT <span class="keyword">PRIMARY KEY</span>,
+  <span class="field">nombre</span> VARCHAR(80) <span class="keyword">NOT NULL</span>
+);</div></div></div>
+      <div class="col-md-6"><div class="pastel b-peach h-100"><h3>DML / CRUD</h3><p>Manipula datos: <strong>INSERT</strong>, <strong>SELECT</strong>, <strong>UPDATE</strong>, <strong>DELETE</strong>.</p><div class="sqlbox"><span class="keyword">INSERT INTO</span> <span class="tablex">cliente</span> <span class="keyword">VALUES</span> (1, <span class="str">'Ana'</span>);
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="tablex">cliente</span>;
+<span class="keyword">UPDATE</span> <span class="tablex">cliente</span> <span class="keyword">SET</span> nombre=<span class="str">'Ana G.'</span> <span class="keyword">WHERE</span> id_cliente=1;
+<span class="keyword">DELETE FROM</span> <span class="tablex">cliente</span> <span class="keyword">WHERE</span> id_cliente=1;</div></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="JOIN y dataset"><div class="brand">SQL para datasets</div>
+    <span class="kicker"><i class="fa-solid fa-magnifying-glass-chart"></i> Consulta analítica</span><h2>De tablas relacionales a un dataset para IA</h2>
+    <p>El valor analítico aparece cuando combinamos tablas con <strong>JOIN</strong>, filtramos, agrupamos y calculamos variables.</p>
+    <div class="sqlbox"><span class="comment">-- Total comprado por cliente: posible variable para segmentación o recomendación</span>
+<span class="keyword">SELECT</span> c.id_cliente, c.nombre, c.preferencia,
+       COUNT(v.id_venta) AS cantidad_compras,
+       SUM(v.importe) AS total_gastado
+<span class="keyword">FROM</span> <span class="tablex">cliente</span> c
+<span class="keyword">LEFT JOIN</span> <span class="tablex">venta</span> v ON v.id_cliente = c.id_cliente
+<span class="keyword">GROUP BY</span> c.id_cliente, c.nombre, c.preferencia;</div>
+    <div class="pastel b-yellow mt-4"><strong>Resultado esperado:</strong> una tabla preparada para análisis, donde cada fila representa un cliente y las columnas resumen su comportamiento.</div>
+  </section>
+
+  <section class="slide" data-title="Caso real"><div class="brand">Caso real</div>
     <span class="kicker"><i class="fa-solid fa-store"></i> Ejemplo de la vida real</span><h2>Cantina universitaria + IA</h2>
     <div class="row g-4">
       <div class="col-lg-6"><div class="pastel b-mint h-100"><h3>Contexto</h3><p>La cantina desea registrar clientes, preferencias de alimentos y bebidas, ventas, fecha/hora, producto, cantidad, importe total y medio de pago.</p><p><strong>Objetivo analítico:</strong> predecir demanda diaria y recomendar productos según historial y preferencias.</p></div></div>
-      <div class="col-lg-6"><div class="pastel b-yellow h-100"><h3>Posible MER inicial</h3><p><span class="pill">Cliente</span><span class="pill">Producto</span><span class="pill">Venta</span><span class="pill">DetalleVenta</span><span class="pill">Preferencia</span><span class="pill">MedioPago</span></p><p>La relación Cliente–Venta permite analizar comportamiento. Producto–DetalleVenta permite calcular demanda, ticket promedio y patrones de consumo.</p></div></div>
+      <div class="col-lg-6"><div class="pastel b-yellow h-100"><h3>Posible modelo inicial</h3><p><span class="pill">Cliente</span><span class="pill">Producto</span><span class="pill">Venta</span><span class="pill">DetalleVenta</span><span class="pill">Preferencia</span><span class="pill">MedioPago</span></p><p>La relación Cliente–Venta permite analizar comportamiento. Producto–DetalleVenta permite calcular demanda, ticket promedio y patrones de consumo.</p></div></div>
     </div>
-    <div class="sqlbox mt-4"><span class="comment">-- Pregunta analítica: productos más vendidos por franja horaria</span><br><span class="keyword">SELECT</span> <span class="field">p.nombre</span>, EXTRACT(HOUR FROM <span class="field">v.fecha_hora</span>) AS hora, SUM(<span class="field">dv.cantidad</span>) AS unidades<br><span class="keyword">FROM</span> <span class="tablex">venta</span> v JOIN <span class="tablex">detalle_venta</span> dv ON dv.id_venta = v.id<br>JOIN <span class="tablex">producto</span> p ON p.id = dv.id_producto<br><span class="keyword">GROUP BY</span> p.nombre, hora;</div>
+    <div class="sqlbox mt-4"><span class="comment">-- Productos más vendidos por franja horaria</span>
+<span class="keyword">SELECT</span> p.nombre, HOUR(v.fecha_hora) AS hora, SUM(dv.cantidad) AS unidades
+<span class="keyword">FROM</span> <span class="tablex">venta</span> v
+<span class="keyword">JOIN</span> <span class="tablex">detalle_venta</span> dv ON dv.id_venta = v.id_venta
+<span class="keyword">JOIN</span> <span class="tablex">producto</span> p ON p.id_producto = dv.id_producto
+<span class="keyword">GROUP BY</span> p.nombre, HOUR(v.fecha_hora);</div>
   </section>
 
-  <section class="slide"><div class="brand">Datos para IA</div>
-    <span class="kicker"><i class="fa-solid fa-robot"></i> Del MER al dataset</span><h2>¿Cómo ayuda SQL a la IA?</h2>
+  <section class="slide" data-title="Datos para IA"><div class="brand">Datos para IA</div>
+    <span class="kicker"><i class="fa-solid fa-robot"></i> Del modelo al dataset</span><h2>¿Cómo ayuda SQL a la IA?</h2>
     <div class="flow"><div class="node b-blue">Modelo de datos<br><span class="mini">entidades y relaciones</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-mint">Consultas SQL<br><span class="mini">joins, filtros, agregaciones</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-yellow">Dataset<br><span class="mini">variables limpias</span></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-lav">Modelo IA<br><span class="mini">predicción o clasificación</span></div></div>
     <div class="row g-4 mt-4"><div class="col-md-4"><div class="pastel b-peach"><h3>Calidad</h3><p>Tipos, dominios y reglas evitan valores inconsistentes.</p></div></div><div class="col-md-4"><div class="pastel b-rose"><h3>Trazabilidad</h3><p>Las relaciones permiten explicar de dónde sale cada variable.</p></div></div><div class="col-md-4"><div class="pastel b-blue"><h3>Escalabilidad</h3><p>Un diseño claro facilita nuevas preguntas y nuevos modelos.</p></div></div></div>
   </section>
 
-  <section class="slide"><div class="brand">Actividad</div>
-    <span class="kicker"><i class="fa-solid fa-pen-nib"></i> Actividad rápida</span><h2>Mini desafío: MER para Ciencia de Datos</h2>
-    <div class="hero-card"><p>Diseñar un MER inicial para un sistema que permita analizar y predecir la <strong>deserción estudiantil</strong>.</p><div class="row g-3 mt-2"><div class="col-md-3"><span class="pill">Estudiante</span></div><div class="col-md-3"><span class="pill">Curso</span></div><div class="col-md-3"><span class="pill">Inscripción</span></div><div class="col-md-3"><span class="pill">Evaluación</span></div></div><hr><p class="mb-0"><strong>Preguntas guía:</strong> ¿qué atributos serían útiles? ¿Qué relaciones permiten calcular asistencia, rendimiento, avance y riesgo?</p></div>
-    <button class="btn btn-dark btn-lg rounded-pill mt-4" onclick="Swal.fire('Pista', 'Pensá en atributos como fecha de ingreso, carrera, asistencia, calificaciones, cantidad de créditos aprobados, recursadas y estado de inscripción. Luego preguntate qué tabla permitiría construir cada variable.', 'question')"><i class="fa-solid fa-hint me-2"></i>Ver pista</button>
+  <section class="slide" data-title="Actividad"><div class="brand">Actividad</div>
+    <span class="kicker"><i class="fa-solid fa-pen-nib"></i> Actividad rápida</span><h2>Mini desafío: MER + SQL para Ciencia de Datos</h2>
+    <div class="hero-card"><p>Diseñar un MER inicial y proponer dos tablas relacionales para un sistema que permita analizar y predecir la <strong>deserción estudiantil</strong>.</p><div class="row g-3 mt-2"><div class="col-md-3"><span class="pill">Estudiante</span></div><div class="col-md-3"><span class="pill">Curso</span></div><div class="col-md-3"><span class="pill">Inscripción</span></div><div class="col-md-3"><span class="pill">Evaluación</span></div></div><hr><p class="mb-0"><strong>Preguntas guía:</strong> ¿qué atributos serían útiles? ¿Qué PK y FK usarías? ¿Qué consulta SQL permitiría construir variables como asistencia, rendimiento o riesgo?</p></div>
+    <button class="btn btn-dark btn-lg rounded-pill mt-4" onclick="Swal.fire('Pista', 'Pensá en atributos como fecha de ingreso, carrera, asistencia, calificaciones, créditos aprobados, recursadas y estado de inscripción. Luego preguntate qué tabla permitiría construir cada variable.', 'question')"><i class="fa-solid fa-lightbulb me-2"></i>Ver pista</button>
   </section>
 
-  <section class="slide"><div class="brand">Quiz</div>
+  <section class="slide" data-title="Quiz"><div class="brand">Quiz</div>
     <span class="kicker"><i class="fa-solid fa-circle-question"></i> Evaluación interactiva</span><h2>Quiz final</h2>
-    <div class="row g-4 align-items-start"><div class="col-lg-7"><div class="pastel b-blue"><h3 id="qText">Pregunta</h3><div id="options"></div><button class="btn btn-dark rounded-pill mt-3" onclick="nextQuestion()">Siguiente</button></div></div><div class="col-lg-5"><div class="pastel b-yellow"><i class="fa-solid fa-trophy icon-big"></i><h3 class="mt-3">Puntaje</h3><p id="scoreText">0 / 5</p><p class="mini">Cada respuesta muestra retroalimentación con SweetAlert.</p><button class="btn btn-outline-dark rounded-pill" onclick="restartQuiz()">Reiniciar quiz</button></div></div></div>
+    <div class="row g-4 align-items-start"><div class="col-lg-7"><div class="pastel b-blue"><div class="d-flex justify-content-between align-items-center gap-2 flex-wrap"><h3 id="qText" class="mb-0">Pregunta</h3><span class="pill" id="qCount">1 / 5</span></div><div id="options" class="mt-3"></div><div class="d-flex gap-2 flex-wrap mt-3"><button class="btn btn-dark rounded-pill" id="answerBtn" onclick="checkQuizAnswer()">Responder</button><button class="btn btn-outline-dark rounded-pill" id="nextQBtn" onclick="nextQuestion()" disabled>Siguiente</button></div></div></div><div class="col-lg-5"><div class="pastel b-yellow"><i class="fa-solid fa-trophy icon-big"></i><h3 class="mt-3">Puntaje</h3><p id="scoreText">0 / 7</p><p class="mini">Seleccioná una opción, respondé y luego avanzá con “Siguiente”.</p><button class="btn btn-outline-dark rounded-pill" onclick="restartQuiz()">Reiniciar quiz</button></div></div></div>
   </section>
 
-  <section class="slide"><div class="brand">Cierre</div>
-    <div class="row h-100 align-items-center"><div class="col-lg-8"><span class="kicker"><i class="fa-solid fa-flag-checkered"></i> Cierre</span><h2>Una buena IA empieza con una buena base de datos</h2><p>El análisis define qué realidad se quiere representar. El MER organiza esa realidad en entidades, atributos, relaciones y cardinalidades. SQL transforma ese diseño en consultas y datasets útiles para Ciencia de Datos e IA.</p><button class="btn btn-dark btn-lg rounded-pill" onclick="goTo(0)"><i class="fa-solid fa-rotate-left me-2"></i>Volver al inicio</button></div></div>
+  <section class="slide" data-title="Cierre"><div class="brand">Cierre</div>
+    <div class="row h-100 align-items-center"><div class="col-lg-8"><span class="kicker"><i class="fa-solid fa-flag-checkered"></i> Cierre</span><h2>Una buena IA empieza con una buena base de datos</h2><p>El análisis define qué realidad se quiere representar. El MER organiza esa realidad en entidades, atributos, relaciones y cardinalidades. El diseño relacional incorpora tablas, PK, FK, normalización e integridad. Luego, SQL y MySQL permiten transformar ese diseño en consultas y datasets útiles para Ciencia de Datos e IA.</p><button class="btn btn-dark btn-lg rounded-pill" onclick="goTo(0)"><i class="fa-solid fa-rotate-left me-2"></i>Volver al inicio</button></div></div>
   </section>
 </div>
 <script>
 const slides=[...document.querySelectorAll('.slide')]; let current=0;
-function show(i){slides[current].classList.remove('active','animate__animated','animate__fadeIn'); current=(i+slides.length)%slides.length; slides[current].classList.add('active','animate__animated','animate__fadeIn'); document.getElementById('counter').textContent=`${current+1} / ${slides.length}`; document.getElementById('progress').style.width=`${((current+1)/slides.length)*100}%`;}
+function show(i){
+  slides[current].classList.remove('active','animate__animated','animate__fadeIn');
+  current=Math.max(0, Math.min(slides.length-1, i));
+  slides[current].classList.add('active','animate__animated','animate__fadeIn');
+  document.getElementById('counter').textContent=`${current+1} / ${slides.length}`;
+  document.getElementById('progress').style.width=`${((current+1)/slides.length)*100}%`;
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===slides.length-1;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 function nextSlide(){show(current+1)} function prevSlide(){show(current-1)} function goTo(i){show(i)}
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nextSlide(); if(e.key==='ArrowLeft')prevSlide();}); show(0);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nextSlide(); if(e.key==='ArrowLeft')prevSlide();});
+function openMenu(){
+  Swal.fire({title:'Índice', html:slides.map((s,i)=>`<button class="btn btn-light w-100 my-1 text-start" onclick="Swal.close(); goTo(${i})">${i+1}. ${s.dataset.title}</button>`).join(''), showConfirmButton:false, background:'#fffdfb'});
+}
+show(0);
+
 const quiz=[
- {q:'¿Cuál es el objetivo principal del diseño conceptual?',o:['Elegir índices físicos','Representar datos y relaciones del mundo real','Programar pantallas','Crear backups'],a:1,fb:'Correcto: el diseño conceptual describe la información necesaria sin depender del DBMS.'},
- {q:'¿Qué elemento del MER representa un objeto o concepto distinguible?',o:['Atributo','Cardinalidad','Entidad','Consulta'],a:2,fb:'Correcto: una entidad puede ser Cliente, Venta, Producto, Persona, etc.'},
- {q:'¿Qué indica la cardinalidad?',o:['El color del diagrama','La cantidad mínima y máxima de asociaciones','El lenguaje de programación','El nombre de la tabla física'],a:1,fb:'Correcto: define cuántas instancias pueden asociarse en una relación.'},
- {q:'En un curso de SQL para IA, ¿por qué importa modelar bien?',o:['Porque mejora la calidad del dataset','Porque elimina la necesidad de consultar datos','Porque reemplaza al DBMS','Porque evita usar relaciones'],a:0,fb:'Correcto: un buen modelo facilita consultas confiables y variables útiles para IA.'},
- {q:'¿Cuál es un ejemplo típico de relación 1:N?',o:['Cliente realiza muchas ventas','Alumno cursa muchas materias y materia tiene muchos alumnos','Persona tiene un único documento','Producto tiene un único precio histórico'],a:0,fb:'Correcto: un cliente puede tener muchas ventas, pero cada venta pertenece a un cliente.'}
+ {q:'¿Cuál es el objetivo principal del diseño conceptual?',o:['Elegir índices físicos','Representar datos y relaciones del mundo real','Programar pantallas','Crear backups'],a:1,fb:'El diseño conceptual describe la información necesaria sin depender todavía del DBMS.'},
+ {q:'¿Qué elemento del MER representa un objeto o concepto distinguible?',o:['Atributo','Cardinalidad','Entidad','Consulta'],a:2,fb:'Una entidad puede ser Cliente, Venta, Producto, Persona, Curso, etc.'},
+ {q:'¿Qué indica la cardinalidad?',o:['El color del diagrama','La cantidad mínima y máxima de asociaciones','El lenguaje de programación','El nombre de la tabla física'],a:1,fb:'La cardinalidad define cuántas instancias pueden asociarse en una relación.'},
+ {q:'En una relación Cliente–Venta, ¿cuál sería una FK típica?',o:['cliente.nombre','venta.id_cliente','venta.importe','cliente.preferencia'],a:1,fb:'venta.id_cliente referencia a cliente.id_cliente y permite unir ambas tablas.'},
+ {q:'¿Qué propiedad ACID significa “todo se realiza o nada se realiza”?',o:['Atomicidad','Consistencia','Aislamiento','Durabilidad'],a:0,fb:'Atomicidad evita operaciones parciales dentro de una transacción.'},
+ {q:'¿Qué operación CRUD se utiliza para consultar datos?',o:['INSERT','SELECT','UPDATE','DELETE'],a:1,fb:'SELECT permite leer datos y construir resultados para reportes o datasets.'},
+ {q:'En un curso de SQL para IA, ¿por qué importa modelar bien?',o:['Porque mejora la calidad del dataset','Porque elimina la necesidad de consultar datos','Porque reemplaza al DBMS','Porque evita usar relaciones'],a:0,fb:'Un buen modelo facilita consultas confiables y variables útiles para IA.'}
 ];
-let qi=0, score=0, answered=false;
-function renderQ(){answered=false; const q=quiz[qi]; document.getElementById('qText').textContent=`${qi+1}. ${q.q}`; document.getElementById('options').innerHTML=q.o.map((x,i)=>`<div class="quiz-option" onclick="answer(${i})">${String.fromCharCode(65+i)}. ${x}</div>`).join(''); document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`;}
-function answer(i){if(answered)return; answered=true; const q=quiz[qi]; if(i===q.a){score++; Swal.fire('¡Correcto!', q.fb, 'success');} else {Swal.fire('Revisar', `La respuesta correcta era: ${q.o[q.a]}`, 'error');} document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`;}
-function nextQuestion(){if(qi<quiz.length-1){qi++; renderQ();} else {Swal.fire('Resultado final', `Obtuviste ${score} de ${quiz.length} respuestas correctas.`, score>=4?'success':'info');}}
-function restartQuiz(){qi=0; score=0; renderQ(); Swal.fire('Quiz reiniciado', 'Volvé a responder las 5 preguntas.', 'info');}
+let qi=0, score=0, answered=false, selected=null;
+function renderQ(){
+  answered=false; selected=null;
+  const q=quiz[qi];
+  document.getElementById('qText').textContent=`${qi+1}. ${q.q}`;
+  document.getElementById('qCount').textContent=`${qi+1} / ${quiz.length}`;
+  document.getElementById('options').innerHTML=q.o.map((x,i)=>`<div class="quiz-option" data-index="${i}" onclick="selectOption(${i})">${String.fromCharCode(65+i)}. ${x}</div>`).join('');
+  document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`;
+  document.getElementById('answerBtn').disabled=false;
+  document.getElementById('nextQBtn').disabled=true;
+  document.getElementById('nextQBtn').textContent=qi===quiz.length-1?'Ver resultado':'Siguiente';
+}
+function selectOption(i){
+  if(answered)return;
+  selected=i;
+  document.querySelectorAll('.quiz-option').forEach(opt=>opt.classList.toggle('selected', Number(opt.dataset.index)===i));
+}
+function checkQuizAnswer(){
+  if(selected===null){Swal.fire('Seleccioná una opción', 'Antes de responder, elegí una alternativa.', 'warning'); return;}
+  if(answered)return;
+  answered=true;
+  const q=quiz[qi];
+  document.querySelectorAll('.quiz-option').forEach(opt=>{
+    const idx=Number(opt.dataset.index);
+    if(idx===q.a) opt.classList.add('correct');
+    if(idx===selected && idx!==q.a) opt.classList.add('wrong');
+  });
+  if(selected===q.a){score++; document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`; Swal.fire('¡Correcto!', q.fb, 'success');}
+  else{Swal.fire('Revisar', `La respuesta correcta era: ${q.o[q.a]}`, 'error');}
+  document.getElementById('answerBtn').disabled=true;
+  document.getElementById('nextQBtn').disabled=false;
+}
+function nextQuestion(){
+  if(!answered){Swal.fire('Primero respondé', 'Seleccioná una opción y presioná “Responder”.', 'info'); return;}
+  if(qi<quiz.length-1){qi++; renderQ();}
+  else{Swal.fire('Resultado final', `Obtuviste ${score} de ${quiz.length} respuestas correctas.`, score>=5?'success':'info');}
+}
+function restartQuiz(){qi=0; score=0; renderQ(); Swal.fire('Quiz reiniciado', 'Volvé a responder las preguntas.', 'info');}
 renderQ();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

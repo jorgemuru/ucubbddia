@@ -32,6 +32,11 @@
     .schema{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.schema .box{padding:1.2rem;border-radius:24px;background:#fff;min-height:190px;border:1px solid rgba(0,0,0,.05)}
     .comparison td,.comparison th{vertical-align:middle}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f5f1ff;padding:.2rem .45rem;border-radius:.45rem}
     .quiz-option{cursor:pointer;border:2px solid transparent;transition:.2s}.quiz-option:hover{transform:translateY(-2px);border-color:var(--accent)}.quiz-option.selected{border-color:var(--accent);background:#f4f0ff}.quiz-option.correct{border-color:#42b883;background:#e8fff4}.quiz-option.wrong{border-color:#ff6b6b;background:#fff0f0}
+
+    .rel-table caption{caption-side:top;font-weight:800;color:var(--ink);padding:.25rem 0 .5rem}
+    .fk-tag{display:inline-block;background:var(--lemon);border:1px solid rgba(0,0,0,.06);border-radius:999px;padding:.15rem .5rem;font-size:.82rem;font-weight:700}
+    .codebox{background:#2e2b3f;color:#fff;border-radius:20px;padding:1rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem;overflow:auto;white-space:pre;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+    .quiz-actions{display:flex;gap:.75rem;flex-wrap:wrap}.quiz-feedback{min-height:48px;border-radius:18px;padding:.75rem 1rem;background:#fff;border:1px solid rgba(0,0,0,.06)}
     @media (max-width: 768px){.slide{padding:58px 5vw 88px}.schema{grid-template-columns:1fr}.title{font-size:3rem}.timeline::before{left:20px}.titem{margin-left:55px}.titem::before{left:-45px}.nav{width:92%;justify-content:center}}
   </style>
 </head>
@@ -95,9 +100,50 @@
 
   <section class="slide" data-title="Relacional">
     <h2><i class="fa-solid fa-table me-3"></i>Modelo relacional y SQL</h2>
-    <div class="row g-4 align-items-center">
-      <div class="col-lg-5"><div class="glass p-4"><p class="lead">El modelo relacional representa la información mediante tablas. Cada fila es un registro y cada columna representa un atributo.</p><p>SQL permite consultar y manipular la información, mientras que ACID favorece transacciones confiables.</p></div></div>
-      <div class="col-lg-7"><div class="table-responsive glass p-3"><table class="table table-hover align-middle mb-0"><thead><tr><th>Cédula</th><th>Nombre</th><th>Edad</th><th>Preferencia</th></tr></thead><tbody><tr><td>1.111.111-1</td><td>Ana</td><td>21</td><td>Vegetariano</td></tr><tr><td>2.222.222-2</td><td>Bruno</td><td>24</td><td>Café</td></tr><tr><td>3.333.333-3</td><td>Carla</td><td>20</td><td>Sin gluten</td></tr></tbody></table></div><p class="mini mt-2">Regla: una celda debe contener un solo valor y cada columna debe respetar su dominio.</p></div>
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-4">
+        <div class="glass p-4 h-100">
+          <p class="lead">El modelo relacional representa la información mediante <strong>tablas relacionadas entre sí</strong>.</p>
+          <p>Cada fila es un registro, cada columna es un atributo y las relaciones se implementan usando claves.</p>
+          <div class="alert alert-light border rounded-4 mb-0"><strong>Idea clave:</strong> una tabla puede “apuntar” a otra usando una <span class="fk-tag">clave foránea</span>.</div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="glass p-3 h-100">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle rel-table mb-0">
+                  <caption>Tabla CLIENTE</caption>
+                  <thead><tr><th>id_cliente</th><th>nombre</th><th>edad</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>1</strong></td><td>Ana</td><td>21</td></tr>
+                    <tr><td><strong>2</strong></td><td>Bruno</td><td>24</td></tr>
+                    <tr><td><strong>3</strong></td><td>Carla</td><td>20</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle rel-table mb-0">
+                  <caption>Tabla VENTA</caption>
+                  <thead><tr><th>id_venta</th><th>producto</th><th>id_cliente</th></tr></thead>
+                  <tbody>
+                    <tr><td>101</td><td>Café</td><td><span class="fk-tag">1</span></td></tr>
+                    <tr><td>102</td><td>Medialuna</td><td><span class="fk-tag">1</span></td></tr>
+                    <tr><td>103</td><td>Jugo</td><td><span class="fk-tag">2</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 codebox">SELECT c.nombre, v.producto
+FROM cliente c
+JOIN venta v ON c.id_cliente = v.id_cliente;</div>
+          <p class="mini mt-2 mb-0">Resultado esperado: permite saber qué productos compró cada cliente. Para IA, esta unión ayuda a crear un dataset de preferencias y comportamiento de compra.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -134,14 +180,19 @@
       <div class="d-flex justify-content-between align-items-center mb-3"><span class="pill" id="qcount">Pregunta 1/5</span><span class="pill"><i class="fa-solid fa-star"></i> Puntaje: <span id="score">0</span></span></div>
       <h3 id="question" class="mb-4"></h3>
       <div id="options" class="row g-3"></div>
-      <div class="mt-4 d-flex gap-2"><button class="btn btn-primary rounded-pill" id="checkBtn" onclick="checkAnswer()">Responder</button><button class="btn btn-outline-secondary rounded-pill" onclick="resetQuiz()">Reiniciar</button></div>
+      <div id="quizFeedback" class="quiz-feedback mt-4 mini">Selecciona una opción y presiona <strong>Responder</strong>.</div>
+      <div class="mt-4 quiz-actions">
+        <button type="button" class="btn btn-primary rounded-pill" id="checkBtn" onclick="checkAnswer()"><i class="fa-solid fa-check me-2"></i>Responder</button>
+        <button type="button" class="btn btn-outline-primary rounded-pill" id="nextQuizBtn" onclick="nextQuizQuestion()" disabled><i class="fa-solid fa-arrow-right me-2"></i>Siguiente pregunta</button>
+        <button type="button" class="btn btn-outline-secondary rounded-pill" onclick="resetQuiz()"><i class="fa-solid fa-rotate-left me-2"></i>Reiniciar</button>
+      </div>
     </div>
   </section>
 
   <section class="slide" data-title="Cierre">
     <div class="row h-100 align-items-center g-5">
       <div class="col-lg-7"><h2>Conclusión</h2><p class="lead">Las bases de datos evolucionaron desde estructuras rígidas hasta plataformas relacionales, NoSQL, NewSQL y en la nube. Para IA, el objetivo no es solo almacenar: es disponer de datos correctos, consistentes y útiles para tomar mejores decisiones.</p><button class="btn btn-lg btn-primary rounded-pill" onclick="go(0)"><i class="fa-solid fa-rotate-left me-2"></i>Volver al inicio</button></div>
-      <div class="col-lg-5"><div class="glass p-5 text-center"><i class="fa-solid fa-graduation-cap fa-6x mb-4" style="color:var(--accent)"></i><h3>Hasta la próxima</h3><p class="mini">Bases de Datos I · Semana 1 · Unidad 1</p></div></div>
+      <div class="col-lg-5"><div class="glass p-5 text-center"><i class="fa-solid fa-graduation-cap fa-6x mb-4" style="color:var(--accent)"></i><h3>Hasta la próxima</h3><p class="mini">BBDD + IA · Semana 1</p></div></div>
     </div>
   </section>
 </div>
@@ -159,12 +210,66 @@ const quiz=[
  {q:'¿Qué modelo organiza los datos como una estructura de árbol padre-hijo?',o:['Relacional','Jerárquico','Documental','NewSQL'],a:1},
  {q:'¿Qué lenguaje se asocia principalmente al modelo relacional?',o:['HTML','SQL','CSS','NoCode'],a:1},
  {q:'¿Qué aporta una regla de integridad?',o:['Define colores de la interfaz','Evita que se registren datos inválidos','Acelera el teclado','Reemplaza las tablas'],a:1},
- {q:'¿Qué tipo de BBDD suele usarse para datos flexibles o no estructurados?',o:['NoSQL','Jerárquica pura','Archivo plano manual','Solo planillas'],a:0},
+ {q:'En el ejemplo relacional, ¿qué permite unir CLIENTE con VENTA?',o:['El color de la tabla','La clave foránea id_cliente','El nombre del producto','El orden de las filas'],a:1},
  {q:'En un proyecto con IA, ¿por qué importa una buena base de datos?',o:['Porque elimina la necesidad de programar','Porque mejora la calidad y disponibilidad de los datos para el modelo','Porque impide consultar datos','Porque solo sirve para guardar imágenes'],a:1}
-];let qi=0,score=0,selected=null,answered=false;
-function renderQ(){const q=quiz[qi];selected=null;answered=false;document.getElementById('qcount').textContent=`Pregunta ${qi+1}/5`;document.getElementById('score').textContent=score;document.getElementById('question').textContent=q.q;document.getElementById('checkBtn').textContent='Responder';document.getElementById('options').innerHTML=q.o.map((op,i)=>`<div class="col-md-6"><div class="quiz-option glass p-3 h-100" onclick="selectOpt(${i})" data-i="${i}"><strong>${String.fromCharCode(65+i)}.</strong> ${op}</div></div>`).join('');}
-function selectOpt(i){if(answered)return;selected=i;document.querySelectorAll('.quiz-option').forEach(el=>el.classList.toggle('selected',Number(el.dataset.i)===i));}
-function checkAnswer(){if(answered){ if(qi<quiz.length-1){qi++;renderQ();} else {Swal.fire({title:'Resultado final',html:`Obtuviste <b>${score} de ${quiz.length}</b> respuestas correctas.`,icon:score>=4?'success':'info',confirmButtonColor:'#7d6bff'});} return;} if(selected===null){tip('Selecciona una opción antes de responder.'); return;} answered=true;const correct=quiz[qi].a;document.querySelectorAll('.quiz-option').forEach(el=>{const i=Number(el.dataset.i); if(i===correct)el.classList.add('correct'); if(i===selected&&i!==correct)el.classList.add('wrong');}); if(selected===correct){score++;document.getElementById('score').textContent=score;Swal.fire({title:'¡Correcto!',icon:'success',timer:1100,showConfirmButton:false});} else {Swal.fire({title:'A revisar',text:`La respuesta correcta era: ${quiz[qi].o[correct]}`,icon:'warning',confirmButtonColor:'#7d6bff'});} document.getElementById('checkBtn').textContent=qi<quiz.length-1?'Siguiente':'Ver resultado';}
+];
+let qi=0,score=0,selected=null,answered=false;
+function renderQ(){
+  const q=quiz[qi];
+  selected=null; answered=false;
+  document.getElementById('qcount').textContent=`Pregunta ${qi+1}/5`;
+  document.getElementById('score').textContent=score;
+  document.getElementById('question').textContent=q.q;
+  document.getElementById('quizFeedback').innerHTML='Selecciona una opción y presiona <strong>Responder</strong>.';
+  document.getElementById('checkBtn').disabled=false;
+  document.getElementById('nextQuizBtn').disabled=true;
+  document.getElementById('nextQuizBtn').innerHTML= qi < quiz.length-1 ? '<i class="fa-solid fa-arrow-right me-2"></i>Siguiente pregunta' : '<i class="fa-solid fa-trophy me-2"></i>Ver resultado';
+  document.getElementById('options').innerHTML=q.o.map((op,i)=>`<div class="col-md-6"><div class="quiz-option glass p-3 h-100" role="button" tabindex="0" onclick="selectOpt(${i})" onkeydown="if(event.key==='Enter'){selectOpt(${i})}" data-i="${i}"><strong>${String.fromCharCode(65+i)}.</strong> ${op}</div></div>`).join('');
+}
+function selectOpt(i){
+  if(answered)return;
+  selected=i;
+  document.querySelectorAll('.quiz-option').forEach(el=>el.classList.toggle('selected',Number(el.dataset.i)===i));
+}
+function checkAnswer(){
+  if(selected===null){tip('Selecciona una opción antes de responder.'); return;}
+  if(answered)return;
+  answered=true;
+  const q=quiz[qi];
+  const correct=q.a;
+  document.querySelectorAll('.quiz-option').forEach(el=>{
+    const i=Number(el.dataset.i);
+    if(i===correct)el.classList.add('correct');
+    if(i===selected&&i!==correct)el.classList.add('wrong');
+  });
+  if(selected===correct){
+    score++;
+    document.getElementById('score').textContent=score;
+    document.getElementById('quizFeedback').innerHTML='<strong>¡Correcto!</strong> Presiona <strong>Siguiente pregunta</strong> para continuar.';
+    Swal.fire({title:'¡Correcto!',icon:'success',timer:900,showConfirmButton:false,background:'#fffafd'});
+  }else{
+    document.getElementById('quizFeedback').innerHTML=`<strong>A revisar.</strong> La respuesta correcta es: <strong>${q.o[correct]}</strong>. Presiona <strong>Siguiente pregunta</strong> para continuar.`;
+    Swal.fire({title:'A revisar',text:`La respuesta correcta era: ${q.o[correct]}`,icon:'warning',confirmButtonColor:'#7d6bff',background:'#fffafd'});
+  }
+  document.getElementById('checkBtn').disabled=true;
+  document.getElementById('nextQuizBtn').disabled=false;
+}
+function nextQuizQuestion(){
+  if(!answered){tip('Primero responde la pregunta actual.'); return;}
+  if(qi<quiz.length-1){
+    qi++;
+    renderQ();
+  }else{
+    Swal.fire({
+      title:'Resultado final',
+      html:`Obtuviste <b>${score} de ${quiz.length}</b> respuestas correctas.`,
+      icon:score>=4?'success':'info',
+      confirmButtonText:'Finalizar',
+      confirmButtonColor:'#7d6bff',
+      background:'#fffafd'
+    });
+  }
+}
 function resetQuiz(){qi=0;score=0;renderQ();}
 renderQ();update();
 </script>
