@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DDL y DML en SQL - Presentación interactiva</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root{
+      --pastel-blue:#d8ecff;
+      --pastel-purple:#eadcff;
+      --pastel-green:#dcf8e8;
+      --pastel-yellow:#fff2c6;
+      --pastel-pink:#ffe0ec;
+      --pastel-orange:#ffe5cf;
+      --dark:#263238;
+      --soft:#f8fbff;
+      --card:#ffffff;
+    }
+
+    body{
+      background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple), var(--pastel-green));
+      min-height:100vh;
+      color:var(--dark);
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .navbar{
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    .hero{
+      min-height: calc(100vh - 72px);
+      display:flex;
+      align-items:center;
+      padding: 3rem 0;
+    }
+
+    .hero-card, .slide-card{
+      background: rgba(255,255,255,.92);
+      border:0;
+      border-radius:28px;
+      box-shadow: 0 14px 38px rgba(57,73,171,.16);
+    }
+
+    .icon-bubble{
+      width:74px;
+      height:74px;
+      border-radius:24px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2rem;
+      background: var(--pastel-yellow);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.7);
+    }
+
+    .section{
+      display:none;
+      min-height: calc(100vh - 72px);
+      padding: 2rem 0;
+    }
+
+    .section.active{
+      display:flex;
+      align-items:center;
+    }
+
+    .badge-soft{
+      background: var(--pastel-blue);
+      color:#263238;
+      border:1px solid rgba(0,0,0,.06);
+      padding:.55rem .8rem;
+      border-radius:999px;
+      font-weight:600;
+    }
+
+    .mini-card{
+      background: #fff;
+      border-radius:22px;
+      padding:1.25rem;
+      height:100%;
+      border:1px solid rgba(0,0,0,.05);
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+
+    .mini-card.ddl{ background: linear-gradient(160deg, #ffffff, var(--pastel-blue)); }
+    .mini-card.dml{ background: linear-gradient(160deg, #ffffff, var(--pastel-green)); }
+    .mini-card.guide{ background: linear-gradient(160deg, #ffffff, var(--pastel-yellow)); }
+    .mini-card.warn{ background: linear-gradient(160deg, #ffffff, var(--pastel-pink)); }
+
+    code, pre{
+      font-family: "Consolas", "Courier New", monospace;
+    }
+
+    pre{
+      background:#1f2937;
+      color:#e5e7eb;
+      border-radius:18px;
+      padding:1rem;
+      overflow:auto;
+      font-size:.92rem;
+    }
+
+    .syntax-box{
+      background:#f6f8ff;
+      border-left:6px solid #9bbcff;
+      border-radius:16px;
+      padding:1rem;
+      margin-bottom:1rem;
+    }
+
+    .btn-pastel{
+      border:0;
+      border-radius:999px;
+      padding:.7rem 1.15rem;
+      font-weight:700;
+      background:#ffffff;
+      box-shadow: 0 5px 16px rgba(0,0,0,.08);
+      transition:.25s;
+    }
+
+    .btn-pastel:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 9px 22px rgba(0,0,0,.12);
+    }
+
+    .btn-blue{ background: var(--pastel-blue); }
+    .btn-green{ background: var(--pastel-green); }
+    .btn-purple{ background: var(--pastel-purple); }
+    .btn-yellow{ background: var(--pastel-yellow); }
+    .btn-pink{ background: var(--pastel-pink); }
+
+    .progress{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+    }
+
+    .progress-bar{
+      background: linear-gradient(90deg, #9bbcff, #c7a7ff);
+    }
+
+    .step-number{
+      width:42px;
+      height:42px;
+      border-radius:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--pastel-purple);
+      font-weight:800;
+      margin-right:.75rem;
+    }
+
+    .hidden-solution{
+      display:none;
+    }
+
+    .table thead th{
+      background: var(--pastel-blue);
+    }
+
+    .quiz-option{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:0;
+      background:#fff;
+      padding:.85rem 1rem;
+      margin:.5rem 0;
+      border-radius:16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.06);
+      transition:.2s;
+    }
+
+    .quiz-option:hover{
+      transform: translateX(4px);
+      background: var(--pastel-yellow);
+    }
+
+    .footer-note{
+      font-size:.92rem;
+      opacity:.8;
+    }
+
+    @media (max-width: 768px){
+      .hero{
+        min-height:auto;
+      }
+      .section.active{
+        align-items:flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#" onclick="goToSlide(0)">
+      <i class="fa-solid fa-database me-2"></i>SQL: DDL y DML
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge-soft d-none d-md-inline" id="slideLabel">Inicio</span>
+      <button class="btn btn-sm btn-pastel btn-blue" onclick="goToSlide(0)">
+        <i class="fa-solid fa-house"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- Slide 0 -->
+  <section class="hero section active" id="slide0">
+    <div class="container">
+      <div class="hero-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <div class="icon-bubble mb-3">
+              <i class="fa-solid fa-table"></i>
+            </div>
+            <h1 class="display-5 fw-bold">DDL y DML en SQL</h1>
+            <p class="lead mt-3">
+              Presentación interactiva para comprender qué son, para qué sirven y cómo se aplican
+              los lenguajes <strong>DDL</strong> y <strong>DML</strong> en la creación y carga de datos.
+            </p>
+            <div class="d-flex flex-wrap gap-2 my-4">
+              <span class="badge-soft"><i class="fa-solid fa-hammer me-1"></i> Crear estructura</span>
+              <span class="badge-soft"><i class="fa-solid fa-pen-to-square me-1"></i> Manipular datos</span>
+              <span class="badge-soft"><i class="fa-solid fa-eye-slash me-1"></i> Solución oculta</span>
+            </div>
+            <button class="btn btn-pastel btn-purple" onclick="nextSlide()">
+              Comenzar <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+          <div class="col-lg-5">
+            <div class="mini-card guide">
+              <h4><i class="fa-solid fa-bullseye me-2"></i>Objetivo del ejercicio</h4>
+              <p class="mb-2">Crear las tablas:</p>
+              <ul>
+                <li><strong>clientes</strong>: cédula, nombre, apellido, dirección, teléfono, email.</li>
+                <li><strong>productos</strong>: código, descripción, precio, stock.</li>
+                <li><strong>ventas</strong>: fecha, cliente, producto, cantidad, importe.</li>
+              </ul>
+              <p class="mb-0">Luego insertar <strong>20 registros</strong> en cada una.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 1 -->
+  <section class="section" id="slide1">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-code-branch me-2"></i>¿Qué es SQL?</h2>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="mini-card">
+              <h4><i class="fa-solid fa-database me-2"></i>SQL</h4>
+              <p>
+                SQL significa <strong>Structured Query Language</strong>. Es el lenguaje usado para
+                trabajar con bases de datos relacionales.
+              </p>
+              <p class="mb-0">
+                Permite crear estructuras, insertar datos, consultar información, actualizar registros
+                y eliminar datos.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mini-card">
+              <h4><i class="fa-solid fa-layer-group me-2"></i>Dos grandes grupos</h4>
+              <p>
+                Para este ejercicio nos interesan especialmente:
+              </p>
+              <ul>
+                <li><strong>DDL</strong>: define la estructura de la base de datos.</li>
+                <li><strong>DML</strong>: manipula los datos almacenados.</li>
+              </ul>
+              <button class="btn btn-pastel btn-yellow" onclick="showInfo('sql')">
+                Ver analogía <i class="fa-solid fa-lightbulb ms-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2 -->
+  <section class="section" id="slide2">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-hammer me-2"></i>DDL: Data Definition Language</h2>
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="mini-card ddl">
+              <h4>¿Para qué sirve DDL?</h4>
+              <p>
+                DDL se usa para <strong>definir, modificar o eliminar estructuras</strong> dentro
+                de una base de datos.
+              </p>
+              <p class="mb-0">
+                En este ejercicio, DDL se utiliza para crear la base de datos y las tablas:
+                <strong>clientes</strong>, <strong>productos</strong> y <strong>ventas</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h4>Comandos frecuentes</h4>
+              <table class="table table-bordered align-middle">
+                <thead>
+                  <tr>
+                    <th>Comando</th>
+                    <th>Uso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>CREATE</code></td><td>Crear bases, tablas u otros objetos.</td></tr>
+                  <tr><td><code>ALTER</code></td><td>Modificar una estructura existente.</td></tr>
+                  <tr><td><code>DROP</code></td><td>Eliminar una estructura.</td></tr>
+                  <tr><td><code>TRUNCATE</code></td><td>Vaciar una tabla rápidamente.</td></tr>
+                </tbody>
+              </table>
+              <button class="btn btn-pastel btn-blue" onclick="showInfo('ddl')">
+                Ver ejemplo conceptual
+              </button>
+            </div>
+          </div>
+        </div>
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3 -->
+  <section class="section" id="slide3">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-pen-to-square me-2"></i>DML: Data Manipulation Language</h2>
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="mini-card dml">
+              <h4>¿Para qué sirve DML?</h4>
+              <p>
+                DML se usa para <strong>trabajar con los datos</strong> que están guardados en las tablas.
+              </p>
+              <p class="mb-0">
+                En este ejercicio, DML se usa para insertar los registros de clientes, productos y ventas.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h4>Comandos frecuentes</h4>
+              <table class="table table-bordered align-middle">
+                <thead>
+                  <tr>
+                    <th>Comando</th>
+                    <th>Uso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>INSERT</code></td><td>Agregar nuevos registros.</td></tr>
+                  <tr><td><code>SELECT</code></td><td>Consultar datos.</td></tr>
+                  <tr><td><code>UPDATE</code></td><td>Modificar datos existentes.</td></tr>
+                  <tr><td><code>DELETE</code></td><td>Eliminar registros.</td></tr>
+                </tbody>
+              </table>
+              <button class="btn btn-pastel btn-green" onclick="showInfo('dml')">
+                Ver ejemplo conceptual
+              </button>
+            </div>
+          </div>
+        </div>
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4 -->
+  <section class="section" id="slide4">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-diagram-project me-2"></i>Modelo del ejercicio</h2>
+        <p class="lead">
+          Antes de escribir SQL, conviene identificar entidades, atributos, claves primarias y relaciones.
+        </p>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="mini-card ddl">
+              <h4><i class="fa-solid fa-user me-2"></i>clientes</h4>
+              <p><strong>Clave primaria:</strong> cédula.</p>
+              <ul>
+                <li>cedula</li>
+                <li>nombre</li>
+                <li>apellido</li>
+                <li>direccion</li>
+                <li>telefono</li>
+                <li>email</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mini-card dml">
+              <h4><i class="fa-solid fa-box me-2"></i>productos</h4>
+              <p><strong>Clave primaria:</strong> código.</p>
+              <ul>
+                <li>codigo</li>
+                <li>descripcion</li>
+                <li>precio</li>
+                <li>stock</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mini-card guide">
+              <h4><i class="fa-solid fa-cart-shopping me-2"></i>ventas</h4>
+              <p><strong>Relaciones:</strong></p>
+              <ul>
+                <li>cliente → clientes.cedula</li>
+                <li>producto → productos.codigo</li>
+              </ul>
+              <p class="mb-0">Cada venta registra qué cliente compró qué producto.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-light border mt-4">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          Es recomendable agregar un identificador propio para cada venta, por ejemplo <code>id_venta</code>.
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5 -->
+  <section class="section" id="slide5">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-scroll me-2"></i>Sintaxis DDL utilizada</h2>
+        <p>
+          Esta sección muestra solamente la <strong>sintaxis general</strong>, no la solución completa.
+        </p>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-database me-2"></i>Crear una base de datos</h5>
+          <pre><code>CREATE DATABASE nombre_base_de_datos;</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-right-to-bracket me-2"></i>Seleccionar una base de datos</h5>
+          <pre><code>USE nombre_base_de_datos;</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-table me-2"></i>Crear una tabla</h5>
+          <pre><code>CREATE TABLE nombre_tabla (
+    campo1 TIPO_DATO restricciones,
+    campo2 TIPO_DATO restricciones,
+    campo3 TIPO_DATO restricciones
+);</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-key me-2"></i>Definir clave primaria</h5>
+          <pre><code>campo TIPO_DATO PRIMARY KEY</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-link me-2"></i>Definir clave foránea</h5>
+          <pre><code>CONSTRAINT nombre_restriccion
+FOREIGN KEY (campo_local)
+REFERENCES tabla_referenciada(campo_referenciado)</code></pre>
+        </div>
+
+        <button class="btn btn-pastel btn-purple" onclick="showInfo('tipos')">
+          Ver tipos de datos sugeridos
+        </button>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6 -->
+  <section class="section" id="slide6">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-list-check me-2"></i>Guía para crear las tablas</h2>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h5><span class="step-number">1</span>Crear la base de datos</h5>
+              <p>Usa <code>CREATE DATABASE</code> para crear el espacio donde estarán las tablas.</p>
+              <pre><code>CREATE DATABASE nombre_base;</code></pre>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h5><span class="step-number">2</span>Seleccionarla</h5>
+              <p>Usa <code>USE</code> para indicar que trabajarás sobre esa base.</p>
+              <pre><code>USE nombre_base;</code></pre>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h5><span class="step-number">3</span>Crear tablas principales</h5>
+              <p>Primero crea las tablas que no dependen de otras.</p>
+              <pre><code>CREATE TABLE clientes (...);
+CREATE TABLE productos (...);</code></pre>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="mini-card">
+              <h5><span class="step-number">4</span>Crear tabla relacionada</h5>
+              <p>Luego crea la tabla que referencia a las anteriores.</p>
+              <pre><code>CREATE TABLE ventas (
+    ...,
+    FOREIGN KEY (...) REFERENCES ...(...)
+);</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-4">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          Orden importante: primero <strong>clientes</strong> y <strong>productos</strong>, luego <strong>ventas</strong>.
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7 -->
+  <section class="section" id="slide7">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-keyboard me-2"></i>Sintaxis DML utilizada</h2>
+        <p>
+          Para cargar datos se utiliza principalmente la sentencia <code>INSERT INTO</code>.
+        </p>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-plus me-2"></i>Insertar un registro</h5>
+          <pre><code>INSERT INTO nombre_tabla (campo1, campo2, campo3)
+VALUES (valor1, valor2, valor3);</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-layer-group me-2"></i>Insertar varios registros</h5>
+          <pre><code>INSERT INTO nombre_tabla (campo1, campo2, campo3) VALUES
+(valor1, valor2, valor3),
+(valor1, valor2, valor3),
+(valor1, valor2, valor3);</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5><i class="fa-solid fa-magnifying-glass me-2"></i>Consultar datos insertados</h5>
+          <pre><code>SELECT * FROM nombre_tabla;</code></pre>
+        </div>
+
+        <div class="alert alert-light border">
+          <i class="fa-solid fa-circle-check me-2"></i>
+          Para cargar ventas, los clientes y productos usados en cada venta deben existir previamente.
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8 -->
+  <section class="section" id="slide8">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-route me-2"></i>Guía para resolver el ejercicio</h2>
+
+        <div class="accordion" id="guideAccordion">
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#g1">
+                Paso 1: Identificar las tablas
+              </button>
+            </h2>
+            <div id="g1" class="accordion-collapse collapse show" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                Las tablas son <code>clientes</code>, <code>productos</code> y <code>ventas</code>.
+                Cada tabla representa un conjunto de datos del sistema.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#g2">
+                Paso 2: Elegir claves primarias
+              </button>
+            </h2>
+            <div id="g2" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                Una clave primaria identifica de forma única cada registro. Para este ejercicio:
+                <code>clientes.cedula</code> y <code>productos.codigo</code> pueden ser claves primarias.
+                En <code>ventas</code> conviene agregar <code>id_venta</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#g3">
+                Paso 3: Elegir tipos de datos
+              </button>
+            </h2>
+            <div id="g3" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                Textos como nombres, direcciones y correos pueden ser <code>VARCHAR</code>.
+                Precios e importes pueden ser <code>DECIMAL(10,2)</code>.
+                Cantidades y stock pueden ser <code>INT</code>.
+                Fechas pueden ser <code>DATE</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#g4">
+                Paso 4: Crear relaciones
+              </button>
+            </h2>
+            <div id="g4" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                La tabla <code>ventas</code> debe guardar el cliente y el producto de cada compra.
+                Por eso se usan claves foráneas hacia <code>clientes</code> y <code>productos</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#g5">
+                Paso 5: Insertar datos en orden
+              </button>
+            </h2>
+            <div id="g5" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                Primero inserta los <code>clientes</code>, luego los <code>productos</code> y finalmente las
+                <code>ventas</code>. Así se evitan errores de claves foráneas.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9 -->
+  <section class="section" id="slide9">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-person-chalkboard me-2"></i>Actividad para estudiantes</h2>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="mini-card guide">
+              <h4>Parte A: DDL</h4>
+              <p>Crear las tablas necesarias para registrar clientes, productos y ventas.</p>
+              <ul>
+                <li>Definir claves primarias.</li>
+                <li>Definir tipos de datos adecuados.</li>
+                <li>Relacionar ventas con clientes y productos.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="mini-card dml">
+              <h4>Parte B: DML</h4>
+              <p>Insertar 20 registros en cada tabla.</p>
+              <ul>
+                <li>20 clientes.</li>
+                <li>20 productos.</li>
+                <li>20 ventas.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-4">
+          <i class="fa-solid fa-circle-question me-2"></i>
+          Pregunta guía: ¿por qué no conviene insertar primero las ventas?
+        </div>
+
+        <button class="btn btn-pastel btn-yellow" onclick="showInfo('orden')">
+          Ver pista
+        </button>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 10 -->
+  <section class="section" id="slide10">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-clipboard-check me-2"></i>Verificación del trabajo</h2>
+
+        <p class="lead">
+          Luego de ejecutar los scripts, se puede verificar si las tablas tienen datos.
+        </p>
+
+        <div class="syntax-box">
+          <h5>Consultar todos los clientes</h5>
+          <pre><code>SELECT * FROM clientes;</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5>Consultar todos los productos</h5>
+          <pre><code>SELECT * FROM productos;</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5>Consultar todas las ventas</h5>
+          <pre><code>SELECT * FROM ventas;</code></pre>
+        </div>
+
+        <div class="syntax-box">
+          <h5>Contar registros</h5>
+          <pre><code>SELECT COUNT(*) FROM nombre_tabla;</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <i class="fa-solid fa-check me-2"></i>
+          Si cada tabla devuelve 20 registros, la carga básica fue realizada correctamente.
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 11 -->
+  <section class="section" id="slide11">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-eye-slash me-2"></i>Script de solución oculto</h2>
+
+        <div class="mini-card warn mb-4">
+          <h4>Antes de ver la solución</h4>
+          <p>
+            Intentá resolver el ejercicio usando la guía anterior. La solución se muestra solamente
+            cuando presionás el botón.
+          </p>
+          <button class="btn btn-pastel btn-pink" onclick="confirmSolution()">
+            Mostrar solución <i class="fa-solid fa-unlock ms-2"></i>
+          </button>
+        </div>
+
+        <div class="hidden-solution" id="solutionBlock">
+          <ul class="nav nav-tabs" id="solutionTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ddlSol" type="button">
+                DDL
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#dmlSol" type="button">
+                DML
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content pt-3">
+            <div class="tab-pane fade show active" id="ddlSol">
+<pre><code>CREATE DATABASE IF NOT EXISTS gestion_ventas;
+
+USE gestion_ventas;
+
+CREATE TABLE clientes (
+    cedula VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    direccion VARCHAR(100),
+    telefono VARCHAR(20),
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE productos (
+    codigo INT PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL CHECK (precio >= 0),
+    stock INT NOT NULL CHECK (stock >= 0)
+);
+
+CREATE TABLE ventas (
+    id_venta INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    cliente VARCHAR(20) NOT NULL,
+    producto INT NOT NULL,
+    cantidad INT NOT NULL CHECK (cantidad > 0),
+    importe DECIMAL(10,2) NOT NULL CHECK (importe >= 0),
+
+    CONSTRAINT fk_ventas_clientes
+        FOREIGN KEY (cliente)
+        REFERENCES clientes(cedula),
+
+    CONSTRAINT fk_ventas_productos
+        FOREIGN KEY (producto)
+        REFERENCES productos(codigo)
+);</code></pre>
+            </div>
+
+            <div class="tab-pane fade" id="dmlSol">
+<pre><code>USE gestion_ventas;
+
+INSERT INTO clientes (cedula, nombre, apellido, direccion, telefono, email) VALUES
+('50000001', 'Juan', 'Pérez', 'Av. Rivera 1234', '099111001', 'juan.perez@email.com'),
+('50000002', 'María', 'Gómez', 'Bvar. Artigas 2345', '099111002', 'maria.gomez@email.com'),
+('50000003', 'Carlos', 'Rodríguez', '18 de Julio 3456', '099111003', 'carlos.rodriguez@email.com'),
+('50000004', 'Ana', 'Fernández', 'Sarandí 456', '099111004', 'ana.fernandez@email.com'),
+('50000005', 'Luis', 'Martínez', 'Colonia 789', '099111005', 'luis.martinez@email.com'),
+('50000006', 'Laura', 'Silva', 'Agraciada 321', '099111006', 'laura.silva@email.com'),
+('50000007', 'Pedro', 'López', 'San Martín 654', '099111007', 'pedro.lopez@email.com'),
+('50000008', 'Sofía', 'Torres', 'Brasil 987', '099111008', 'sofia.torres@email.com'),
+('50000009', 'Diego', 'Ramírez', 'Lavalleja 159', '099111009', 'diego.ramirez@email.com'),
+('50000010', 'Valentina', 'Castro', 'Ituzaingó 753', '099111010', 'valentina.castro@email.com'),
+('50000011', 'Martín', 'Suárez', 'Rincón 852', '099111011', 'martin.suarez@email.com'),
+('50000012', 'Camila', 'Méndez', 'Paysandú 951', '099111012', 'camila.mendez@email.com'),
+('50000013', 'Federico', 'Díaz', 'Misiones 147', '099111013', 'federico.diaz@email.com'),
+('50000014', 'Lucía', 'Acosta', 'Durazno 258', '099111014', 'lucia.acosta@email.com'),
+('50000015', 'Nicolás', 'Morales', 'Canelones 369', '099111015', 'nicolas.morales@email.com'),
+('50000016', 'Florencia', 'Vega', 'Maldonado 741', '099111016', 'florencia.vega@email.com'),
+('50000017', 'Agustín', 'Herrera', 'Soriano 852', '099111017', 'agustin.herrera@email.com'),
+('50000018', 'Paula', 'Navarro', 'Tacuarembó 963', '099111018', 'paula.navarro@email.com'),
+('50000019', 'Santiago', 'Pereira', 'Rocha 159', '099111019', 'santiago.pereira@email.com'),
+('50000020', 'Natalia', 'Cabrera', 'Florida 357', '099111020', 'natalia.cabrera@email.com');
+
+INSERT INTO productos (codigo, descripcion, precio, stock) VALUES
+(1, 'Notebook Lenovo 15 pulgadas', 28500.00, 12),
+(2, 'Mouse inalámbrico Logitech', 850.00, 50),
+(3, 'Teclado mecánico Redragon', 2300.00, 25),
+(4, 'Monitor Samsung 24 pulgadas', 7900.00, 18),
+(5, 'Impresora HP multifunción', 6200.00, 10),
+(6, 'Disco SSD Kingston 480GB', 2600.00, 30),
+(7, 'Memoria RAM 8GB DDR4', 1800.00, 40),
+(8, 'Auriculares JBL Bluetooth', 3200.00, 22),
+(9, 'Parlantes Genius USB', 1200.00, 35),
+(10, 'Webcam Logitech HD', 2500.00, 16),
+(11, 'Router TP-Link WiFi', 3100.00, 20),
+(12, 'Cable HDMI 2 metros', 450.00, 60),
+(13, 'Pendrive Kingston 64GB', 650.00, 70),
+(14, 'Tablet Samsung Galaxy', 14500.00, 8),
+(15, 'Celular Xiaomi Redmi', 16900.00, 14),
+(16, 'Cargador USB-C rápido', 900.00, 45),
+(17, 'Silla ergonómica oficina', 8900.00, 9),
+(18, 'Escritorio de madera', 12500.00, 6),
+(19, 'Fuente de poder 600W', 3400.00, 15),
+(20, 'Gabinete gamer RGB', 5200.00, 11);
+
+INSERT INTO ventas (fecha, cliente, producto, cantidad, importe) VALUES
+('2026-06-01', '50000001', 1, 1, 28500.00),
+('2026-06-01', '50000002', 2, 2, 1700.00),
+('2026-06-02', '50000003', 3, 1, 2300.00),
+('2026-06-02', '50000004', 4, 1, 7900.00),
+('2026-06-03', '50000005', 5, 1, 6200.00),
+('2026-06-03', '50000006', 6, 2, 5200.00),
+('2026-06-04', '50000007', 7, 2, 3600.00),
+('2026-06-04', '50000008', 8, 1, 3200.00),
+('2026-06-05', '50000009', 9, 3, 3600.00),
+('2026-06-05', '50000010', 10, 1, 2500.00),
+('2026-06-06', '50000011', 11, 1, 3100.00),
+('2026-06-06', '50000012', 12, 4, 1800.00),
+('2026-06-07', '50000013', 13, 3, 1950.00),
+('2026-06-07', '50000014', 14, 1, 14500.00),
+('2026-06-08', '50000015', 15, 1, 16900.00),
+('2026-06-08', '50000016', 16, 2, 1800.00),
+('2026-06-09', '50000017', 17, 1, 8900.00),
+('2026-06-09', '50000018', 18, 1, 12500.00),
+('2026-06-10', '50000019', 19, 2, 6800.00),
+('2026-06-10', '50000020', 20, 1, 5200.00);</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 12 -->
+  <section class="section" id="slide12">
+    <div class="container">
+      <div class="slide-card p-4 p-md-5 animate__animated animate__fadeIn">
+        <h2 class="fw-bold mb-4"><i class="fa-solid fa-gamepad me-2"></i>Quiz final</h2>
+
+        <div class="mini-card">
+          <h4 id="quizQuestion">Pregunta</h4>
+          <div id="quizOptions" class="mt-3"></div>
+          <div class="mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-pastel btn-purple" onclick="nextQuestion()">
+              Siguiente pregunta <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+            <button class="btn btn-pastel btn-yellow" onclick="restartQuiz()">
+              Reiniciar quiz <i class="fa-solid fa-rotate-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <navButtons></navButtons>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="container pb-4">
+  <div class="progress mb-3">
+    <div class="progress-bar" id="progressBar" style="width: 7%"></div>
+  </div>
+  <p class="text-center footer-note">
+    Presentación interactiva sobre SQL, DDL y DML.
+  </p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const totalSlides = 13;
+  let currentSlide = 0;
+
+  const labels = [
+    "Inicio",
+    "SQL",
+    "DDL",
+    "DML",
+    "Modelo",
+    "Sintaxis DDL",
+    "Guía DDL",
+    "Sintaxis DML",
+    "Guía ejercicio",
+    "Actividad",
+    "Verificación",
+    "Solución oculta",
+    "Quiz"
+  ];
+
+  function renderNavButtons(){
+    document.querySelectorAll("navButtons").forEach(el => {
+      el.innerHTML = `
+        <div class="d-flex justify-content-between flex-wrap gap-2 mt-4">
+          <button class="btn btn-pastel btn-blue" onclick="prevSlide()">
+            <i class="fa-solid fa-arrow-left me-2"></i>Anterior
+          </button>
+          <button class="btn btn-pastel btn-purple" onclick="nextSlide()">
+            Siguiente<i class="fa-solid fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  function goToSlide(n){
+    document.getElementById(`slide${currentSlide}`).classList.remove("active");
+    currentSlide = Math.max(0, Math.min(totalSlides - 1, n));
+    const next = document.getElementById(`slide${currentSlide}`);
+    next.classList.add("active");
+    next.classList.remove("animate__fadeIn");
+    void next.offsetWidth;
+    next.classList.add("animate__fadeIn");
+    document.getElementById("slideLabel").innerText = labels[currentSlide];
+    document.getElementById("progressBar").style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function nextSlide(){
+    goToSlide(currentSlide + 1);
+  }
+
+  function prevSlide(){
+    goToSlide(currentSlide - 1);
+  }
+
+  function showInfo(type){
+    const messages = {
+      sql: {
+        title: "Analogía",
+        html: "Pensá en una base de datos como una biblioteca. <strong>DDL</strong> sería construir estantes y etiquetar secciones. <strong>DML</strong> sería guardar, buscar, modificar o retirar libros."
+      },
+      ddl: {
+        title: "DDL en pocas palabras",
+        html: "DDL trabaja sobre la <strong>estructura</strong>. Por ejemplo: crear una tabla, agregar una columna o eliminar una tabla."
+      },
+      dml: {
+        title: "DML en pocas palabras",
+        html: "DML trabaja sobre los <strong>datos</strong>. Por ejemplo: insertar clientes, modificar precios, consultar ventas o eliminar registros."
+      },
+      tipos: {
+        title: "Tipos de datos sugeridos",
+        html: `
+          <div class="text-start">
+            <ul>
+              <li><code>VARCHAR(n)</code>: textos de longitud variable.</li>
+              <li><code>INT</code>: números enteros.</li>
+              <li><code>DECIMAL(10,2)</code>: valores monetarios.</li>
+              <li><code>DATE</code>: fechas.</li>
+              <li><code>AUTO_INCREMENT</code>: numeración automática.</li>
+            </ul>
+          </div>`
+      },
+      orden: {
+        title: "Pista",
+        html: "No conviene insertar primero las ventas porque cada venta necesita referenciar un cliente y un producto que ya existan."
+      }
+    };
+
+    Swal.fire({
+      icon: "info",
+      title: messages[type].title,
+      html: messages[type].html,
+      confirmButtonText: "Entendido"
+    });
+  }
+
+  function confirmSolution(){
+    Swal.fire({
+      title: "¿Mostrar solución?",
+      text: "La idea es intentar resolver primero el ejercicio. ¿Querés verla igualmente?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, mostrar",
+      cancelButtonText: "Seguir intentando"
+    }).then((result) => {
+      if(result.isConfirmed){
+        document.getElementById("solutionBlock").style.display = "block";
+        Swal.fire({
+          icon: "success",
+          title: "Solución desbloqueada",
+          text: "Ya podés revisar el script DDL y DML.",
+          confirmButtonText: "Ver"
+        });
+      }
+    });
+  }
+
+  const questions = [
+    {
+      q: "¿Qué significa DDL?",
+      options: ["Data Definition Language", "Data Delete Language", "Database Detail List"],
+      correct: 0
+    },
+    {
+      q: "¿Cuál de estos comandos pertenece principalmente a DML?",
+      options: ["CREATE TABLE", "INSERT INTO", "DROP TABLE"],
+      correct: 1
+    },
+    {
+      q: "¿Para qué se usa PRIMARY KEY?",
+      options: ["Para identificar registros de forma única", "Para borrar registros", "Para cambiar el nombre de una base"],
+      correct: 0
+    },
+    {
+      q: "¿Por qué ventas debe crearse después de clientes y productos?",
+      options: ["Porque tiene claves foráneas hacia esas tablas", "Porque tiene menos campos", "Porque siempre debe ser la última tabla alfabéticamente"],
+      correct: 0
+    },
+    {
+      q: "¿Qué sentencia permite consultar los datos de una tabla?",
+      options: ["SELECT", "ALTER", "CREATE"],
+      correct: 0
+    },
+    {
+      q: "¿Qué tipo de dato es adecuado para precio e importe?",
+      options: ["DECIMAL(10,2)", "DATE", "VARCHAR sin límite"],
+      correct: 0
+    },
+    {
+      q: "¿Qué comando se utiliza para crear una tabla?",
+      options: ["INSERT TABLE", "CREATE TABLE", "SELECT TABLE"],
+      correct: 1
+    },
+    {
+      q: "¿Qué comando se utiliza para agregar registros?",
+      options: ["INSERT INTO", "DROP", "ALTER"],
+      correct: 0
+    }
+  ];
+
+  let quizIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  function renderQuestion(){
+    answered = false;
+    const q = questions[quizIndex];
+    document.getElementById("quizQuestion").innerText = `${quizIndex + 1}. ${q.q}`;
+    const optionsDiv = document.getElementById("quizOptions");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-option";
+      btn.innerHTML = `<i class="fa-regular fa-circle me-2"></i>${opt}`;
+      btn.onclick = () => answerQuestion(i);
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  function answerQuestion(i){
+    if(answered) return;
+    answered = true;
+
+    const correct = questions[quizIndex].correct;
+    if(i === correct){
+      score++;
+      Swal.fire({
+        icon: "success",
+        title: "Correcto",
+        text: "Muy bien.",
+        timer: 1200,
+        showConfirmButton: false
+      });
+    }else{
+      Swal.fire({
+        icon: "error",
+        title: "Incorrecto",
+        text: `La respuesta correcta era: ${questions[quizIndex].options[correct]}`,
+        confirmButtonText: "Entendido"
+      });
+    }
+  }
+
+  function nextQuestion(){
+    if(quizIndex < questions.length - 1){
+      quizIndex++;
+      renderQuestion();
+    }else{
+      Swal.fire({
+        icon: "success",
+        title: "Quiz finalizado",
+        html: `Puntaje: <strong>${score} / ${questions.length}</strong>`,
+        confirmButtonText: "Aceptar"
+      });
+    }
+  }
+
+  function restartQuiz(){
+    quizIndex = 0;
+    score = 0;
+    renderQuestion();
+  }
+
+  renderNavButtons();
+  renderQuestion();
+</script>
+
+</body>
+</html>
