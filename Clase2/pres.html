@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL para Analistas — Clase 2 | Bases Relacionales y SQL</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1220;
+  --bg2:#101a30;
+  --card:#15203a;
+  --card2:#1a2745;
+  --line:#27365c;
+  --ink:#e9effb;
+  --muted:#94a5c6;
+  --teal:#1fd2c1;
+  --teal-dim:rgba(31,210,193,.14);
+  --orange:#ff9d3c;
+  --orange-dim:rgba(255,157,60,.14);
+  --ok:#3ddc84;
+  --bad:#ff6b81;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(31,210,193,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(255,157,60,.08), transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Sora',system-ui,sans-serif;
+  overflow:hidden;
+}
+code,pre,kbd,.mono,textarea.sql-input{font-family:'Fira Code',monospace}
+
+/* ---------- frame ---------- */
+#progressbar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--teal),var(--orange));width:0%;z-index:60;transition:width .35s ease}
+header.hud{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;pointer-events:none;
+}
+.hud .brand{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
+.hud .brand .prompt{
+  background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:4px 10px;color:var(--teal);font-family:'Fira Code',monospace;font-size:.8rem;
+}
+.hud .right{display:flex;align-items:center;gap:10px;pointer-events:auto}
+.badge-slide{
+  background:var(--card);border:1px solid var(--line);color:var(--muted);
+  font-family:'Fira Code',monospace;font-size:.8rem;border-radius:8px;padding:4px 12px;
+}
+.badge-score{
+  background:var(--orange-dim);border:1px solid rgba(255,157,60,.4);color:var(--orange);
+  font-family:'Fira Code',monospace;font-size:.8rem;border-radius:8px;padding:4px 12px;
+}
+
+/* ---------- slides ---------- */
+.slide{
+  position:absolute;inset:0;display:none;
+  padding:84px 7vw 96px;overflow-y:auto;
+}
+.slide.active{display:block}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Fira Code',monospace;font-size:.78rem;letter-spacing:.08em;
+  color:var(--teal);background:var(--teal-dim);border:1px solid rgba(31,210,193,.35);
+  border-radius:999px;padding:5px 14px;margin-bottom:14px;text-transform:uppercase;
+}
+.eyebrow.naranja{color:var(--orange);background:var(--orange-dim);border-color:rgba(255,157,60,.4)}
+h1.title{font-weight:800;font-size:clamp(2rem,5vw,3.4rem);line-height:1.1;margin-bottom:.4em}
+h2.stitle{font-weight:800;font-size:clamp(1.5rem,3.4vw,2.3rem);margin-bottom:.5em}
+.lead-x{color:var(--muted);font-size:1.05rem;max-width:62ch}
+.accent{color:var(--teal)}
+.accent-o{color:var(--orange)}
+
+.card-x{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:20px 22px;height:100%;
+}
+.card-x h5{font-weight:700;display:flex;align-items:center;gap:10px}
+.card-x h5 i{color:var(--teal)}
+.card-x p,.card-x li{color:var(--muted);font-size:.95rem;margin-bottom:.3rem}
+.card-x.hl{border-color:rgba(31,210,193,.5);box-shadow:0 0 0 1px rgba(31,210,193,.2) inset}
+.card-x.warn{border-color:rgba(255,157,60,.5)}
+.card-x.warn h5 i{color:var(--orange)}
+
+pre.code{
+  background:#0a0f1d;border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;color:#d7e3ff;font-size:.92rem;line-height:1.6;overflow-x:auto;margin:0;
+}
+pre.code .kw{color:var(--teal);font-weight:600}
+pre.code .str{color:var(--orange)}
+pre.code .num{color:#c792ea}
+pre.code .com{color:#5b6b8f;font-style:italic}
+.code-head{
+  display:flex;align-items:center;gap:8px;background:#0a0f1d;border:1px solid var(--line);
+  border-bottom:none;border-radius:12px 12px 0 0;padding:8px 14px;
+  font-family:'Fira Code',monospace;font-size:.75rem;color:var(--muted);
+}
+.code-head .dot{width:9px;height:9px;border-radius:50%}
+.code-head + pre.code{border-radius:0 0 12px 12px}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+table.tbl th{
+  background:var(--card2);color:var(--teal);font-family:'Fira Code',monospace;
+  font-weight:600;font-size:.8rem;padding:9px 12px;border:1px solid var(--line);text-align:left;
+}
+table.tbl td{padding:8px 12px;border:1px solid var(--line);color:var(--ink)}
+table.tbl td.mut{color:var(--muted)}
+table.tbl tr.bad td{background:rgba(255,107,129,.08)}
+table.tbl td .pk{color:var(--orange);font-weight:600}
+table.tbl td .fk{color:var(--teal);font-weight:600}
+
+.kbd{
+  background:var(--card);border:1px solid var(--line);border-bottom-width:3px;
+  border-radius:7px;padding:2px 9px;font-family:'Fira Code',monospace;font-size:.8rem;color:var(--ink);
+}
+ul.checks{list-style:none;padding-left:0}
+ul.checks li{padding-left:1.7em;position:relative;margin-bottom:.5rem;color:var(--muted)}
+ul.checks li::before{content:'\f00c';font-family:'Font Awesome 6 Free';font-weight:900;color:var(--teal);position:absolute;left:0}
+ul.crosses li::before{content:'\f00d';color:var(--bad)}
+
+.big-num{font-family:'Fira Code',monospace;font-weight:600;font-size:2.4rem;color:var(--teal)}
+.pill-time{
+  font-family:'Fira Code',monospace;font-size:.78rem;color:var(--orange);
+  background:var(--orange-dim);border-radius:6px;padding:2px 10px;white-space:nowrap;
+}
+.agenda-row{
+  display:flex;align-items:center;gap:16px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:10px;
+}
+.agenda-row .n{font-family:'Fira Code',monospace;color:var(--teal);font-weight:600;min-width:2ch}
+.agenda-row .t{flex:1}
+
+/* relación diagrams */
+.rel-box{
+  background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  padding:10px 16px;font-family:'Fira Code',monospace;font-size:.85rem;text-align:center;
+}
+.rel-arrow{color:var(--orange);font-family:'Fira Code',monospace;font-size:.85rem;text-align:center}
+
+/* ---------- lab ---------- */
+.exercise{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:18px;
+}
+.exercise.done{border-color:rgba(61,220,132,.55);box-shadow:0 0 0 1px rgba(61,220,132,.25) inset}
+.exercise .ex-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.exercise .ex-num{
+  font-family:'Fira Code',monospace;color:var(--orange);font-weight:600;font-size:.85rem;
+}
+.exercise .ex-status{font-size:1.1rem;color:var(--muted)}
+.exercise.done .ex-status{color:var(--ok)}
+.exercise p.enun{color:var(--ink);font-size:.97rem;margin-bottom:10px}
+textarea.sql-input{
+  width:100%;background:#0a0f1d;border:1px solid var(--line);border-radius:10px;
+  color:#d7e3ff;font-size:.95rem;padding:12px 14px;resize:vertical;min-height:64px;
+  caret-color:var(--teal);
+}
+textarea.sql-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,210,193,.15)}
+textarea.sql-input::placeholder{color:#44557d}
+.btn-verify{
+  background:var(--teal);border:none;color:#06241f;font-weight:700;border-radius:9px;padding:8px 18px;
+}
+.btn-verify:hover{background:#3ee2d2;color:#06241f}
+.btn-hint{
+  background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 14px;
+}
+.btn-hint:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ---------- nav ---------- */
+nav.navbtns{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+  background:linear-gradient(transparent, rgba(11,18,32,.92) 40%);
+}
+.btn-nav{
+  background:var(--card);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:9px 20px;font-weight:600;
+}
+.btn-nav:hover{border-color:var(--teal);color:var(--teal)}
+.btn-nav:disabled{opacity:.35}
+.nav-help{color:var(--muted);font-size:.8rem;font-family:'Fira Code',monospace}
+
+/* scrollbars */
+.slide::-webkit-scrollbar{width:8px}
+.slide::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* SweetAlert dark fixes */
+.swal2-popup{font-family:'Sora',sans-serif!important}
+.swal-radio-list{display:flex;flex-direction:column;gap:10px;text-align:left}
+.swal-radio-list label{
+  display:flex;gap:10px;align-items:flex-start;background:var(--card2);
+  border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;color:var(--ink);
+  font-size:.95rem;
+}
+.swal-radio-list label:hover{border-color:var(--teal)}
+.swal-radio-list input{margin-top:4px;accent-color:var(--teal)}
+
+@media (max-width:768px){
+  .slide{padding:78px 5vw 100px}
+  .nav-help{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .animate__animated{animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="progressbar"></div>
+
+<header class="hud">
+  <div class="brand">
+    <span class="prompt">mysql&gt;</span>
+    <span class="d-none d-md-inline">SQL para Analistas · Clase 2 · Centro Ludus / UCU</span>
+  </div>
+  <div class="right">
+    <span class="badge-score" id="scoreBadge" title="Puntos de la clase"><i class="fa-solid fa-star"></i> 0 pts</span>
+    <span class="badge-slide" id="slideBadge">1 / 25</span>
+  </div>
+</header>
+
+<main id="deck">
+
+<!-- ============ 1. PORTADA ============ -->
+<section class="slide">
+  <div class="d-flex flex-column justify-content-center" style="min-height:70vh">
+    <span class="eyebrow"><i class="fa-solid fa-database"></i> SQL para Analistas · Semana 1 · Clase 2</span>
+    <h1 class="title">Bases de datos relacionales<br>y <span class="accent">primeros pasos en SQL</span></h1>
+    <p class="lead-x">Modelado de datos · ACID y transacciones · Normalización · PK y FK · MySQL · CRUD</p>
+    <div class="mt-4 d-flex gap-3 flex-wrap">
+      <span class="badge-slide"><i class="fa-regular fa-clock"></i> 20:00 – 21:30</span>
+      <span class="badge-slide"><i class="fa-solid fa-flask"></i> Incluye laboratorio autocorregible</span>
+    </div>
+    <p class="mt-5 nav-help">Navegá con <span class="kbd">←</span> <span class="kbd">→</span> o los botones de abajo</p>
+  </div>
+</section>
+
+<!-- ============ 2. AGENDA ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-list-check"></i> Hoja de ruta</span>
+  <h2 class="stitle">La clase de hoy</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-8">
+      <div class="agenda-row"><span class="n">01</span><span class="t">Repaso: ¿qué es una base de datos relacional?</span><span class="pill-time">20:00</span></div>
+      <div class="agenda-row"><span class="n">02</span><span class="t">Modelado de datos: transacciones y propiedades ACID</span><span class="pill-time">20:10</span></div>
+      <div class="agenda-row"><span class="n">03</span><span class="t">Tablas, relaciones y normalización (1FN → 3FN)</span><span class="pill-time">20:25</span></div>
+      <div class="agenda-row"><span class="n">04</span><span class="t">Reglas de integridad: PK, FK e integridad referencial</span><span class="pill-time">20:45</span></div>
+      <div class="agenda-row"><span class="n">05</span><span class="t">DBMS: conociendo MySQL</span><span class="pill-time">20:55</span></div>
+      <div class="agenda-row"><span class="n">06</span><span class="t">SQL: conceptos básicos y CRUD</span><span class="pill-time">21:05</span></div>
+      <div class="agenda-row"><span class="n">07</span><span class="t"><strong class="accent-o">Laboratorio:</strong> tus primeras consultas, autocorregidas</span><span class="pill-time">21:15</span></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card-x hl">
+        <h5><i class="fa-solid fa-bullseye"></i> Al final de la clase vas a poder</h5>
+        <ul class="checks mt-3">
+          <li>Explicar qué garantiza ACID</li>
+          <li>Detectar tablas mal normalizadas</li>
+          <li>Distinguir PK de FK</li>
+          <li>Escribir tus primeros SELECT, INSERT, UPDATE y DELETE</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. REPASO BD RELACIONAL ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-rotate-left"></i> Repaso · Clase 1</span>
+  <h2 class="stitle">¿Qué es una base de datos <span class="accent">relacional</span>?</h2>
+  <p class="lead-x">Un conjunto de datos organizados en <strong class="accent">tablas</strong> (relaciones) que se vinculan entre sí. Propuesto por <strong>E. F. Codd</strong> en 1970, sigue siendo el modelo dominante para datos estructurados.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-md-4">
+      <div class="card-x">
+        <h5><i class="fa-solid fa-table"></i> Tablas</h5>
+        <p>Cada tabla representa una entidad del negocio: clientes, productos, ventas.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card-x">
+        <h5><i class="fa-solid fa-link"></i> Relaciones</h5>
+        <p>Las tablas se conectan mediante claves: un dato vive en un solo lugar y se referencia desde otros.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card-x">
+        <h5><i class="fa-solid fa-terminal"></i> SQL</h5>
+        <p>Un lenguaje declarativo y estándar para consultar y manipular esos datos. Decís <em>qué</em> querés, no <em>cómo</em> obtenerlo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4">
+    <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> anticipo de la noche</div>
+    <pre class="code"><span class="kw">SELECT</span> nombre, ciudad <span class="kw">FROM</span> clientes <span class="kw">WHERE</span> ciudad = <span class="str">'Montevideo'</span>;</pre>
+  </div>
+</section>
+
+<!-- ============ 4. MODELADO ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-compass-drafting"></i> Modelado de datos</span>
+  <h2 class="stitle">Del mundo real al modelo</h2>
+  <p class="lead-x">Modelar es decidir <strong class="accent">qué entidades</strong> nos importan, <strong class="accent">qué atributos</strong> tienen y <strong class="accent">cómo se relacionan</strong>. Un buen modelo evita problemas que ninguna consulta puede arreglar después.</p>
+  <div class="row g-4 mt-2 align-items-center">
+    <div class="col-md-4">
+      <div class="card-x text-center">
+        <div class="big-num"><i class="fa-solid fa-earth-americas"></i></div>
+        <h5 class="justify-content-center mt-2">Mundo real</h5>
+        <p>"Los clientes hacen pedidos de productos"</p>
+      </div>
+    </div>
+    <div class="col-md-1 rel-arrow d-none d-md-block">──▶</div>
+    <div class="col-md-3">
+      <div class="card-x text-center">
+        <div class="big-num"><i class="fa-solid fa-diagram-project"></i></div>
+        <h5 class="justify-content-center mt-2">Modelo lógico</h5>
+        <p>Entidades, atributos y relaciones (DER)</p>
+      </div>
+    </div>
+    <div class="col-md-1 rel-arrow d-none d-md-block">──▶</div>
+    <div class="col-md-3">
+      <div class="card-x text-center">
+        <div class="big-num"><i class="fa-solid fa-database"></i></div>
+        <h5 class="justify-content-center mt-2">Modelo físico</h5>
+        <p>Tablas, tipos de datos, claves… en MySQL</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-x warn mt-4">
+    <h5><i class="fa-solid fa-lightbulb"></i> Idea clave para analistas</h5>
+    <p>Cuando una consulta se vuelve imposible o un reporte da números duplicados, casi siempre el problema nació acá: en el modelo.</p>
+  </div>
+</section>
+
+<!-- ============ 5. TRANSACCIONES ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-right-left"></i> Modelado de datos</span>
+  <h2 class="stitle">Transacciones: todo o nada</h2>
+  <p class="lead-x">Una <strong class="accent">transacción</strong> es una unidad de trabajo: un conjunto de operaciones que deben ejecutarse <strong>como un bloque indivisible</strong>.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> transferencia.sql</div>
+      <pre class="code"><span class="kw">START TRANSACTION</span>;
+
+<span class="com">-- Ana le transfiere $1000 a Bruno</span>
+<span class="kw">UPDATE</span> cuentas <span class="kw">SET</span> saldo = saldo - <span class="num">1000</span> <span class="kw">WHERE</span> titular = <span class="str">'Ana'</span>;
+<span class="kw">UPDATE</span> cuentas <span class="kw">SET</span> saldo = saldo + <span class="num">1000</span> <span class="kw">WHERE</span> titular = <span class="str">'Bruno'</span>;
+
+<span class="kw">COMMIT</span>;   <span class="com">-- confirma TODO…</span>
+<span class="com">-- o ROLLBACK; deshace TODO</span></pre>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-x h-auto mb-3">
+        <h5><i class="fa-solid fa-circle-question"></i> ¿Qué pasaría sin transacción?</h5>
+        <p>Si el sistema se cae <strong>entre</strong> los dos UPDATE: a Ana le descontaron $1000… y Bruno nunca los recibió. El dinero "desapareció".</p>
+      </div>
+      <div class="card-x h-auto hl">
+        <h5><i class="fa-solid fa-shield-halved"></i> Con transacción</h5>
+        <p>O se ejecutan <strong>las dos</strong> operaciones, o <strong>ninguna</strong>. El motor garantiza que la base nunca queda a mitad de camino.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. ACID ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-vial"></i> Modelado de datos</span>
+  <h2 class="stitle">Las 4 garantías: <span class="accent">A·C·I·D</span></h2>
+  <div class="row g-4 mt-1">
+    <div class="col-md-6 col-lg-3">
+      <div class="card-x">
+        <div class="big-num">A</div>
+        <h5 class="mt-2">Atomicidad</h5>
+        <p>La transacción es indivisible: se completa entera o no deja rastro. <em>Todo o nada.</em></p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card-x">
+        <div class="big-num">C</div>
+        <h5 class="mt-2">Consistencia</h5>
+        <p>La base pasa de un estado válido a otro estado válido: nunca viola sus reglas (saldos, claves, restricciones).</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card-x">
+        <div class="big-num">I</div>
+        <h5 class="mt-2">Aislamiento</h5>
+        <p>Las transacciones simultáneas no se pisan entre sí: cada una ve la base como si estuviera sola.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card-x">
+        <div class="big-num">D</div>
+        <h5 class="mt-2">Durabilidad</h5>
+        <p>Una vez confirmada (<span class="mono accent">COMMIT</span>), la transacción sobrevive a cortes de luz y caídas del sistema.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-x mt-4">
+    <h5><i class="fa-solid fa-cart-shopping"></i> Pensalo así</h5>
+    <p>Una compra online: descontar stock + registrar el pedido + cobrar la tarjeta. ACID garantiza que jamás cobres sin registrar el pedido, ni vendas un producto sin stock que otro cliente acaba de llevarse.</p>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-verify btn-lg" onclick="quizACID()"><i class="fa-solid fa-gamepad"></i> Mini-quiz ACID</button>
+  </div>
+</section>
+
+<!-- ============ 7. TABLAS Y RELACIONES ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-table-cells"></i> Modelado de datos</span>
+  <h2 class="stitle">Tablas y tipos de relaciones</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-5">
+      <p class="lead-x mb-3">Una tabla = una entidad. Cada <strong class="accent">fila</strong> es una ocurrencia; cada <strong class="accent">columna</strong>, un atributo con su tipo de dato.</p>
+      <table class="tbl">
+        <thead><tr><th>id</th><th>nombre</th><th>email</th><th>ciudad</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pk">1</span></td><td>Lucía Pérez</td><td class="mut">lucia@mail.com</td><td>Montevideo</td></tr>
+          <tr><td><span class="pk">2</span></td><td>Diego Sosa</td><td class="mut">diego@mail.com</td><td>Salto</td></tr>
+          <tr><td><span class="pk">3</span></td><td>Marta Gil</td><td class="mut">marta@mail.com</td><td>Montevideo</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-2 nav-help">tabla: clientes</p>
+    </div>
+    <div class="col-lg-7">
+      <div class="card-x mb-3 h-auto">
+        <h5><i class="fa-solid fa-arrows-left-right"></i> 1 a 1 (1:1)</h5>
+        <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
+          <span class="rel-box">persona</span><span class="rel-arrow">1 ──── 1</span><span class="rel-box">pasaporte</span>
+        </div>
+      </div>
+      <div class="card-x mb-3 h-auto hl">
+        <h5><i class="fa-solid fa-arrows-split-up-and-left"></i> 1 a muchos (1:N) — la más común</h5>
+        <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
+          <span class="rel-box">cliente</span><span class="rel-arrow">1 ──── N</span><span class="rel-box">pedidos</span>
+        </div>
+      </div>
+      <div class="card-x h-auto">
+        <h5><i class="fa-solid fa-arrows-up-down-left-right"></i> Muchos a muchos (N:M)</h5>
+        <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
+          <span class="rel-box">pedidos</span><span class="rel-arrow">N ─┐</span><span class="rel-box" style="border-color:var(--orange)">pedido_producto</span><span class="rel-arrow">┌─ M</span><span class="rel-box">productos</span>
+        </div>
+        <p class="mt-2">Se resuelve con una <strong class="accent-o">tabla intermedia</strong> que guarda los pares.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. NORMALIZACIÓN: POR QUÉ ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-triangle-exclamation"></i> Normalización</span>
+  <h2 class="stitle">¿Por qué normalizar? Una tabla con problemas</h2>
+  <p class="lead-x">Esta tabla "funciona"… hasta que hay que mantenerla. Encontrá los problemas:</p>
+  <div class="table-responsive mt-3">
+  <table class="tbl">
+    <thead><tr><th>pedido</th><th>cliente</th><th>email_cliente</th><th>productos</th><th>ciudad_cliente</th></tr></thead>
+    <tbody>
+      <tr><td>101</td><td>Lucía Pérez</td><td class="mut">lucia@mail.com</td><td class="mut">Teclado, Mouse, Monitor</td><td>Montevideo</td></tr>
+      <tr><td>102</td><td>Diego Sosa</td><td class="mut">diego@mail.com</td><td class="mut">Mouse</td><td>Salto</td></tr>
+      <tr class="bad"><td>103</td><td>Lucía Pérez</td><td class="mut">lucia@gmail.com</td><td class="mut">Notebook</td><td>Montevdeo</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="row g-4 mt-2">
+    <div class="col-md-4">
+      <div class="card-x warn">
+        <h5><i class="fa-solid fa-copy"></i> Anomalía de actualización</h5>
+        <p>El cliente se repite en cada pedido. Si cambia su email, hay que corregirlo en N filas… y en la fila 103 ya quedó distinto.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card-x warn">
+        <h5><i class="fa-solid fa-plus"></i> Anomalía de inserción</h5>
+        <p>No puedo registrar un cliente nuevo hasta que haga un pedido: no hay dónde ponerlo.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card-x warn">
+        <h5><i class="fa-solid fa-trash"></i> Anomalía de borrado</h5>
+        <p>Si borro el pedido 102, pierdo también los datos de Diego: era su único pedido.</p>
+      </div>
+    </div>
+  </div>
+  <p class="lead-x mt-3">¿Y notaste "Montevdeo" en la fila 103? La redundancia <strong class="accent-o">invita al error</strong>. La normalización lo previene por diseño.</p>
+</section>
+
+<!-- ============ 9. 1FN ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-1"></i> Normalización</span>
+  <h2 class="stitle">Primera Forma Normal (1FN)</h2>
+  <p class="lead-x"><strong class="accent">Valores atómicos:</strong> cada celda guarda un solo valor, sin listas ni grupos repetidos. Y cada fila se identifica de forma única.</p>
+  <div class="row g-4 mt-2 align-items-start">
+    <div class="col-lg-6">
+      <h5 class="text-danger mb-2"><i class="fa-solid fa-xmark"></i> Viola 1FN</h5>
+      <table class="tbl">
+        <thead><tr><th>pedido</th><th>productos</th></tr></thead>
+        <tbody>
+          <tr class="bad"><td>101</td><td>Teclado, Mouse, Monitor</td></tr>
+          <tr class="bad"><td>102</td><td>Mouse</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-2 nav-help">¿Cómo contás cuántos pedidos incluyen "Mouse"? ¿Con LIKE y rezando?</p>
+    </div>
+    <div class="col-lg-6">
+      <h5 class="accent mb-2"><i class="fa-solid fa-check"></i> Cumple 1FN</h5>
+      <table class="tbl">
+        <thead><tr><th>pedido</th><th>producto</th></tr></thead>
+        <tbody>
+          <tr><td>101</td><td>Teclado</td></tr>
+          <tr><td>101</td><td>Mouse</td></tr>
+          <tr><td>101</td><td>Monitor</td></tr>
+          <tr><td>102</td><td>Mouse</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-2 nav-help">Ahora un COUNT lo responde en una línea.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. 2FN ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-2"></i> Normalización</span>
+  <h2 class="stitle">Segunda Forma Normal (2FN)</h2>
+  <p class="lead-x">Estando en 1FN: ningún atributo depende de <strong>una parte</strong> de la clave. Cada dato depende de <strong class="accent">la clave completa</strong>.</p>
+  <div class="row g-4 mt-2 align-items-start">
+    <div class="col-lg-6">
+      <h5 class="text-danger mb-2"><i class="fa-solid fa-xmark"></i> Viola 2FN — clave: (pedido, producto)</h5>
+      <table class="tbl">
+        <thead><tr><th>pedido</th><th>producto</th><th>cantidad</th><th>precio_prod</th></tr></thead>
+        <tbody>
+          <tr class="bad"><td>101</td><td>Mouse</td><td>2</td><td>800</td></tr>
+          <tr class="bad"><td>102</td><td>Mouse</td><td>1</td><td>800</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-2 nav-help">precio_prod depende solo de <em>producto</em>, no del pedido → se repite y puede divergir.</p>
+    </div>
+    <div class="col-lg-6">
+      <h5 class="accent mb-2"><i class="fa-solid fa-check"></i> Cumple 2FN — se separa</h5>
+      <div class="d-flex gap-3 flex-wrap">
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>pedido</th><th>producto</th><th>cantidad</th></tr></thead>
+          <tbody><tr><td>101</td><td>Mouse</td><td>2</td></tr><tr><td>102</td><td>Mouse</td><td>1</td></tr></tbody>
+        </table>
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>producto</th><th>precio</th></tr></thead>
+          <tbody><tr><td>Mouse</td><td>800</td></tr></tbody>
+        </table>
+      </div>
+      <p class="mt-2 nav-help">El precio vive en un solo lugar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. 3FN ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-3"></i> Normalización</span>
+  <h2 class="stitle">Tercera Forma Normal (3FN)</h2>
+  <p class="lead-x">Estando en 2FN: ningún atributo depende de <strong>otro atributo que no sea clave</strong>. Sin dependencias transitivas.</p>
+  <div class="row g-4 mt-2 align-items-start">
+    <div class="col-lg-6">
+      <h5 class="text-danger mb-2"><i class="fa-solid fa-xmark"></i> Viola 3FN</h5>
+      <table class="tbl">
+        <thead><tr><th>cliente_id</th><th>nombre</th><th>cod_ciudad</th><th>nombre_ciudad</th></tr></thead>
+        <tbody>
+          <tr class="bad"><td>1</td><td>Lucía</td><td>MVD</td><td>Montevideo</td></tr>
+          <tr class="bad"><td>3</td><td>Marta</td><td>MVD</td><td>Montevideo</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-2 nav-help">nombre_ciudad depende de cod_ciudad (no de la clave) → cadena: clave → cod_ciudad → nombre_ciudad.</p>
+    </div>
+    <div class="col-lg-6">
+      <h5 class="accent mb-2"><i class="fa-solid fa-check"></i> Cumple 3FN — tabla de ciudades</h5>
+      <div class="d-flex gap-3 flex-wrap">
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>cliente_id</th><th>nombre</th><th>cod_ciudad</th></tr></thead>
+          <tbody><tr><td>1</td><td>Lucía</td><td class="mut">MVD</td></tr><tr><td>3</td><td>Marta</td><td class="mut">MVD</td></tr></tbody>
+        </table>
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>cod_ciudad</th><th>nombre_ciudad</th></tr></thead>
+          <tbody><tr><td>MVD</td><td>Montevideo</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card-x mt-4">
+    <h5><i class="fa-solid fa-quote-left"></i> Regla mnemotécnica</h5>
+    <p>Cada atributo depende de <strong>la clave</strong> (1FN), de <strong>toda la clave</strong> (2FN) y de <strong>nada más que la clave</strong> (3FN).</p>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-verify btn-lg" onclick="quizNormalizacion()"><i class="fa-solid fa-gamepad"></i> Mini-quiz Normalización</button>
+  </div>
+</section>
+
+<!-- ============ 12. PK ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-key"></i> Reglas de integridad</span>
+  <h2 class="stitle">Clave primaria (PK)</h2>
+  <p class="lead-x">Identifica de forma <strong class="accent">única e inequívoca</strong> a cada fila. Es la base de la <strong>integridad de entidad</strong>.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> clientes.sql</div>
+      <pre class="code"><span class="kw">CREATE TABLE</span> clientes (
+  id     <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre <span class="kw">VARCHAR</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+  email  <span class="kw">VARCHAR</span>(<span class="num">120</span>) <span class="kw">UNIQUE</span>,
+  ciudad <span class="kw">VARCHAR</span>(<span class="num">60</span>),
+  <span class="kw">PRIMARY KEY</span> (id)
+);</pre>
+    </div>
+    <div class="col-lg-6">
+      <ul class="checks mt-2">
+        <li><strong class="accent">Única:</strong> no puede repetirse en dos filas.</li>
+        <li><strong class="accent">No nula:</strong> toda fila debe tenerla (NOT NULL implícito).</li>
+        <li><strong class="accent">Estable:</strong> idealmente no cambia nunca → por eso solemos usar un <span class="mono">id</span> autoincremental y no el email o la cédula.</li>
+        <li>Puede ser <strong>compuesta</strong>: varias columnas juntas, como (pedido_id, producto_id) en una tabla intermedia.</li>
+      </ul>
+      <div class="card-x warn h-auto mt-2">
+        <h5><i class="fa-solid fa-circle-question"></i> Para discutir</h5>
+        <p>¿Por qué la cédula de identidad puede ser una mala PK para clientes? (extranjeros, errores de tipeo, datos sensibles…)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13. FK ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-link"></i> Reglas de integridad</span>
+  <h2 class="stitle">Clave foránea (FK) e integridad referencial</h2>
+  <p class="lead-x">Una columna que <strong class="accent">apunta a la PK de otra tabla</strong>. El motor garantiza que la referencia siempre exista: <strong>integridad referencial</strong>.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-7">
+      <div class="d-flex gap-3 flex-wrap align-items-start">
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>clientes</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="pk">id (PK)</span></td><td>nombre</td></tr>
+            <tr><td>1</td><td>Lucía</td></tr>
+            <tr><td>2</td><td>Diego</td></tr>
+          </tbody>
+        </table>
+        <span class="rel-arrow mt-4">◀── referencia ──</span>
+        <table class="tbl" style="width:auto">
+          <thead><tr><th>pedidos</th><th></th><th></th></tr></thead>
+          <tbody>
+            <tr><td><span class="pk">id (PK)</span></td><td><span class="fk">cliente_id (FK)</span></td><td>fecha</td></tr>
+            <tr><td>101</td><td><span class="fk">1</span></td><td class="mut">2026-06-01</td></tr>
+            <tr><td>102</td><td><span class="fk">2</span></td><td class="mut">2026-06-03</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-3">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> pedidos.sql</div>
+      <pre class="code"><span class="kw">CREATE TABLE</span> pedidos (
+  id         <span class="kw">INT</span> <span class="kw">AUTO_INCREMENT</span> <span class="kw">PRIMARY KEY</span>,
+  cliente_id <span class="kw">INT</span> <span class="kw">NOT NULL</span>,
+  fecha      <span class="kw">DATE</span>,
+  <span class="kw">FOREIGN KEY</span> (cliente_id) <span class="kw">REFERENCES</span> clientes(id)
+);</pre>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card-x h-auto mb-3 hl">
+        <h5><i class="fa-solid fa-shield-halved"></i> Qué impide el motor</h5>
+        <ul class="checks mt-2">
+          <li>Insertar un pedido con <span class="mono">cliente_id = 99</span> si ese cliente no existe.</li>
+          <li>Borrar un cliente que todavía tiene pedidos (salvo que definas ON DELETE).</li>
+        </ul>
+      </div>
+      <div class="card-x h-auto">
+        <h5><i class="fa-solid fa-database"></i> Pedidos huérfanos = reportes rotos</h5>
+        <p>Para un analista, una FK rota significa ventas que no suman en ningún cliente. La integridad referencial es tu seguro de calidad de datos.</p>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-verify btn-lg" onclick="quizClaves()"><i class="fa-solid fa-gamepad"></i> Mini-quiz PK / FK</button>
+  </div>
+</section>
+
+<!-- ============ 14. DBMS ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-server"></i> DBMS</span>
+  <h2 class="stitle">El DBMS: quién hace cumplir las reglas</h2>
+  <p class="lead-x">El <strong class="accent">Sistema de Gestión de Bases de Datos</strong> (DBMS) es el software que almacena los datos y garantiza todo lo que vimos: ACID, integridad, concurrencia, seguridad y respaldo.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-md-3 col-6"><div class="card-x text-center"><h5 class="justify-content-center">MySQL</h5><p>Open source, el que usaremos</p></div></div>
+    <div class="col-md-3 col-6"><div class="card-x text-center"><h5 class="justify-content-center">PostgreSQL</h5><p>Open source, muy completo</p></div></div>
+    <div class="col-md-3 col-6"><div class="card-x text-center"><h5 class="justify-content-center">SQL Server</h5><p>Microsoft, mundo corporativo</p></div></div>
+    <div class="col-md-3 col-6"><div class="card-x text-center"><h5 class="justify-content-center">Oracle</h5><p>Grandes empresas y banca</p></div></div>
+  </div>
+  <div class="card-x mt-4">
+    <h5><i class="fa-solid fa-lightbulb"></i> La buena noticia</h5>
+    <p>Todos hablan <strong class="accent">SQL</strong> con pequeñas variantes (dialectos). Lo que aprendas en MySQL se transfiere casi directo a cualquiera de los otros.</p>
+  </div>
+</section>
+
+<!-- ============ 15. MYSQL ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-dolphin"></i> DBMS</span>
+  <h2 class="stitle">MySQL: nuestro motor del curso</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <ul class="checks">
+        <li>Open source, gratuito y multiplataforma.</li>
+        <li>Uno de los DBMS más usados del mundo: WordPress, e-commerce, startups y corporaciones.</li>
+        <li>Motor <strong class="accent">InnoDB</strong>: transacciones ACID y claves foráneas.</li>
+        <li>Se integra de forma directa con <strong>Power BI</strong> (lo veremos en la clase 8).</li>
+      </ul>
+      <div class="card-x h-auto mt-3">
+        <h5><i class="fa-solid fa-screwdriver-wrench"></i> Herramientas para trabajar</h5>
+        <p><strong>MySQL Workbench</strong> (gráfica, oficial) · <strong>phpMyAdmin</strong> (web) · <strong>línea de comandos</strong> · DBeaver, HeidiSQL…</p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> terminal</div>
+      <pre class="code"><span class="com">$ mysql -u analista -p</span>
+mysql&gt; <span class="kw">SHOW DATABASES</span>;
++--------------------+
+| Database           |
++--------------------+
+| ludus_ventas       |
+| information_schema |
++--------------------+
+mysql&gt; <span class="kw">USE</span> ludus_ventas;
+mysql&gt; <span class="kw">SHOW TABLES</span>;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 16. SQL CONCEPTOS ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-terminal"></i> SQL</span>
+  <h2 class="stitle">SQL: el lenguaje</h2>
+  <p class="lead-x"><strong class="accent">Structured Query Language</strong> — declarativo (decís <em>qué</em>, no <em>cómo</em>), estándar ISO, y con más de 50 años sigue siendo la herramienta nº1 del analista de datos.</p>
+  <div class="row g-4 mt-2">
+    <div class="col-md-6 col-lg-3"><div class="card-x"><h5><i class="fa-solid fa-hammer"></i> DDL</h5><p><em>Definition:</em> define estructuras.<br><span class="mono">CREATE, ALTER, DROP</span></p><p class="nav-help">→ próxima clase</p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x hl"><h5><i class="fa-solid fa-pen-to-square"></i> DML</h5><p><em>Manipulation:</em> trabaja con los datos.<br><span class="mono">SELECT, INSERT, UPDATE, DELETE</span></p><p class="nav-help">→ hoy: CRUD</p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x"><h5><i class="fa-solid fa-user-lock"></i> DCL</h5><p><em>Control:</em> permisos.<br><span class="mono">GRANT, REVOKE</span></p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x"><h5><i class="fa-solid fa-right-left"></i> TCL</h5><p><em>Transaction:</em> transacciones.<br><span class="mono">COMMIT, ROLLBACK</span></p></div></div>
+  </div>
+</section>
+
+<!-- ============ 17. CRUD ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-arrows-spin"></i> SQL · CRUD</span>
+  <h2 class="stitle">CRUD: las 4 operaciones de toda app</h2>
+  <p class="lead-x">Cualquier sistema que toque datos hace estas cuatro cosas. En SQL, cada una tiene su sentencia:</p>
+  <div class="row g-4 mt-2">
+    <div class="col-md-6 col-lg-3"><div class="card-x text-center"><div class="big-num">C</div><h5 class="justify-content-center">Create</h5><p class="mono accent">INSERT</p><p>Agregar filas nuevas</p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x text-center hl"><div class="big-num">R</div><h5 class="justify-content-center">Read</h5><p class="mono accent">SELECT</p><p>Consultar — el 90% del trabajo del analista</p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x text-center"><div class="big-num">U</div><h5 class="justify-content-center">Update</h5><p class="mono accent">UPDATE</p><p>Modificar filas existentes</p></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card-x text-center"><div class="big-num">D</div><h5 class="justify-content-center">Delete</h5><p class="mono accent">DELETE</p><p>Eliminar filas</p></div></div>
+  </div>
+</section>
+
+<!-- ============ 18. SELECT ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-magnifying-glass"></i> CRUD · Read</span>
+  <h2 class="stitle"><span class="mono accent">SELECT</span> — consultar datos</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> select.sql</div>
+      <pre class="code"><span class="com">-- todas las columnas, todas las filas</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> clientes;
+
+<span class="com">-- solo algunas columnas</span>
+<span class="kw">SELECT</span> nombre, email <span class="kw">FROM</span> clientes;
+
+<span class="com">-- con filtro</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> clientes
+<span class="kw">WHERE</span> ciudad = <span class="str">'Montevideo'</span>;
+
+<span class="com">-- ordenado y limitado</span>
+<span class="kw">SELECT</span> nombre <span class="kw">FROM</span> clientes
+<span class="kw">ORDER BY</span> nombre <span class="kw">ASC</span>
+<span class="kw">LIMIT</span> <span class="num">10</span>;</pre>
+    </div>
+    <div class="col-lg-6">
+      <ul class="checks mt-2">
+        <li><span class="mono">*</span> = todas las columnas. Útil para explorar; en producción se prefieren columnas explícitas.</li>
+        <li><span class="mono">WHERE</span> filtra filas con condiciones: <span class="mono">=, &lt;&gt;, &gt;, &lt;, LIKE, IN, BETWEEN</span>.</li>
+        <li>Los textos van entre <strong class="accent-o">comillas simples</strong>; los números, sin comillas.</li>
+        <li><span class="mono">ORDER BY</span> ordena, <span class="mono">LIMIT</span> recorta.</li>
+        <li>SQL no distingue mayúsculas en las palabras clave, pero la convención es escribirlas en MAYÚSCULAS.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 19. INSERT ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-plus"></i> CRUD · Create</span>
+  <h2 class="stitle"><span class="mono accent">INSERT</span> — agregar filas</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> insert.sql</div>
+      <pre class="code"><span class="com">-- forma recomendada: columnas explícitas</span>
+<span class="kw">INSERT INTO</span> clientes (nombre, email, ciudad)
+<span class="kw">VALUES</span> (<span class="str">'Ana Ruiz'</span>, <span class="str">'ana@mail.com'</span>, <span class="str">'Salto'</span>);
+
+<span class="com">-- varias filas de una vez</span>
+<span class="kw">INSERT INTO</span> productos (nombre, precio)
+<span class="kw">VALUES</span> (<span class="str">'Teclado'</span>, <span class="num">1200</span>),
+       (<span class="str">'Mouse'</span>,   <span class="num">800</span>);</pre>
+    </div>
+    <div class="col-lg-6">
+      <ul class="checks mt-2">
+        <li>Listar las columnas hace el INSERT <strong>robusto</strong>: si mañana la tabla agrega una columna, tu sentencia sigue funcionando.</li>
+        <li>El <span class="mono">id AUTO_INCREMENT</span> no se incluye: lo genera el motor.</li>
+        <li>El orden de los VALUES debe coincidir con el orden de las columnas declaradas.</li>
+        <li>Si violás una regla (email UNIQUE repetido, FK inexistente) el motor <strong class="accent-o">rechaza la fila</strong>: la integridad en acción.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 20. UPDATE / DELETE ============ -->
+<section class="slide">
+  <span class="eyebrow"><i class="fa-solid fa-pen"></i> CRUD · Update &amp; Delete</span>
+  <h2 class="stitle"><span class="mono accent">UPDATE</span> y <span class="mono accent">DELETE</span> — con cuidado</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="code-head"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span> update-delete.sql</div>
+      <pre class="code"><span class="com">-- modificar</span>
+<span class="kw">UPDATE</span> productos
+<span class="kw">SET</span> precio = <span class="num">1500</span>
+<span class="kw">WHERE</span> id = <span class="num">1</span>;
+
+<span class="com">-- eliminar</span>
+<span class="kw">DELETE FROM</span> clientes
+<span class="kw">WHERE</span> id = <span class="num">5</span>;</pre>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-x warn h-auto mb-3">
+        <h5><i class="fa-solid fa-triangle-exclamation"></i> La regla de oro</h5>
+        <p>Un <span class="mono">UPDATE</span> o <span class="mono">DELETE</span> <strong>sin WHERE</strong> afecta <strong class="accent-o">TODAS las filas</strong> de la tabla. Es el error clásico que arruina viernes a la tarde.</p>
+      </div>
+      <div class="card-x hl h-auto">
+        <h5><i class="fa-solid fa-lightbulb"></i> Truco profesional</h5>
+        <p>Antes del UPDATE/DELETE, ejecutá un <span class="mono">SELECT</span> con el mismo WHERE. Si devuelve exactamente las filas que querés tocar, recién ahí ejecutás. Y mejor aún: dentro de una transacción.</p>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-verify btn-lg" onclick="quizCRUD()"><i class="fa-solid fa-gamepad"></i> Mini-quiz CRUD</button>
+  </div>
+</section>
+
+<!-- ============ 21. LAB INTRO ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-flask"></i> Laboratorio</span>
+  <h2 class="stitle">Tu turno: laboratorio autocorregible</h2>
+  <p class="lead-x">6 ejercicios. Escribís la sentencia, presionás <strong class="accent">Verificar</strong> y la corrección es instantánea. Cada acierto suma <strong class="accent-o">10 puntos</strong> (5 si pediste pista).</p>
+  <div class="row g-4 mt-2">
+    <div class="col-lg-7">
+      <h5 class="mb-2"><i class="fa-solid fa-database accent"></i> Esquema de trabajo: <span class="mono">ludus_ventas</span></h5>
+      <div class="d-flex gap-3 flex-wrap">
+        <table class="tbl" style="width:auto">
+          <thead><tr><th colspan="2">clientes</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pk">id</span></td><td class="mut">INT, PK</td></tr>
+            <tr><td>nombre</td><td class="mut">VARCHAR</td></tr>
+            <tr><td>email</td><td class="mut">VARCHAR</td></tr>
+            <tr><td>ciudad</td><td class="mut">VARCHAR</td></tr>
+          </tbody>
+        </table>
+        <table class="tbl" style="width:auto">
+          <thead><tr><th colspan="2">productos</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pk">id</span></td><td class="mut">INT, PK</td></tr>
+            <tr><td>nombre</td><td class="mut">VARCHAR</td></tr>
+            <tr><td>precio</td><td class="mut">DECIMAL</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card-x hl">
+        <h5><i class="fa-solid fa-circle-info"></i> Reglas del juego</h5>
+        <ul class="checks mt-2">
+          <li>Mayúsculas o minúsculas: da igual.</li>
+          <li>Espacios extra: no molestan.</li>
+          <li>El <span class="mono">;</span> final es opcional.</li>
+          <li>Botón <strong>Pista</strong> si te trancás.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-verify btn-lg" onclick="nextSlide()"><i class="fa-solid fa-play"></i> Empezar el laboratorio</button>
+  </div>
+</section>
+
+<!-- ============ 22. LAB 1-2 ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-flask"></i> Laboratorio · SELECT</span>
+  <h2 class="stitle">Ejercicios 1 y 2 <span class="nav-help" id="lab-progress-1"></span></h2>
+
+  <div class="exercise" id="ex1">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 01 · SELECT básico</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Mostrá <strong>todas las columnas</strong> y <strong>todas las filas</strong> de la tabla <span class="mono accent">clientes</span>.</p>
+    <textarea class="sql-input" id="in1" rows="2" spellcheck="false" placeholder="-- escribí tu consulta acá"></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(1)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(1)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+
+  <div class="exercise" id="ex2">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 02 · Columnas específicas</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Mostrá solo las columnas <span class="mono accent">nombre</span> y <span class="mono accent">email</span> (en ese orden) de la tabla <span class="mono accent">clientes</span>.</p>
+    <textarea class="sql-input" id="in2" rows="2" spellcheck="false" placeholder="-- escribí tu consulta acá"></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(2)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(2)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 23. LAB 3-4 ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-flask"></i> Laboratorio · WHERE e INSERT</span>
+  <h2 class="stitle">Ejercicios 3 y 4 <span class="nav-help" id="lab-progress-2"></span></h2>
+
+  <div class="exercise" id="ex3">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 03 · Filtrar con WHERE</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Mostrá todas las columnas de <span class="mono accent">clientes</span> cuya <span class="mono accent">ciudad</span> sea <strong>'Montevideo'</strong>.</p>
+    <textarea class="sql-input" id="in3" rows="2" spellcheck="false" placeholder="-- escribí tu consulta acá"></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(3)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(3)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+
+  <div class="exercise" id="ex4">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 04 · INSERT</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Insertá en <span class="mono accent">productos</span> un producto a tu elección, indicando las columnas <span class="mono accent">(nombre, precio)</span>. El nombre entre comillas simples y el precio como número.</p>
+    <textarea class="sql-input" id="in4" rows="2" spellcheck="false" placeholder="-- INSERT INTO ..."></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(4)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(4)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 24. LAB 5-6 ============ -->
+<section class="slide">
+  <span class="eyebrow naranja"><i class="fa-solid fa-flask"></i> Laboratorio · UPDATE y DELETE</span>
+  <h2 class="stitle">Ejercicios 5 y 6 <span class="nav-help" id="lab-progress-3"></span></h2>
+
+  <div class="exercise" id="ex5">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 05 · UPDATE</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Cambiá el <span class="mono accent">precio</span> del producto con <span class="mono accent">id = 1</span> a <strong>1500</strong>. ¡No te olvides del WHERE!</p>
+    <textarea class="sql-input" id="in5" rows="2" spellcheck="false" placeholder="-- UPDATE ..."></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(5)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(5)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+
+  <div class="exercise" id="ex6">
+    <div class="ex-head">
+      <span class="ex-num">EJERCICIO 06 · DELETE</span>
+      <span class="ex-status"><i class="fa-regular fa-circle"></i></span>
+    </div>
+    <p class="enun">Eliminá de <span class="mono accent">clientes</span> la fila con <span class="mono accent">id = 5</span>.</p>
+    <textarea class="sql-input" id="in6" rows="2" spellcheck="false" placeholder="-- DELETE ..."></textarea>
+    <div class="d-flex gap-2 mt-2">
+      <button class="btn btn-verify" onclick="checkExercise(6)"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn btn-hint" onclick="showHint(6)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 25. CIERRE ============ -->
+<section class="slide">
+  <div class="d-flex flex-column justify-content-center" style="min-height:70vh">
+    <span class="eyebrow"><i class="fa-solid fa-flag-checkered"></i> Cierre</span>
+    <h2 class="stitle">Lo que te llevás de hoy</h2>
+    <div class="row g-4 mt-1">
+      <div class="col-md-6">
+        <ul class="checks">
+          <li>Las transacciones y ACID protegen los datos: todo o nada.</li>
+          <li>Normalizar (1FN → 3FN) elimina redundancia y anomalías.</li>
+          <li>PK identifica; FK conecta y el motor hace cumplir la integridad.</li>
+          <li>CRUD = INSERT, SELECT, UPDATE, DELETE.</li>
+          <li>UPDATE/DELETE siempre con WHERE (y antes, un SELECT de control).</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <div class="card-x hl">
+          <h5><i class="fa-solid fa-forward"></i> Próxima clase (Clase 3)</h5>
+          <p>DDL y DML en profundidad · Joins · Subconsultas · Agregaciones · Vistas y funciones analíticas.</p>
+          <p class="mt-2"><strong class="accent-o">Tarea:</strong> instalá MySQL + Workbench y verificá que podés conectarte. Lo vamos a necesitar sí o sí.</p>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-5">
+      <button class="btn btn-verify btn-lg" onclick="showFinalScore()"><i class="fa-solid fa-trophy"></i> Ver mi puntaje final</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="navbtns">
+  <button class="btn-nav" id="btnPrev" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i> Anterior</button>
+  <span class="nav-help"><span class="kbd">←</span> <span class="kbd">→</span> navegar · <span class="kbd">Inicio</span>/<span class="kbd">Fin</span> saltar</span>
+  <button class="btn-nav" id="btnNext" onclick="nextSlide()">Siguiente <i class="fa-solid fa-arrow-right"></i></button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+/* ================= NAVEGACIÓN ================= */
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+
+const swalBase = {
+  background: '#15203a',
+  color: '#e9effb',
+  confirmButtonColor: '#1fd2c1',
+  cancelButtonColor: '#27365c'
+};
+
+function showSlide(i, dir = 1){
+  if(i < 0 || i >= slides.length) return;
+  slides[current].classList.remove('active');
+  current = i;
+  const s = slides[current];
+  s.classList.add('active');
+  s.scrollTop = 0;
+  s.classList.remove('animate__animated','animate__fadeInRight','animate__fadeInLeft');
+  void s.offsetWidth; // reflow para reanimar
+  s.classList.add('animate__animated', dir >= 0 ? 'animate__fadeInRight' : 'animate__fadeInLeft');
+  document.getElementById('slideBadge').textContent = (current+1) + ' / ' + slides.length;
+  document.getElementById('progressbar').style.width = ((current+1)/slides.length*100) + '%';
+  document.getElementById('btnPrev').disabled = current === 0;
+  document.getElementById('btnNext').disabled = current === slides.length-1;
+}
+function nextSlide(){ showSlide(current+1, 1); }
+function prevSlide(){ showSlide(current-1, -1); }
+
+document.addEventListener('keydown', e => {
+  // no navegar mientras se escribe en un ejercicio o hay un Swal abierto
+  if(e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if(Swal.isVisible()) return;
+  if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if(e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+  if(e.key === 'Home'){ e.preventDefault(); showSlide(0,-1); }
+  if(e.key === 'End'){ e.preventDefault(); showSlide(slides.length-1,1); }
+});
+
+/* ================= PUNTAJE ================= */
+let score = 0;
+function addPoints(p){
+  score += p;
+  const b = document.getElementById('scoreBadge');
+  b.innerHTML = '<i class="fa-solid fa-star"></i> ' + score + ' pts';
+  b.classList.remove('animate__animated','animate__bounce');
+  void b.offsetWidth;
+  b.classList.add('animate__animated','animate__bounce');
+}
+
+/* ================= QUIZZES (SweetAlert2) ================= */
+function runQuiz(title, question, options, correctIndex, explanation, points = 10){
+  const inputs = options.map((o,i) =>
+    `<label><input type="radio" name="qz" value="${i}"><span>${o}</span></label>`
+  ).join('');
+  Swal.fire({
+    ...swalBase,
+    title: title,
+    html: `<p style="text-align:left;margin-bottom:14px">${question}</p><div class="swal-radio-list">${inputs}</div>`,
+    confirmButtonText: 'Responder',
+    showCancelButton: true,
+    cancelButtonText: 'Cancelar',
+    showClass: { popup: 'animate__animated animate__zoomIn animate__faster' },
+    hideClass: { popup: 'animate__animated animate__zoomOut animate__faster' },
+    preConfirm: () => {
+      const sel = document.querySelector('input[name="qz"]:checked');
+      if(!sel){ Swal.showValidationMessage('Elegí una opción'); return false; }
+      return parseInt(sel.value);
+    }
+  }).then(res => {
+    if(!res.isConfirmed) return;
+    if(res.value === correctIndex){
+      addPoints(points);
+      Swal.fire({
+        ...swalBase,
+        icon: 'success',
+        title: '¡Correcto! +' + points + ' pts',
+        html: `<p style="text-align:left">${explanation}</p>`,
+        showClass: { popup: 'animate__animated animate__tada' }
+      });
+    } else {
+      Swal.fire({
+        ...swalBase,
+        icon: 'error',
+        title: 'No es esa…',
+        html: `<p style="text-align:left">La respuesta correcta era: <strong style="color:#1fd2c1">${options[correctIndex]}</strong></p><p style="text-align:left">${explanation}</p>`,
+        showClass: { popup: 'animate__animated animate__shakeX' }
+      });
+    }
+  });
+}
+
+function quizACID(){
+  runQuiz('Mini-quiz · ACID',
+    'Durante una transferencia bancaria se corta la luz entre el débito y el crédito. Al reiniciar, la base no muestra ningún cambio. ¿Qué propiedad actuó?',
+    ['Consistencia','Atomicidad','Aislamiento','Durabilidad'],
+    1,
+    'La <strong>Atomicidad</strong> garantiza "todo o nada": como la transacción no llegó al COMMIT, se deshizo por completo y la base quedó como antes.');
+}
+
+function quizNormalizacion(){
+  runQuiz('Mini-quiz · Normalización',
+    'Una tabla guarda en la columna <code>telefonos</code> valores como "099111222, 24001234". ¿Qué forma normal viola?',
+    ['1FN — valores no atómicos','2FN — dependencia parcial','3FN — dependencia transitiva','Ninguna, es válido'],
+    0,
+    'Varias valores en una misma celda violan la <strong>1FN</strong>: cada celda debe contener un único valor atómico. La solución es una tabla <code>telefonos</code> aparte (relación 1:N).');
+}
+
+function quizClaves(){
+  runQuiz('Mini-quiz · PK y FK',
+    'En la tabla <code>pedidos</code>, la columna <code>cliente_id</code> referencia a <code>clientes.id</code>. Si intento insertar un pedido con cliente_id = 99 y ese cliente no existe, el motor…',
+    ['Lo inserta y queda NULL','Lo inserta igual: es solo una advertencia','Rechaza el INSERT por integridad referencial','Crea automáticamente el cliente 99'],
+    2,
+    'La <strong>FK</strong> obliga a que toda referencia exista: el motor rechaza la operación. Así se evitan los "pedidos huérfanos" que rompen los reportes.');
+}
+
+function quizCRUD(){
+  runQuiz('Mini-quiz · CRUD',
+    'Ejecutás <code>DELETE FROM clientes;</code> (sin WHERE). ¿Qué pasa?',
+    ['Error de sintaxis: WHERE es obligatorio','Borra solo la primera fila','No borra nada','Borra TODAS las filas de la tabla'],
+    3,
+    'Sin <code>WHERE</code>, la sentencia aplica a toda la tabla. Es sintácticamente válida y por eso tan peligrosa. Regla de oro: primero un SELECT con el mismo WHERE, y mejor dentro de una transacción.');
+}
+
+/* ================= LABORATORIO (regex) ================= */
+/* Las regex son tolerantes: mayúsculas/minúsculas, espacios múltiples y ; opcional */
+const exercises = {
+  1: {
+    regex: /^\s*select\s+\*\s+from\s+clientes\s*;?\s*$/i,
+    hint: 'Estructura: <code>SELECT &lt;qué&gt; FROM &lt;tabla&gt;;</code> — para "todas las columnas" se usa el asterisco <code>*</code>.',
+    success: 'Esa consulta devuelve la tabla completa: las 4 columnas y todas las filas de <code>clientes</code>.',
+    errorHint: 'Revisá: ¿usaste <code>SELECT * FROM clientes</code>? Verificá el nombre de la tabla y el asterisco.'
+  },
+  2: {
+    regex: /^\s*select\s+nombre\s*,\s*email\s+from\s+clientes\s*;?\s*$/i,
+    hint: 'Las columnas se listan separadas por coma: <code>SELECT col1, col2 FROM tabla;</code>',
+    success: 'Proyección perfecta: solo <code>nombre</code> y <code>email</code>, en ese orden.',
+    errorHint: 'Deben ser exactamente <code>nombre, email</code> (en ese orden, separadas por coma) desde la tabla <code>clientes</code>.'
+  },
+  3: {
+    regex: /^\s*select\s+\*\s+from\s+clientes\s+where\s+ciudad\s*=\s*'monteviden?o'\s*;?\s*$/i,
+    hint: 'Agregá la cláusula <code>WHERE columna = \'valor\'</code> después del FROM. El texto va entre comillas simples.',
+    success: 'Filtro aplicado: solo las filas donde <code>ciudad = \'Montevideo\'</code>.',
+    errorHint: 'Estructura: <code>SELECT * FROM clientes WHERE ciudad = \'Montevideo\'</code> — ojo con las comillas simples en el texto.'
+  },
+  4: {
+    regex: /^\s*insert\s+into\s+productos\s*\(\s*nombre\s*,\s*precio\s*\)\s*values\s*\(\s*'[^']+'\s*,\s*\d+(\.\d+)?\s*\)\s*;?\s*$/i,
+    hint: 'Estructura: <code>INSERT INTO tabla (col1, col2) VALUES (\'texto\', numero);</code>',
+    success: 'Fila insertada. Notá que el <code>id</code> no se incluye: lo genera el AUTO_INCREMENT.',
+    errorHint: 'Verificá: <code>INSERT INTO productos (nombre, precio) VALUES (\'...\', ...)</code> — nombre entre comillas simples, precio sin comillas.'
+  },
+  5: {
+    regex: /^\s*update\s+productos\s+set\s+precio\s*=\s*1500(\.0+)?\s+where\s+id\s*=\s*1\s*;?\s*$/i,
+    hint: 'Estructura: <code>UPDATE tabla SET columna = valor WHERE condición;</code>',
+    success: 'Actualización quirúrgica: solo el producto 1 cambió de precio, gracias al WHERE.',
+    errorHint: 'Debe ser <code>UPDATE productos SET precio = 1500 WHERE id = 1</code> — sin el WHERE, ¡cambiarías el precio de todos!'
+  },
+  6: {
+    regex: /^\s*delete\s+from\s+clientes\s+where\s+id\s*=\s*5\s*;?\s*$/i,
+    hint: 'Estructura: <code>DELETE FROM tabla WHERE condición;</code> — DELETE no lleva asterisco ni columnas.',
+    success: 'Eliminación controlada: una sola fila, la del id 5. El WHERE te salvó el viernes.',
+    errorHint: 'Debe ser <code>DELETE FROM clientes WHERE id = 5</code> — recordá que DELETE no lista columnas.'
+  }
+};
+const exState = {}; // {n: {done:bool, hinted:bool}}
+for(const k in exercises) exState[k] = { done:false, hinted:false };
+
+function updateLabProgress(){
+  const done = Object.values(exState).filter(s => s.done).length;
+  ['lab-progress-1','lab-progress-2','lab-progress-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = '· completados: ' + done + ' / 6';
+  });
+}
+
+function checkExercise(n){
+  const ex = exercises[n];
+  const value = document.getElementById('in'+n).value;
+  if(!value.trim()){
+    Swal.fire({ ...swalBase, icon:'question', title:'Está vacío', text:'Escribí tu sentencia SQL antes de verificar.' });
+    return;
+  }
+  if(ex.regex.test(value)){
+    const first = !exState[n].done;
+    exState[n].done = true;
+    const card = document.getElementById('ex'+n);
+    card.classList.add('done');
+    card.querySelector('.ex-status').innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+    let pts = 0;
+    if(first){ pts = exState[n].hinted ? 5 : 10; addPoints(pts); }
+    updateLabProgress();
+    Swal.fire({
+      ...swalBase,
+      icon: 'success',
+      title: first ? '¡Correcto! +' + pts + ' pts' : '¡Correcto!',
+      html: `<p style="text-align:left">${ex.success}</p>`,
+      showClass: { popup: 'animate__animated animate__tada' },
+      timer: 3500,
+      timerProgressBar: true
+    });
+  } else {
+    Swal.fire({
+      ...swalBase,
+      icon: 'error',
+      title: 'Todavía no…',
+      html: `<p style="text-align:left">${ex.errorHint}</p>`,
+      showClass: { popup: 'animate__animated animate__shakeX' }
+    });
+  }
+}
+
+function showHint(n){
+  exState[n].hinted = true;
+  Swal.fire({
+    ...swalBase,
+    icon: 'info',
+    title: 'Pista · Ejercicio ' + n,
+    html: `<p style="text-align:left">${exercises[n].hint}</p><p style="text-align:left;color:#94a5c6;font-size:.85rem">Usar la pista reduce el puntaje de este ejercicio a 5 pts.</p>`
+  });
+}
+
+/* ================= PUNTAJE FINAL ================= */
+function showFinalScore(){
+  const done = Object.values(exState).filter(s => s.done).length;
+  const max = 4*10 + 6*10; // 4 quizzes + 6 ejercicios
+  let msg, icon;
+  if(score >= 80){ msg = '¡Nivel analista senior! Dominaste la clase.'; icon = 'success'; }
+  else if(score >= 50){ msg = 'Muy buen trabajo. Repasá los temas donde dudaste.'; icon = 'success'; }
+  else if(score > 0){ msg = 'Buen comienzo. Volvé a recorrer las slides y reintentá los ejercicios.'; icon = 'info'; }
+  else { msg = 'Todavía no sumaste puntos: ¡los quizzes y el laboratorio te esperan!'; icon = 'info'; }
+  Swal.fire({
+    ...swalBase,
+    icon: icon,
+    title: score + ' / ' + max + ' puntos',
+    html: `<p>Ejercicios del laboratorio completados: <strong style="color:#ff9d3c">${done} / 6</strong></p><p style="margin-top:8px">${msg}</p>`,
+    confirmButtonText: '¡Nos vemos en la clase 3!',
+    showClass: { popup: 'animate__animated animate__zoomIn' }
+  });
+}
+
+/* ================= INIT ================= */
+slides[0].classList.add('active','animate__animated','animate__fadeIn');
+document.getElementById('slideBadge').textContent = '1 / ' + slides.length;
+document.getElementById('progressbar').style.width = (1/slides.length*100) + '%';
+document.getElementById('btnPrev').disabled = true;
+updateLabProgress();
+</script>
+</body>
+</html>
