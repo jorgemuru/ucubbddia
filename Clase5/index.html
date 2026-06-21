@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL para Analistas de Ciencia de Datos e IA | Índices, Consultas, Optimización y Triggers</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --bg:#fbf7ff; --ink:#263044; --muted:#687083; --lav:#ded1ff; --mint:#caf3df;
+      --sky:#cdeeff; --peach:#ffd8c7; --lemon:#fff1b8; --rose:#ffd7e9; --accent:#7d6bff;
+      --accent2:#48b7aa; --dark:#25324a; --card:#ffffffdc;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:linear-gradient(135deg,var(--bg),#f3fffb);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden;overflow-y:auto;}
+    .deck{min-height:100vh;width:100%;position:relative;}
+    .slide{display:none;min-height:100vh;padding:58px 7vw 118px;position:relative;overflow:visible;}
+    .slide.active{display:block;}
+    .brand{position:absolute;top:22px;right:34px;color:#59617a;font-weight:900;letter-spacing:.07em;opacity:.75;font-size:.9rem;}
+    h1{font-size:clamp(2.5rem,6vw,5.7rem);font-weight:950;line-height:.95;letter-spacing:-.055em;}
+    h2{font-size:clamp(2rem,4.2vw,4rem);font-weight:950;letter-spacing:-.045em;margin-bottom:20px;}
+    h3{font-weight:880;letter-spacing:-.025em;}
+    p,li{font-size:clamp(1rem,1.45vw,1.25rem);line-height:1.45;}
+    .lead{font-size:clamp(1.12rem,1.75vw,1.45rem);}
+    .kicker{display:inline-flex;gap:10px;align-items:center;background:white;color:#51617c;border:1px solid #0000000d;border-radius:999px;padding:9px 15px;font-weight:900;box-shadow:0 10px 25px #00000012;margin-bottom:18px;}
+    .glass{background:var(--card);border:1px solid #ffffffcc;border-radius:30px;box-shadow:0 22px 55px #4f3c7414;backdrop-filter:blur(10px);}
+    .pastel{border-radius:26px;padding:24px;box-shadow:0 16px 38px #00000010;border:1px solid #fff;}
+    .b-lav{background:var(--lav)}.b-mint{background:var(--mint)}.b-sky{background:var(--sky)}.b-peach{background:var(--peach)}.b-lemon{background:var(--lemon)}.b-rose{background:var(--rose)}
+    .icon-big{font-size:3.8rem;color:#273b59;opacity:.85}.mini{font-size:.96rem;color:var(--muted)}
+    .pill{display:inline-flex;gap:8px;align-items:center;background:#fff;border:1px solid #0000000d;border-radius:999px;padding:8px 13px;font-weight:850;color:#4e5873;margin:4px;}
+    .navbtn{position:fixed;bottom:24px;border:0;border-radius:999px;width:48px;height:48px;background:white;color:var(--dark);z-index:30;box-shadow:0 12px 30px #0002;}
+    .prev{right:92px}.next{right:32px}.home{left:32px}.list{left:92px}.counter{position:fixed;bottom:36px;left:154px;color:var(--muted);font-weight:900;z-index:30;}
+    .progress-wrap{position:fixed;left:0;right:0;bottom:0;height:9px;background:#eee5ff;z-index:20}.progress-barx{height:9px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2),#ffd166);transition:.3s;}
+    .decor{position:absolute;border-radius:999px;opacity:.4;z-index:-1}.d1{width:250px;height:250px;background:var(--lav);right:-70px;top:100px}.d2{width:190px;height:190px;background:var(--mint);left:-65px;bottom:120px}.d3{width:110px;height:110px;background:var(--peach);right:230px;bottom:80px}
+    .flow{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}.node{background:white;border:3px solid #d9d0ff;border-radius:22px;box-shadow:0 12px 28px #0001;padding:18px 22px;text-align:center;min-width:158px;font-weight:900}.arrow{font-size:2rem;color:#7b8aa9}
+    .sqlbox{background:#253044;color:#f8fafc;border-radius:24px;padding:22px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:clamp(.84rem,1.05vw,1.02rem);box-shadow:0 20px 48px #0002;white-space:pre-wrap;overflow:auto;max-height:52vh}.kw{color:#ffd166}.tb{color:#9bf6ff}.fn{color:#caffbf}.cm{color:#bdb2ff}.st{color:#ffd6e7}
+    .table-soft{background:white;border-radius:22px;overflow:auto;box-shadow:0 14px 32px #0001}.table-soft th{background:#edf3ff!important;color:#26354e}.table-soft td,.table-soft th{padding:13px!important;vertical-align:middle;font-size:1rem;}
+    .badge-ai{background:#25324a;color:white;border-radius:18px;padding:8px 12px;font-weight:900;display:inline-flex;gap:8px;align-items:center;}
+    .quiz-option{cursor:pointer;background:white;border:2px solid transparent;border-radius:18px;padding:14px 18px;margin:10px 0;transition:.18s;font-weight:750;box-shadow:0 10px 22px #0000000d}.quiz-option:hover{transform:translateY(-2px);border-color:var(--accent)}.quiz-option.selected{border-color:var(--accent);background:#f2efff}.quiz-option.correct{border-color:#35b779;background:#e8fff3}.quiz-option.wrong{border-color:#ef6a6a;background:#fff0f0}
+    @media(max-height:820px){.slide{padding-top:38px;padding-bottom:112px}h1{font-size:clamp(2.2rem,5vw,4.6rem)}h2{font-size:clamp(1.8rem,3.5vw,3.3rem);margin-bottom:13px}p,li{font-size:clamp(.94rem,1.25vw,1.09rem)}.pastel{padding:20px}.icon-big{font-size:3rem}.table-soft td,.table-soft th{font-size:.94rem;padding:10px!important}.sqlbox{max-height:47vh}}
+    @media(max-width:900px){.slide{padding:42px 5vw 120px}.brand{display:none}.flow{justify-content:flex-start}.navbtn{bottom:18px}.prev{right:82px}.next{right:24px}.home{left:24px}.list{left:80px}.counter{left:138px;bottom:30px}.table-soft table{min-width:680px}.sqlbox{font-size:.86rem;max-height:none}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <button class="navbtn home" onclick="goTo(0)" title="Inicio"><i class="fa-solid fa-house"></i></button>
+  <button class="navbtn list" onclick="menu()" title="Índice"><i class="fa-solid fa-list"></i></button>
+  <button class="navbtn prev" onclick="prevSlide()" title="Anterior"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="navbtn next" onclick="nextSlide()" title="Siguiente"><i class="fa-solid fa-arrow-right"></i></button>
+  <div class="counter" id="counter"></div><div class="progress-wrap"><div class="progress-barx" id="progress"></div></div>
+
+  <section class="slide active" data-title="Inicio">
+    <div class="decor d1"></div><div class="decor d2"></div><div class="decor d3"></div><div class="brand">UCU · SQL + IA</div>
+    <div class="row min-vh-100 align-items-center g-5">
+      <div class="col-lg-8">
+        <span class="kicker animate__animated animate__fadeInDown"><i class="fa-solid fa-database"></i> SQL para Analistas de Ciencia de Datos e IA</span>
+        <h1 class="animate__animated animate__fadeInUp">Índices, consultas, optimización y triggers</h1>
+        <p class="lead mt-4 animate__animated animate__fadeInUp animate__delay-1s">Cómo consultar datos de forma eficiente, mejorar scripts SQL y automatizar reglas de negocio dentro de la base de datos.</p>
+        <button class="btn btn-dark btn-lg rounded-pill mt-3" onclick="tip('Objetivo', 'Comprender cómo los índices, las consultas bien diseñadas, la optimización y los triggers ayudan a construir soluciones de datos más rápidas, confiables y útiles para análisis e IA.', 'info')"><i class="fa-solid fa-bullseye me-2"></i>Ver objetivo</button>
+      </div>
+      <div class="col-lg-4"><div class="glass p-4 text-center animate__animated animate__pulse animate__infinite animate__slower"><i class="fa-solid fa-gauge-high fa-6x mb-3" style="color:var(--accent)"></i><h3>Idea central</h3><p class="mb-0">No alcanza con que una consulta funcione: debe ser correcta, legible y eficiente.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Mapa de temas"><div class="brand">Mapa</div>
+    <span class="kicker"><i class="fa-solid fa-map"></i> Recorrido</span><h2>¿Qué vamos a trabajar?</h2>
+    <div class="row g-4">
+      <div class="col-md-3"><div class="pastel b-lav h-100"><i class="fa-solid fa-bookmark icon-big"></i><h3 class="mt-3">Índices</h3><p>Aceleran búsquedas y joins, pero tienen costo en escrituras y espacio.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-mint h-100"><i class="fa-solid fa-magnifying-glass-chart icon-big"></i><h3 class="mt-3">Consultas</h3><p>SELECT, filtros, joins, agregaciones y subconsultas para análisis.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-peach h-100"><i class="fa-solid fa-screwdriver-wrench icon-big"></i><h3 class="mt-3">Optimización</h3><p>Mejora de scripts, uso de EXPLAIN y buenas prácticas.</p></div></div>
+      <div class="col-md-3"><div class="pastel b-sky h-100"><i class="fa-solid fa-bolt icon-big"></i><h3 class="mt-3">Triggers</h3><p>Automatizan acciones ante INSERT, UPDATE o DELETE.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Consultas SQL"><div class="brand">Consultas</div>
+    <span class="kicker"><i class="fa-solid fa-code"></i> SELECT como herramienta analítica</span><h2>Consultas: transformar datos en preguntas respondidas</h2>
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5"><div class="pastel b-mint h-100"><p>Una consulta SQL permite recuperar, filtrar, unir, agrupar y ordenar datos. Para un analista, SQL es la herramienta que convierte tablas en indicadores, datasets y evidencia.</p><p><span class="badge-ai"><i class="fa-solid fa-robot"></i> IA</span> Una buena consulta puede generar las variables de entrada para un modelo predictivo.</p></div></div>
+      <div class="col-lg-7"><div class="sqlbox"><span class="cm">-- Ventas por producto y día</span>
+<span class="kw">SELECT</span> p.nombre,
+       DATE(v.fecha_hora) <span class="kw">AS</span> fecha,
+       SUM(dv.cantidad) <span class="kw">AS</span> unidades,
+       SUM(dv.cantidad * dv.precio_unitario) <span class="kw">AS</span> total
+<span class="kw">FROM</span> <span class="tb">venta</span> v
+<span class="kw">JOIN</span> <span class="tb">detalle_venta</span> dv <span class="kw">ON</span> dv.id_venta = v.id
+<span class="kw">JOIN</span> <span class="tb">producto</span> p <span class="kw">ON</span> p.id = dv.id_producto
+<span class="kw">WHERE</span> v.fecha_hora >= <span class="st">'2026-01-01'</span>
+<span class="kw">GROUP BY</span> p.nombre, DATE(v.fecha_hora)
+<span class="kw">ORDER BY</span> fecha, total <span class="kw">DESC</span>;</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Joins"><div class="brand">Consultas</div>
+    <span class="kicker"><i class="fa-solid fa-link"></i> Relaciones entre tablas</span><h2>JOIN: cuando una pregunta necesita varias tablas</h2>
+    <div class="table-soft mb-4"><table class="table mb-0"><thead><tr><th>JOIN</th><th>Qué devuelve</th><th>Uso típico</th></tr></thead><tbody><tr><td><strong>INNER JOIN</strong></td><td>Solo coincidencias entre ambas tablas.</td><td>Ventas que tienen cliente válido.</td></tr><tr><td><strong>LEFT JOIN</strong></td><td>Todo lo de la izquierda y coincidencias de la derecha.</td><td>Clientes con o sin ventas.</td></tr><tr><td><strong>RIGHT JOIN</strong></td><td>Todo lo de la derecha y coincidencias de la izquierda.</td><td>Menos usado; puede reescribirse como LEFT JOIN.</td></tr><tr><td><strong>CROSS JOIN</strong></td><td>Combinación de todos con todos.</td><td>Escenarios o combinaciones controladas.</td></tr></tbody></table></div>
+    <button class="btn btn-dark rounded-pill" onclick="tip('Cuidado con IA', 'Si un JOIN duplica filas sin querer, el dataset puede inflar cantidades, sesgar promedios o entrenar un modelo con datos incorrectos.', 'warning')"><i class="fa-solid fa-triangle-exclamation me-2"></i>Error frecuente</button>
+  </section>
+
+  <section class="slide" data-title="Índices"><div class="brand">Índices</div>
+    <span class="kicker"><i class="fa-solid fa-bookmark"></i> Concepto</span><h2>Índices: el índice del libro aplicado a una tabla</h2>
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-6"><div class="pastel b-lav h-100"><i class="fa-solid fa-book icon-big"></i><h3 class="mt-3">Analogía</h3><p>Buscar un tema en un libro sin índice obliga a revisar página por página. En una tabla grande ocurre algo parecido: sin índice, el DBMS puede recorrer muchos registros para encontrar pocos resultados.</p></div></div>
+      <div class="col-lg-6"><div class="pastel b-lemon h-100"><i class="fa-solid fa-gauge-high icon-big"></i><h3 class="mt-3">Función</h3><p>Un índice crea una estructura auxiliar que ayuda a localizar datos más rápido, especialmente en columnas usadas en <strong>WHERE</strong>, <strong>JOIN</strong>, <strong>ORDER BY</strong> o <strong>GROUP BY</strong>.</p></div></div>
+    </div>
+    <div class="sqlbox mt-4"><span class="cm">-- Índice para acelerar búsquedas por cliente y fecha</span>
+<span class="kw">CREATE INDEX</span> idx_venta_cliente_fecha
+<span class="kw">ON</span> <span class="tb">venta</span> (id_cliente, fecha_hora);</div>
+  </section>
+
+  <section class="slide" data-title="Tipos de índices"><div class="brand">Índices</div>
+    <span class="kicker"><i class="fa-solid fa-layer-group"></i> Tipos habituales</span><h2>Tipos de índices y cuándo usarlos</h2>
+    <div class="table-soft"><table class="table mb-0"><thead><tr><th>Tipo</th><th>Descripción</th><th>Ejemplo</th></tr></thead><tbody><tr><td><strong>Primario</strong></td><td>Asociado a la PK. Identifica registros únicos.</td><td><code>id_cliente</code></td></tr><tr><td><strong>Único</strong></td><td>Evita valores repetidos.</td><td><code>email</code>, <code>cedula</code></td></tr><tr><td><strong>Simple</strong></td><td>Índice sobre una sola columna.</td><td><code>fecha_hora</code></td></tr><tr><td><strong>Compuesto</strong></td><td>Índice sobre varias columnas. Importa el orden.</td><td><code>(id_cliente, fecha_hora)</code></td></tr><tr><td><strong>Full-text</strong></td><td>Optimizado para búsqueda textual.</td><td>comentarios, descripciones</td></tr></tbody></table></div>
+    <p class="mt-4 mini"><strong>Regla práctica:</strong> indexar columnas muy consultadas, no todas las columnas.</p>
+  </section>
+
+  <section class="slide" data-title="Costo de índices"><div class="brand">Índices</div>
+    <span class="kicker"><i class="fa-solid fa-scale-balanced"></i> Beneficio vs costo</span><h2>Los índices aceleran lecturas, pero no son gratis</h2>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="pastel b-mint h-100"><h3><i class="fa-solid fa-forward-fast me-2"></i>Mejoran</h3><p>Consultas selectivas, búsquedas por clave, joins y ordenamientos frecuentes.</p></div></div>
+      <div class="col-md-4"><div class="pastel b-peach h-100"><h3><i class="fa-solid fa-hard-drive me-2"></i>Consumen</h3><p>Espacio adicional en disco/memoria porque el índice es una estructura extra.</p></div></div>
+      <div class="col-md-4"><div class="pastel b-rose h-100"><h3><i class="fa-solid fa-pen-to-square me-2"></i>Penalizan</h3><p>INSERT, UPDATE y DELETE, porque el DBMS debe actualizar también los índices.</p></div></div>
+    </div>
+    <button class="btn btn-outline-dark rounded-pill mt-4" onclick="tip('Decisión inteligente', 'Antes de crear índices, identificá las consultas críticas, revisá el plan de ejecución y medí tiempos con y sin índice.', 'info')"><i class="fa-solid fa-lightbulb me-2"></i>Consejo</button>
+  </section>
+
+  <section class="slide" data-title="Optimización"><div class="brand">Optimización</div>
+    <span class="kicker"><i class="fa-solid fa-screwdriver-wrench"></i> Buenas prácticas</span><h2>Optimización de consultas y scripts SQL</h2>
+    <div class="row g-4">
+      <div class="col-lg-6"><div class="pastel b-sky h-100"><h3>Antes</h3><div class="sqlbox"><span class="cm">-- Trae columnas innecesarias y filtra tarde</span>
+<span class="kw">SELECT</span> *
+<span class="kw">FROM</span> <span class="tb">venta</span> v, <span class="tb">cliente</span> c
+<span class="kw">WHERE</span> v.id_cliente = c.id
+  <span class="kw">AND</span> YEAR(v.fecha_hora) = 2026;</div></div></div>
+      <div class="col-lg-6"><div class="pastel b-mint h-100"><h3>Después</h3><div class="sqlbox"><span class="cm">-- Columnas necesarias y filtro compatible con índice</span>
+<span class="kw">SELECT</span> c.id, c.nombre, COUNT(*) <span class="kw">AS</span> compras
+<span class="kw">FROM</span> <span class="tb">venta</span> v
+<span class="kw">JOIN</span> <span class="tb">cliente</span> c <span class="kw">ON</span> c.id = v.id_cliente
+<span class="kw">WHERE</span> v.fecha_hora >= <span class="st">'2026-01-01'</span>
+  <span class="kw">AND</span> v.fecha_hora < <span class="st">'2027-01-01'</span>
+<span class="kw">GROUP BY</span> c.id, c.nombre;</div></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="EXPLAIN"><div class="brand">Optimización</div>
+    <span class="kicker"><i class="fa-solid fa-microscope"></i> Medir antes de cambiar</span><h2>EXPLAIN: leer cómo piensa el DBMS</h2>
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5"><div class="pastel b-lemon h-100"><p><strong>EXPLAIN</strong> muestra el plan de ejecución: qué tablas se leen, qué índices se usan, qué orden de joins se aplica y cuántas filas se estiman procesar.</p><p>Es clave para decidir si una consulta necesita índice, reescritura o cambios de diseño.</p></div></div>
+      <div class="col-lg-7"><div class="sqlbox"><span class="cm">-- En MySQL</span>
+<span class="kw">EXPLAIN</span>
+<span class="kw">SELECT</span> c.nombre, SUM(dv.cantidad) <span class="kw">AS</span> unidades
+<span class="kw">FROM</span> <span class="tb">cliente</span> c
+<span class="kw">JOIN</span> <span class="tb">venta</span> v <span class="kw">ON</span> v.id_cliente = c.id
+<span class="kw">JOIN</span> <span class="tb">detalle_venta</span> dv <span class="kw">ON</span> dv.id_venta = v.id
+<span class="kw">WHERE</span> c.id = 15
+<span class="kw">GROUP BY</span> c.nombre;</div></div>
+    </div>
+    <div class="pastel b-rose mt-4"><strong>Señales de alerta:</strong> muchas filas estimadas, escaneo completo de tabla cuando se esperaba índice, filtros aplicados tarde o joins innecesarios.</div>
+  </section>
+
+  <section class="slide" data-title="Optimización de scripts"><div class="brand">Scripts</div>
+    <span class="kicker"><i class="fa-solid fa-file-code"></i> Scripts más seguros y mantenibles</span><h2>Optimización de scripts SQL</h2>
+    <div class="row g-4">
+      <div class="col-md-6"><div class="pastel b-lav h-100"><h3>Buenas prácticas</h3><ul><li>Usar transacciones para operaciones críticas.</li><li>Evitar cambios masivos sin <code>WHERE</code>.</li><li>Separar DDL, DML y datos de prueba.</li><li>Nombrar PK, FK, índices y constraints.</li><li>Probar primero con una copia o ambiente de desarrollo.</li></ul></div></div>
+      <div class="col-md-6"><div class="pastel b-peach h-100"><h3>Para analítica e IA</h3><ul><li>Crear vistas para datasets reutilizables.</li><li>Documentar variables generadas.</li><li>Evitar duplicaciones involuntarias.</li><li>Validar nulos y outliers antes de entrenar modelos.</li><li>Automatizar cargas de datos con control de errores.</li></ul></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Triggers"><div class="brand">Triggers</div>
+    <span class="kicker"><i class="fa-solid fa-bolt"></i> Automatización en la base</span><h2>Triggers: acciones automáticas ante eventos</h2>
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5"><div class="pastel b-sky h-100"><p>Un <strong>trigger</strong> es un bloque de código que se ejecuta automáticamente cuando ocurre un evento sobre una tabla: <strong>INSERT</strong>, <strong>UPDATE</strong> o <strong>DELETE</strong>.</p><p>Puede ejecutarse <strong>BEFORE</strong> o <strong>AFTER</strong> del evento.</p></div></div>
+      <div class="col-lg-7"><div class="table-soft"><table class="table mb-0"><thead><tr><th>Momento</th><th>Uso práctico</th></tr></thead><tbody><tr><td><strong>BEFORE INSERT</strong></td><td>Validar o completar datos antes de guardar.</td></tr><tr><td><strong>AFTER INSERT</strong></td><td>Registrar auditoría o actualizar acumulados.</td></tr><tr><td><strong>BEFORE UPDATE</strong></td><td>Evitar cambios inválidos.</td></tr><tr><td><strong>AFTER DELETE</strong></td><td>Guardar historial de registros eliminados.</td></tr></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Trigger práctico"><div class="brand">Triggers</div>
+    <span class="kicker"><i class="fa-solid fa-store"></i> Ejemplo práctico</span><h2>Ejemplo: auditar cambios de precio</h2>
+    <div class="row g-4">
+      <div class="col-lg-5"><div class="pastel b-mint h-100"><p>En una cantina inteligente, los precios de productos pueden cambiar. Para análisis e IA, interesa conservar historial: cuándo cambió, de cuánto a cuánto, y quién lo cambió.</p><p>Esto permite analizar impacto en ventas, demanda y elasticidad de precio.</p></div></div>
+      <div class="col-lg-7"><div class="sqlbox"><span class="cm">-- MySQL: guardar historial cuando cambia el precio</span>
+<span class="kw">CREATE TRIGGER</span> trg_producto_precio_audit
+<span class="kw">AFTER UPDATE ON</span> <span class="tb">producto</span>
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">IF</span> OLD.precio <> NEW.precio <span class="kw">THEN</span>
+    <span class="kw">INSERT INTO</span> <span class="tb">producto_precio_historial</span>
+      (id_producto, precio_anterior, precio_nuevo, fecha_cambio)
+    <span class="kw">VALUES</span>
+      (OLD.id, OLD.precio, NEW.precio, NOW());
+  <span class="kw">END IF</span>;
+<span class="kw">END</span>;</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Caso integrador"><div class="brand">Caso real</div>
+    <span class="kicker"><i class="fa-solid fa-mug-hot"></i> Caso integrador</span><h2>Cantina inteligente: rendimiento + automatización</h2>
+    <div class="flow mb-4"><div class="node b-mint">Ventas</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-lav">Consultas</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-lemon">Índices</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-rose">Triggers</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node b-sky">Dataset IA</div></div>
+    <div class="row g-4">
+      <div class="col-md-4"><div class="pastel b-mint h-100"><h3>Pregunta</h3><p>¿Qué productos conviene preparar antes del recreo?</p></div></div>
+      <div class="col-md-4"><div class="pastel b-lemon h-100"><h3>Solución SQL</h3><p>Consultar ventas por producto, franja horaria y día de la semana.</p></div></div>
+      <div class="col-md-4"><div class="pastel b-rose h-100"><h3>Optimización</h3><p>Índice en fecha, producto y venta; trigger de auditoría para cambios críticos.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Errores frecuentes"><div class="brand">Buenas prácticas</div>
+    <span class="kicker"><i class="fa-solid fa-triangle-exclamation"></i> Evitar problemas</span><h2>Errores frecuentes y cómo corregirlos</h2>
+    <div class="table-soft"><table class="table mb-0"><thead><tr><th>Error</th><th>Impacto</th><th>Mejor práctica</th></tr></thead><tbody><tr><td>Usar <code>SELECT *</code> siempre</td><td>Más datos, más tráfico, menos claridad.</td><td>Seleccionar solo columnas necesarias.</td></tr><tr><td>Aplicar funciones sobre columnas filtradas</td><td>Puede impedir uso eficiente de índices.</td><td>Usar rangos compatibles con índices.</td></tr><tr><td>Crear índices sin criterio</td><td>Más espacio y escrituras lentas.</td><td>Medir con <code>EXPLAIN</code>.</td></tr><tr><td>Triggers con lógica excesiva</td><td>Dificultan depuración y rendimiento.</td><td>Usarlos para reglas claras y acotadas.</td></tr><tr><td>Joins que duplican filas</td><td>Métricas y datasets incorrectos.</td><td>Validar cardinalidad y conteos.</td></tr></tbody></table></div>
+  </section>
+
+  <section class="slide" data-title="Mini práctica"><div class="brand">Actividad</div>
+    <span class="kicker"><i class="fa-solid fa-laptop-code"></i> Ejercicio práctico</span><h2>Mini práctica: optimizar una consulta</h2>
+    <div class="row g-4">
+      <div class="col-lg-6"><div class="pastel b-peach h-100"><h3>Situación</h3><p>La tabla <code>venta</code> tiene 2 millones de registros. Se consulta frecuentemente por cliente y rango de fechas para generar recomendaciones personalizadas.</p><ol><li>Escribir una consulta con <code>JOIN</code> entre cliente y venta.</li><li>Revisar el plan con <code>EXPLAIN</code>.</li><li>Crear un índice compuesto.</li><li>Comparar tiempos antes/después.</li></ol></div></div>
+      <div class="col-lg-6"><div class="sqlbox"><span class="cm">-- Índice sugerido</span>
+<span class="kw">CREATE INDEX</span> idx_venta_cliente_fecha
+<span class="kw">ON</span> <span class="tb">venta</span> (id_cliente, fecha_hora);
+
+<span class="cm">-- Consulta a evaluar</span>
+<span class="kw">EXPLAIN SELECT</span> id_cliente, COUNT(*) compras
+<span class="kw">FROM</span> <span class="tb">venta</span>
+<span class="kw">WHERE</span> id_cliente = 25
+  <span class="kw">AND</span> fecha_hora >= <span class="st">'2026-06-01'</span>
+  <span class="kw">AND</span> fecha_hora < <span class="st">'2026-07-01'</span>
+<span class="kw">GROUP BY</span> id_cliente;</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Quiz"><div class="brand">Quiz</div>
+    <span class="kicker"><i class="fa-solid fa-circle-question"></i> Evaluación interactiva</span><h2>Quiz final</h2>
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-7"><div class="pastel b-sky"><div class="d-flex justify-content-between align-items-center mb-3"><span class="pill" id="qCount">Pregunta 1/10</span><span class="pill"><i class="fa-solid fa-star"></i> <span id="scoreText">0 / 10</span></span></div><h3 id="qText">Pregunta</h3><div id="options"></div><div class="d-flex gap-2 mt-3 flex-wrap"><button class="btn btn-dark rounded-pill" id="actionBtn" onclick="checkOrNext()">Responder</button><button class="btn btn-outline-dark rounded-pill" onclick="restartQuiz()">Reiniciar</button></div></div></div>
+      <div class="col-lg-5"><div class="pastel b-lemon"><i class="fa-solid fa-trophy icon-big"></i><h3 class="mt-3">Objetivo</h3><p>Revisar conceptos de índices, consultas, optimización y triggers.</p><p class="mini">Seleccioná una opción y presioná “Responder”. Luego avanzá con “Siguiente”.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-title="Cierre"><div class="brand">Cierre</div>
+    <div class="row min-vh-100 align-items-center"><div class="col-lg-8"><span class="kicker"><i class="fa-solid fa-flag-checkered"></i> Cierre</span><h2>Consultar bien también es diseñar bien</h2><p class="lead">Los índices mejoran el acceso, las consultas responden preguntas, la optimización evita desperdicio y los triggers automatizan reglas. En Ciencia de Datos e IA, todo esto ayuda a construir datasets más confiables, rápidos y trazables.</p><button class="btn btn-dark btn-lg rounded-pill" onclick="goTo(0)"><i class="fa-solid fa-rotate-left me-2"></i>Volver al inicio</button></div></div>
+  </section>
+</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')]; let current=0;
+function show(i){slides[current].classList.remove('active','animate__animated','animate__fadeIn'); current=(i+slides.length)%slides.length; slides[current].classList.add('active','animate__animated','animate__fadeIn'); document.getElementById('counter').textContent=`${current+1} / ${slides.length}`; document.getElementById('progress').style.width=`${((current+1)/slides.length)*100}%`;}
+function nextSlide(){show(current+1)} function prevSlide(){show(current-1)} function goTo(i){show(i)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nextSlide(); if(e.key==='ArrowLeft')prevSlide();});
+function tip(title,text,icon='info'){Swal.fire({title,text,icon,confirmButtonColor:'#7d6bff',background:'#fffafd'});} 
+function menu(){Swal.fire({title:'Índice',html:slides.map((s,i)=>`<button class="btn btn-light w-100 my-1 text-start" onclick="Swal.close();goTo(${i})">${i+1}. ${s.dataset.title}</button>`).join(''),showConfirmButton:false,background:'#fffafd'});} 
+const quiz=[
+ {q:'¿Cuál es la función principal de un índice?',o:['Cambiar el color de una tabla','Acelerar la localización de registros','Eliminar la necesidad de SQL','Crear copias completas de la base'],a:1,fb:'Un índice ayuda al DBMS a encontrar registros sin recorrer innecesariamente toda la tabla.'},
+ {q:'¿En qué columnas suele convenir evaluar índices?',o:['Columnas usadas en WHERE, JOIN, ORDER BY o GROUP BY','Columnas que nunca se consultan','Todas las columnas sin excepción','Solo columnas de texto largo'],a:0,fb:'Las columnas usadas en filtros, joins y ordenamientos suelen ser candidatas a índices.'},
+ {q:'¿Cuál es un costo de tener demasiados índices?',o:['Las consultas SELECT desaparecen','INSERT, UPDATE y DELETE pueden volverse más lentos','La tabla no puede tener PK','No se pueden usar JOINs'],a:1,fb:'Cada escritura debe mantener también las estructuras de índices.'},
+ {q:'¿Para qué sirve EXPLAIN?',o:['Para borrar una tabla','Para ver el plan de ejecución de una consulta','Para crear usuarios','Para reemplazar triggers'],a:1,fb:'EXPLAIN ayuda a entender cómo el DBMS ejecutará una consulta.'},
+ {q:'¿Qué problema puede causar un JOIN mal planteado?',o:['Duplicar filas y alterar métricas','Crear automáticamente índices perfectos','Evitar toda inconsistencia','Convertir SQL en NoSQL'],a:0,fb:'Un JOIN incorrecto puede multiplicar registros y sesgar totales o promedios.'},
+ {q:'¿Qué práctica suele ser mejor que SELECT * en producción?',o:['Seleccionar solo las columnas necesarias','Usar siempre CROSS JOIN','No usar WHERE','Convertir todo a texto'],a:0,fb:'Seleccionar columnas específicas reduce tráfico, memoria y ambigüedad.'},
+ {q:'¿Qué es un trigger?',o:['Un índice compuesto','Una acción automática ante INSERT, UPDATE o DELETE','Una copia de seguridad','Un tipo de JOIN'],a:1,fb:'Un trigger ejecuta lógica automáticamente ante eventos de una tabla.'},
+ {q:'¿Cuándo se ejecuta un AFTER INSERT?',o:['Antes de validar un formulario','Después de insertar una fila','Solo al iniciar MySQL','Cuando se crea una base'],a:1,fb:'AFTER INSERT se dispara luego de que el registro fue insertado.'},
+ {q:'¿Cuál es un buen uso de triggers?',o:['Auditar cambios importantes','Reemplazar todo el código de la aplicación','Crear índices en cada consulta','Evitar el uso de PK'],a:0,fb:'La auditoría de cambios es un uso claro y acotado para triggers.'},
+ {q:'En un proyecto de IA, ¿por qué importa optimizar consultas?',o:['Porque mejora la extracción de datasets confiables y rápidos','Porque elimina la necesidad de datos','Porque hace que el modelo no necesite entrenamiento','Porque bloquea el análisis'],a:0,fb:'Consultas optimizadas facilitan datasets más rápidos, correctos y reutilizables.'}
+];
+let qi=0, score=0, selected=null, answered=false;
+function renderQ(){const q=quiz[qi]; selected=null; answered=false; document.getElementById('qCount').textContent=`Pregunta ${qi+1}/${quiz.length}`; document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`; document.getElementById('qText').textContent=q.q; document.getElementById('actionBtn').textContent='Responder'; document.getElementById('options').innerHTML=q.o.map((x,i)=>`<div class="quiz-option" data-i="${i}" onclick="selectOpt(${i})"><strong>${String.fromCharCode(65+i)}.</strong> ${x}</div>`).join('');}
+function selectOpt(i){if(answered)return; selected=i; document.querySelectorAll('.quiz-option').forEach(el=>el.classList.toggle('selected',Number(el.dataset.i)===i));}
+function checkOrNext(){ if(answered){ if(qi<quiz.length-1){qi++; renderQ();} else {Swal.fire({title:'Resultado final',html:`Obtuviste <b>${score} de ${quiz.length}</b> respuestas correctas.`,icon:score>=8?'success':'info',confirmButtonColor:'#7d6bff',background:'#fffafd'});} return;} if(selected===null){tip('Falta seleccionar', 'Seleccioná una opción antes de responder.', 'warning'); return;} answered=true; const q=quiz[qi]; document.querySelectorAll('.quiz-option').forEach(el=>{const i=Number(el.dataset.i); if(i===q.a)el.classList.add('correct'); if(i===selected && i!==q.a)el.classList.add('wrong');}); if(selected===q.a){score++; document.getElementById('scoreText').textContent=`${score} / ${quiz.length}`; Swal.fire({title:'¡Correcto!',text:q.fb,icon:'success',confirmButtonColor:'#7d6bff',background:'#fffafd'});} else {Swal.fire({title:'A revisar',text:`La respuesta correcta era: ${q.o[q.a]}. ${q.fb}`,icon:'warning',confirmButtonColor:'#7d6bff',background:'#fffafd'});} document.getElementById('actionBtn').textContent=qi<quiz.length-1?'Siguiente':'Ver resultado'; }
+function restartQuiz(){qi=0;score=0;renderQ();Swal.fire({title:'Quiz reiniciado',text:'Volvé a responder las 10 preguntas.',icon:'info',confirmButtonColor:'#7d6bff',background:'#fffafd'});}
+renderQ(); show(0);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
