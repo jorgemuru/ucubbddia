@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab TechVentas · Ejercicios desbloqueables · Power BI + MySQL</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#f4f7f8; --bg-soft:#ffffff; --ink:#2d3b45; --ink-soft:#5e7079; --line:#dfe7ea;
+    --teal:#9fc8c4; --teal-deep:#5a9b95; --teal-deeper:#3d7a74;
+    --amber:#f2b134; --amber-deep:#d9971a; --coral:#ef7d6b; --blue:#5b8bd4;
+    --panel:#ffffff; --good:#4caf82; --bad:#e8695b; --locked:#aeb9bd;
+    --s-key:#9b5de5; --s-str:#2a9d5c; --s-num:#d9971a; --s-com:#9aa7ad; --s-fn:#5b8bd4;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;overflow:hidden;}
+  .mono{font-family:'Fira Code',monospace;}
+  .display{font-family:'Poppins',sans-serif;}
+
+  .deck{height:100vh;width:100vw;position:relative;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:clamp(1.3rem,3.5vw,3rem) clamp(1.3rem,5vw,5.5rem);overflow-y:auto;}
+  .slide.active{display:flex;}
+  .slide-inner{margin:auto;width:100%;max-width:1000px;}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.4rem;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-size:.8rem;}
+  .topbar .brand{font-family:'Poppins';font-weight:600;color:var(--ink);display:flex;align-items:center;gap:.5rem;}
+  .topbar .brand i{color:var(--amber);}
+  .xp{display:flex;align-items:center;gap:.5rem;font-family:'Fira Code';font-size:.78rem;color:var(--ink-soft);}
+  .xp .badge-xp{background:var(--amber);color:#fff;border-radius:99px;padding:.1rem .6rem;font-weight:600;}
+  .progress-track{flex:1;margin:0 1.2rem;height:4px;background:#e8eef0;border-radius:99px;overflow:hidden;max-width:420px;}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal-deep),var(--amber));transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+  .nav-arrows{position:fixed;bottom:1.3rem;right:1.3rem;z-index:30;display:flex;gap:.5rem;}
+  .nav-arrows button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--ink);cursor:pointer;font-size:1rem;transition:.18s;box-shadow:0 2px 6px rgba(0,0,0,.04);}
+  .nav-arrows button:hover:not(:disabled){background:var(--teal-deep);border-color:var(--teal-deep);color:#fff;transform:translateY(-2px);}
+  .nav-arrows button:disabled{opacity:.35;cursor:not-allowed;}
+  .hint{position:fixed;bottom:1.6rem;left:1.4rem;z-index:30;color:var(--ink-soft);font-size:.74rem;font-family:'Fira Code';}
+  .hint kbd{background:#fff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.7rem;}
+
+  /* cover */
+  .cover{text-align:center;}
+  .cover .logo-circle{width:84px;height:84px;border-radius:24px;background:var(--bg-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto 1.4rem;box-shadow:0 8px 24px rgba(90,155,149,.15);}
+  .cover .logo-circle i{font-size:2.3rem;color:var(--amber);}
+  .cover .eyebrow{font-family:'Fira Code';color:var(--teal-deep);letter-spacing:.16em;text-transform:uppercase;font-size:.8rem;margin-bottom:.9rem;}
+  .cover h1{font-family:'Poppins';font-weight:700;font-size:clamp(2rem,6vw,3.8rem);line-height:1.05;margin:0 0 1rem;letter-spacing:-.01em;}
+  .cover h1 .hl{color:var(--teal-deep);}
+  .cover p{color:var(--ink-soft);font-size:clamp(1rem,2vw,1.18rem);max-width:580px;margin:0 auto;line-height:1.55;}
+
+  .sec-kicker{font-family:'Fira Code';font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-deep);margin-bottom:.7rem;}
+  .sec-title{font-family:'Poppins';font-weight:600;font-size:clamp(1.4rem,3.6vw,2.3rem);line-height:1.12;letter-spacing:-.01em;margin-bottom:1rem;}
+  .lead{font-size:clamp(.98rem,1.8vw,1.12rem);line-height:1.6;color:var(--ink-soft);max-width:800px;}
+  .lead strong{color:var(--ink);}
+  .lead code,.inlinecode{font-family:'Fira Code';background:#eef3f4;border:1px solid var(--line);border-radius:5px;padding:.05rem .4rem;font-size:.88em;color:var(--teal-deeper);}
+
+  .callout{border-radius:13px;padding:1rem 1.2rem;font-size:.93rem;line-height:1.5;margin-top:1.1rem;display:flex;gap:.7rem;align-items:flex-start;}
+  .callout i{margin-top:.15rem;font-size:1.1rem;}
+  .callout.tip{background:#eef7f6;border:1px solid #c5e3df;}
+  .callout.tip i{color:var(--teal-deep);}
+  .callout.info{background:#eef3fb;border:1px solid #cbdcf3;}
+  .callout.info i{color:var(--blue);}
+
+  /* schema mini */
+  .schema{display:grid;gap:.45rem;margin-top:1rem;}
+  .schema .col{display:flex;gap:.7rem;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:.5rem .85rem;font-size:.85rem;}
+  .schema .col .cname{font-family:'Fira Code';color:var(--teal-deeper);font-weight:500;min-width:140px;}
+  .schema .col .ctype{font-family:'Fira Code';font-size:.74rem;color:var(--amber-deep);background:#fef6e7;border-radius:5px;padding:.05rem .45rem;}
+  .schema .col .cdesc{color:var(--ink-soft);font-size:.82rem;}
+
+  /* ===== EXERCISE CARD ===== */
+  .ex-wrap{position:relative;}
+  .ex-tag{display:inline-flex;align-items:center;gap:.5rem;border-radius:99px;padding:.34rem .9rem;font-family:'Fira Code';font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.9rem;}
+  .ex-tag.sql{background:#f1ecfb;color:#8a4fd0;border:1px solid #ddccf5;}
+  .ex-tag.pbi{background:#fef6e7;color:var(--amber-deep);border:1px solid #f6e0a8;}
+  .ex-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.6rem;box-shadow:0 4px 16px rgba(45,59,69,.05);transition:.3s;}
+  .ex-locked .ex-card{filter:blur(5px);opacity:.5;pointer-events:none;user-select:none;}
+  .lock-overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;z-index:5;text-align:center;}
+  .ex-locked .lock-overlay{display:flex;}
+  .lock-overlay i{font-size:2.4rem;color:var(--locked);}
+  .lock-overlay .lt{font-family:'Poppins';font-weight:600;color:var(--ink-soft);font-size:1.05rem;}
+  .lock-overlay .ls{font-size:.85rem;color:var(--ink-soft);max-width:280px;}
+
+  .ex-q{font-family:'Poppins';font-weight:600;font-size:1.18rem;line-height:1.3;margin-bottom:.5rem;}
+  .ex-context{font-size:.95rem;color:var(--ink-soft);line-height:1.5;margin-bottom:.9rem;}
+
+  .code{background:#fbfdfd;border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:.8rem 0;}
+  .code-bar{display:flex;align-items:center;gap:.5rem;padding:.45rem .85rem;background:#f0f5f5;border-bottom:1px solid var(--line);}
+  .code-bar .dot{width:10px;height:10px;border-radius:50%;}
+  .code-bar .fn{font-family:'Fira Code';font-size:.74rem;color:var(--ink-soft);margin-left:.4rem;}
+  .code pre{margin:0;padding:.85rem 1.1rem;overflow-x:auto;font-family:'Fira Code';font-size:.82rem;line-height:1.55;color:var(--ink);}
+  .tk-key{color:var(--s-key);font-weight:500;}.tk-str{color:var(--s-str);}.tk-num{color:var(--s-num);}.tk-com{color:var(--s-com);font-style:italic;}.tk-fn{color:var(--s-fn);}
+  .blank{background:#fff3cd;border:1px dashed var(--amber-deep);border-radius:4px;padding:0 .5rem;color:var(--amber-deep);font-style:normal;}
+
+  .answer-row{display:flex;gap:.6rem;align-items:stretch;flex-wrap:wrap;margin-top:.9rem;}
+  .answer-input{flex:1;min-width:200px;background:#fff;border:2px solid var(--line);border-radius:10px;padding:.6rem .9rem;font-family:'Fira Code';font-size:.95rem;color:var(--ink);transition:.15s;}
+  .answer-input:focus{outline:none;border-color:var(--teal-deep);}
+  .answer-input.ok{border-color:var(--good);background:#f3fbf6;}
+  .answer-input.no{border-color:var(--bad);background:#fdf1ef;animation:shake .35s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .btn-check{background:var(--teal-deep);color:#fff;border:none;border-radius:10px;padding:.6rem 1.4rem;font-weight:600;font-size:.95rem;cursor:pointer;transition:.15s;}
+  .btn-check:hover{background:var(--teal-deeper);}
+  .btn-hint{background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;cursor:pointer;}
+  .btn-hint:hover{border-color:var(--amber-deep);color:var(--amber-deep);}
+
+  .opt-grid{display:grid;gap:.6rem;grid-template-columns:1fr;margin-top:.9rem;}
+  @media(min-width:680px){.opt-grid{grid-template-columns:1fr 1fr;}}
+  .opt{text-align:left;background:var(--bg-soft);border:2px solid var(--line);color:var(--ink);border-radius:10px;padding:.7rem 1rem;cursor:pointer;font-size:.88rem;transition:.15s;display:flex;gap:.6rem;align-items:flex-start;}
+  .opt:hover{border-color:var(--teal-deep);}
+  .opt .k{font-family:'Fira Code';font-weight:600;color:var(--teal-deep);}
+  .opt.ok{border-color:var(--good);background:#f3fbf6;}
+  .opt.no{border-color:var(--bad);background:#fdf1ef;}
+  .opt:disabled{cursor:default;}
+
+  .feedback{margin-top:.8rem;font-size:.9rem;line-height:1.45;border-radius:10px;padding:.7rem .9rem;display:none;}
+  .feedback.show{display:block;animation:fadeIn .3s;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;}}
+  .feedback.ok{background:#eef9f3;border:1px solid #bfe6d2;color:#2d6a4f;}
+  .feedback.no{background:#fdeeec;border:1px solid #f5cdc7;color:#a23b30;}
+  .hintbox{margin-top:.7rem;background:#fef6e7;border:1px solid #f6e0a8;border-radius:10px;padding:.7rem .9rem;font-size:.86rem;color:#8a6212;display:none;}
+  .hintbox.show{display:block;}
+
+  .step-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Fira Code';font-size:.72rem;color:var(--ink-soft);background:var(--bg-soft);border:1px solid var(--line);border-radius:99px;padding:.2rem .7rem;margin-bottom:.8rem;}
+
+  /* progress map */
+  .map{display:grid;gap:.7rem;grid-template-columns:1fr;}
+  @media(min-width:680px){.map{grid-template-columns:1fr 1fr;}}
+  .map-item{display:flex;gap:.8rem;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;font-size:.9rem;}
+  .map-item .ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#eef3f4;color:var(--locked);}
+  .map-item.done .ico{background:var(--good);color:#fff;}
+  .map-item .mt b{display:block;font-weight:600;}
+  .map-item .mt span{font-size:.78rem;color:var(--ink-soft);}
+
+  .end-big{font-family:'Poppins';font-weight:700;font-size:clamp(1.8rem,5.5vw,3.2rem);line-height:1.08;letter-spacing:-.01em;}
+
+  ::-webkit-scrollbar{width:9px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#cdd9dc;border-radius:99px;}
+  .swal2-popup{font-family:'Inter',sans-serif !important;border-radius:18px !important;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><i class="fa-solid fa-flask-vial"></i> Lab TechVentas</span>
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+  <span class="xp"><i class="fa-solid fa-bolt" style="color:var(--amber)"></i> <span class="badge-xp"><span id="xp">0</span> XP</span></span>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0 · PORTADA -->
+  <section class="slide active">
+    <div class="slide-inner cover">
+      <div class="logo-circle"><i class="fa-solid fa-flask-vial"></i></div>
+      <div class="eyebrow">Clase 6 · Laboratorio práctico</div>
+      <h1>Misión <span class="hl">TechVentas</span></h1>
+      <p>Ocho desafíos que se desbloquean uno tras otro. Resolvés la consulta SQL o el paso de Power BI sobre el dataset TechVentas, ingresás el resultado, y si acertás… se abre el siguiente. ¿Llegás al final?</p>
+      <div class="callout info" style="max-width:520px;margin:1.6rem auto 0;text-align:left;"><i class="fa-solid fa-circle-info"></i><div>Trabajá en tu PC con DBeaver y Power BI. Acá validás los resultados para avanzar y sumar XP.</div></div>
+    </div>
+  </section>
+
+  <!-- 1 · RECORDATORIO DEL DATASET -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">Tu mapa de datos</div>
+      <h2 class="sec-title">La tabla <code class="inlinecode" style="font-size:.7em">ventas</code></h2>
+      <p class="lead">Todos los desafíos usan esta tabla (y la vista <code class="inlinecode">vw_resumen_ventas</code>, que agrega <code class="inlinecode">total_neto</code>). Tenela a mano:</p>
+      <div class="schema">
+        <div class="col"><span class="cname">id_venta</span><span class="ctype">INT</span><span class="cdesc">identificador único</span></div>
+        <div class="col"><span class="cname">fecha</span><span class="ctype">DATE</span><span class="cdesc">fecha de la venta (2024)</span></div>
+        <div class="col"><span class="cname">producto</span><span class="ctype">VARCHAR</span><span class="cdesc">nombre del producto</span></div>
+        <div class="col"><span class="cname">categoria</span><span class="ctype">VARCHAR</span><span class="cdesc">Laptops, Monitores, Audio…</span></div>
+        <div class="col"><span class="cname">precio_unitario</span><span class="ctype">DECIMAL</span><span class="cdesc">precio por unidad</span></div>
+        <div class="col"><span class="cname">cantidad</span><span class="ctype">INT</span><span class="cdesc">unidades vendidas</span></div>
+        <div class="col"><span class="cname">descuento_pct</span><span class="ctype">INT</span><span class="cdesc">% de descuento (0–15)</span></div>
+        <div class="col"><span class="cname">vendedor</span><span class="ctype">VARCHAR</span><span class="cdesc">quién vendió</span></div>
+        <div class="col"><span class="cname">ciudad</span><span class="ctype">VARCHAR</span><span class="cdesc">ciudad de la venta</span></div>
+        <div class="col"><span class="cname">medio_pago</span><span class="ctype">VARCHAR</span><span class="cdesc">Tarjeta, Efectivo…</span></div>
+      </div>
+      <div class="callout tip"><i class="fa-solid fa-lightbulb"></i><div><code class="inlinecode">total_neto = precio_unitario × cantidad × (1 − descuento_pct/100)</code> — ya viene calculado en la vista.</div></div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 1 (siempre abierto) ===== -->
+  <section class="slide" data-ex="1">
+    <div class="slide-inner">
+      <div class="ex-wrap" data-stage="1">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Completá el desafío anterior para desbloquearlo.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 1 / 8 · 10 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · COUNT</span>
+          <div class="ex-q">¿Cuántas ventas hay en total?</div>
+          <div class="ex-context">El calentamiento: contá todas las filas de la tabla <code class="inlinecode">ventas</code>.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío1.sql</span></div>
+            <pre><code><span class="tk-key">SELECT</span> <span class="tk-fn">COUNT</span>(*) <span class="tk-key">FROM</span> ventas;</code></pre>
+          </div>
+          <div class="answer-row">
+            <input class="answer-input" id="a1" placeholder="Ingresá el número de filas" inputmode="numeric">
+            <button class="btn-check" onclick="checkInput(1,'a1',68,'exact')">Verificar</button>
+            <button class="btn-hint" onclick="toggleHint(1)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+          </div>
+          <div class="hintbox" id="h1"><code class="inlinecode">COUNT(*)</code> devuelve la cantidad de filas. Ejecutá la consulta en DBeaver y copiá el número.</div>
+          <div class="feedback" id="f1"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 2 ===== -->
+  <section class="slide" data-ex="2">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="2">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 1 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 2 / 8 · 10 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · DISTINCT</span>
+          <div class="ex-q">¿Cuántas categorías distintas se venden?</div>
+          <div class="ex-context">Completá el hueco en la consulta para contar categorías únicas.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío2.sql</span></div>
+            <pre><code><span class="tk-key">SELECT</span> <span class="tk-fn">COUNT</span>(<span class="blank">______</span> categoria) <span class="tk-key">FROM</span> ventas;</code></pre>
+          </div>
+          <div class="ex-context" style="margin-bottom:.3rem;">Primero, ¿qué palabra va en el hueco?</div>
+          <div class="opt-grid" id="opts2">
+            <button class="opt" onclick="checkOpt(2,this,true)"><span class="k">A</span><span><code>DISTINCT</code></span></button>
+            <button class="opt" onclick="checkOpt(2,this,false)"><span class="k">B</span><span><code>UNIQUE</code></span></button>
+            <button class="opt" onclick="checkOpt(2,this,false)"><span class="k">C</span><span><code>ONLY</code></span></button>
+            <button class="opt" onclick="checkOpt(2,this,false)"><span class="k">D</span><span><code>GROUP</code></span></button>
+          </div>
+          <div class="answer-row" id="num2" style="display:none;">
+            <input class="answer-input" id="a2" placeholder="¿Cuántas categorías da?" inputmode="numeric">
+            <button class="btn-check" onclick="checkInput(2,'a2',5,'exact')">Verificar</button>
+          </div>
+          <div class="feedback" id="f2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 3 ===== -->
+  <section class="slide" data-ex="3">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="3">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 2 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 3 / 8 · 15 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · SUM sobre la vista</span>
+          <div class="ex-q">¿Cuál es el total neto facturado por toda la tienda?</div>
+          <div class="ex-context">Usá la vista <code class="inlinecode">vw_resumen_ventas</code> que ya tiene <code class="inlinecode">total_neto</code> calculado. Redondeá a 2 decimales.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío3.sql</span></div>
+            <pre><code><span class="tk-key">SELECT</span> <span class="tk-fn">ROUND</span>(<span class="tk-fn">SUM</span>(total_neto), <span class="tk-num">2</span>)
+<span class="tk-key">FROM</span> vw_resumen_ventas;</code></pre>
+          </div>
+          <div class="answer-row">
+            <input class="answer-input" id="a3" placeholder="Ej: 12345.67" inputmode="decimal">
+            <button class="btn-check" onclick="checkInput(3,'a3',62422.30,'money')">Verificar</button>
+            <button class="btn-hint" onclick="toggleHint(3)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+          </div>
+          <div class="hintbox" id="h3">Escribí el número sin símbolo de moneda ni separador de miles. Aceptamos un pequeño margen por redondeo.</div>
+          <div class="feedback" id="f3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 4 ===== -->
+  <section class="slide" data-ex="4">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="4">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 3 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 4 / 8 · 15 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · GROUP BY + ORDER BY</span>
+          <div class="ex-q">¿Qué categoría factura MÁS?</div>
+          <div class="ex-context">Agrupá por categoría, sumá el total neto y ordená de mayor a menor. La respuesta es el <strong>nombre</strong> de la categoría en el tope.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío4.sql</span></div>
+            <pre><code><span class="tk-key">SELECT</span> categoria, <span class="tk-fn">SUM</span>(total_neto) <span class="tk-key">AS</span> total
+<span class="tk-key">FROM</span> vw_resumen_ventas
+<span class="tk-key">GROUP BY</span> categoria
+<span class="tk-key">ORDER BY</span> total <span class="tk-key">DESC</span>;</code></pre>
+          </div>
+          <div class="ex-context" style="margin-bottom:.3rem;">¿Cuál quedó primera?</div>
+          <div class="opt-grid" id="opts4">
+            <button class="opt" onclick="checkOpt(4,this,true)"><span class="k">A</span><span>Laptops</span></button>
+            <button class="opt" onclick="checkOpt(4,this,false)"><span class="k">B</span><span>Monitores</span></button>
+            <button class="opt" onclick="checkOpt(4,this,false)"><span class="k">C</span><span>Almacenamiento</span></button>
+            <button class="opt" onclick="checkOpt(4,this,false)"><span class="k">D</span><span>Audio</span></button>
+          </div>
+          <div class="feedback" id="f4"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 5 ===== -->
+  <section class="slide" data-ex="5">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="5">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 4 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 5 / 8 · 20 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · WHERE</span>
+          <div class="ex-q">¿Cuántas ventas se hicieron en Montevideo?</div>
+          <div class="ex-context">Escribí vos la consulta completa en DBeaver (filtrá por <code class="inlinecode">ciudad</code>) e ingresá el número de filas que devuelve.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío5.sql — completalo vos</span></div>
+            <pre><code><span class="tk-key">SELECT</span> <span class="tk-fn">COUNT</span>(*) <span class="tk-key">FROM</span> ventas
+<span class="tk-key">WHERE</span> <span class="blank">_______________</span>;</code></pre>
+          </div>
+          <div class="answer-row">
+            <input class="answer-input" id="a5" placeholder="Cantidad de ventas en Montevideo" inputmode="numeric">
+            <button class="btn-check" onclick="checkInput(5,'a5',11,'exact')">Verificar</button>
+            <button class="btn-hint" onclick="toggleHint(5)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+          </div>
+          <div class="hintbox" id="h5">El filtro es <code class="inlinecode">ciudad = 'Montevideo'</code>. Ojo con las comillas simples y mayúsculas.</div>
+          <div class="feedback" id="f5"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 6 ===== -->
+  <section class="slide" data-ex="6">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="6">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 5 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 6 / 8 · 20 XP</div>
+          <span class="ex-tag sql"><i class="fa-solid fa-database"></i> SQL · GROUP BY + COUNT</span>
+          <div class="ex-q">¿Quién es el vendedor con MÁS ventas (cantidad de tickets)?</div>
+          <div class="ex-context">Agrupá por vendedor, contá las filas y ordená descendente. Respondé el <strong>nombre</strong> del que encabeza.</div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ef7d6b"></span><span class="dot" style="background:#f2b134"></span><span class="dot" style="background:#9fc8c4"></span><span class="fn">desafío6.sql</span></div>
+            <pre><code><span class="tk-key">SELECT</span> vendedor, <span class="tk-fn">COUNT</span>(*) <span class="tk-key">AS</span> cant
+<span class="tk-key">FROM</span> ventas
+<span class="tk-key">GROUP BY</span> vendedor
+<span class="tk-key">ORDER BY</span> cant <span class="tk-key">DESC</span>;</code></pre>
+          </div>
+          <div class="opt-grid" id="opts6">
+            <button class="opt" onclick="checkOpt(6,this,false)"><span class="k">A</span><span>Ana Gómez</span></button>
+            <button class="opt" onclick="checkOpt(6,this,true)"><span class="k">B</span><span>Carlos Díaz</span></button>
+            <button class="opt" onclick="checkOpt(6,this,false)"><span class="k">C</span><span>Sofía Martín</span></button>
+            <button class="opt" onclick="checkOpt(6,this,false)"><span class="k">D</span><span>Luis Pérez</span></button>
+          </div>
+          <div class="feedback" id="f6"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 7 (Power BI) ===== -->
+  <section class="slide" data-ex="7">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="7">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 6 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-bolt"></i> Desafío 7 / 8 · 25 XP</div>
+          <span class="ex-tag pbi"><i class="fa-solid fa-chart-column"></i> Power BI · KPI / tarjeta</span>
+          <div class="ex-q">Construí una tarjeta (KPI) con el total facturado</div>
+          <div class="ex-context">En Power BI, cargá <code class="inlinecode">vw_resumen_ventas</code>, agregá una visualización de tipo <strong>Tarjeta</strong> y arrastrá <code class="inlinecode">total_neto</code> (se mostrará como Suma). ¿Qué valor aparece, redondeado a entero?</div>
+          <div class="callout tip" style="margin-top:.4rem;"><i class="fa-solid fa-wand-magic-sparkles"></i><div style="font-size:.86rem;">Debería coincidir con el total del Desafío 3. ¡Es la misma cuenta, ahora visualizada!</div></div>
+          <div class="answer-row">
+            <input class="answer-input" id="a7" placeholder="Valor de la tarjeta (entero)" inputmode="numeric">
+            <button class="btn-check" onclick="checkInput(7,'a7',62422,'money')">Verificar</button>
+            <button class="btn-hint" onclick="toggleHint(7)"><i class="fa-regular fa-lightbulb"></i> Pista</button>
+          </div>
+          <div class="hintbox" id="h7">Power BI puede mostrarlo como "62,42&nbsp;mil" o "62422". Ingresá el número entero, sin separadores. Aceptamos margen por redondeo.</div>
+          <div class="feedback" id="f7"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DESAFÍO 8 (Power BI - final) ===== -->
+  <section class="slide" data-ex="8">
+    <div class="slide-inner">
+      <div class="ex-wrap ex-locked" data-stage="8">
+        <div class="lock-overlay"><i class="fa-solid fa-lock"></i><div class="lt">Desafío bloqueado</div><div class="ls">Resolvé el Desafío 7 para abrir este.</div></div>
+        <div class="ex-card">
+          <div class="step-pill"><i class="fa-solid fa-trophy" style="color:var(--amber-deep)"></i> Desafío final 8 / 8 · 35 XP</div>
+          <span class="ex-tag pbi"><i class="fa-solid fa-chart-column"></i> Power BI · gráfico + lectura</span>
+          <div class="ex-q">El gráfico que cuenta la historia</div>
+          <div class="ex-context">Armá un <strong>gráfico de barras</strong> con <code class="inlinecode">categoria</code> en el eje y <code class="inlinecode">total_neto</code> en los valores. Agregá una <strong>segmentación</strong> por <code class="inlinecode">ciudad</code>. Mirá el gráfico SIN filtrar: ¿qué barra es claramente la más alta?</div>
+          <div class="opt-grid" id="opts8">
+            <button class="opt" onclick="checkOpt(8,this,true)"><span class="k">A</span><span>Laptops — domina por amplio margen</span></button>
+            <button class="opt" onclick="checkOpt(8,this,false)"><span class="k">B</span><span>Periféricos</span></button>
+            <button class="opt" onclick="checkOpt(8,this,false)"><span class="k">C</span><span>Todas las barras son casi iguales</span></button>
+            <button class="opt" onclick="checkOpt(8,this,false)"><span class="k">D</span><span>Audio</span></button>
+          </div>
+          <div class="feedback" id="f8"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · CIERRE / MAPA DE LOGROS -->
+  <section class="slide" data-final>
+    <div class="slide-inner">
+      <div class="sec-kicker">Resumen de la misión</div>
+      <h2 class="sec-title" id="final-title">Tu progreso</h2>
+      <div class="map" id="achievement-map">
+        <div class="map-item" data-m="1"><div class="ico"><i class="fa-solid fa-hashtag"></i></div><div class="mt"><b>Contar filas</b><span>COUNT(*)</span></div></div>
+        <div class="map-item" data-m="2"><div class="ico"><i class="fa-solid fa-fingerprint"></i></div><div class="mt"><b>Valores únicos</b><span>COUNT(DISTINCT)</span></div></div>
+        <div class="map-item" data-m="3"><div class="ico"><i class="fa-solid fa-coins"></i></div><div class="mt"><b>Sumar la vista</b><span>SUM sobre vista SQL</span></div></div>
+        <div class="map-item" data-m="4"><div class="ico"><i class="fa-solid fa-layer-group"></i></div><div class="mt"><b>Agrupar y ordenar</b><span>GROUP BY + ORDER BY</span></div></div>
+        <div class="map-item" data-m="5"><div class="ico"><i class="fa-solid fa-filter"></i></div><div class="mt"><b>Filtrar</b><span>WHERE</span></div></div>
+        <div class="map-item" data-m="6"><div class="ico"><i class="fa-solid fa-ranking-star"></i></div><div class="mt"><b>Ranking</b><span>GROUP BY + COUNT</span></div></div>
+        <div class="map-item" data-m="7"><div class="ico"><i class="fa-solid fa-gauge-high"></i></div><div class="mt"><b>KPI en Power BI</b><span>Tarjeta</span></div></div>
+        <div class="map-item" data-m="8"><div class="ico"><i class="fa-solid fa-chart-column"></i></div><div class="mt"><b>Gráfico + lectura</b><span>Barras + segmentación</span></div></div>
+      </div>
+      <div id="final-msg" style="margin-top:1.4rem;"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> navegar · resolvé para avanzar</div>
+<div class="nav-arrows">
+  <button id="prevBtn" onclick="go(-1)"><i class="fa-solid fa-arrow-left"></i></button>
+  <button id="nextBtn" onclick="go(1)"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let idx=0;const total=slides.length;
+const TOTAL_EX=8;
+const xpValues={1:10,2:10,3:15,4:15,5:20,6:20,7:25,8:35};
+const solved={};      // stage -> true
+let xp=0;
+
+function render(){
+  slides.forEach((s,i)=>{
+    s.classList.toggle('active',i===idx);
+    if(i===idx){const inner=s.querySelector('.slide-inner');if(inner){inner.classList.remove('animate__animated','animate__fadeInUp');void inner.offsetWidth;inner.classList.add('animate__animated','animate__fadeInUp');}}
+  });
+  document.getElementById('progress').style.width=(idx/(total-1)*100)+'%';
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===total-1;
+  if(slides[idx].hasAttribute('data-final'))renderFinal();
+}
+function go(d){const n=idx+d;if(n>=0&&n<total){idx=n;render();}}
+document.addEventListener('keydown',e=>{
+  if(Swal.isVisible())return;
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='textarea'||tag==='input')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1);
+  if(e.key==='Home'){idx=0;render();}
+  if(e.key==='End'){idx=total-1;render();}
+});
+
+/* desbloquear el siguiente desafío */
+function unlock(stage){
+  const next=document.querySelector('.ex-wrap[data-stage="'+(stage+1)+'"]');
+  if(next)next.classList.remove('ex-locked');
+}
+function awardXP(stage){
+  if(solved[stage])return;
+  solved[stage]=true;
+  xp+=xpValues[stage];
+  document.getElementById('xp').textContent=xp;
+}
+
+/* feedback helpers */
+function showFeedback(stage,ok,msg){
+  const f=document.getElementById('f'+stage);
+  f.className='feedback show '+(ok?'ok':'no');
+  f.innerHTML=msg;
+}
+
+/* validación numérica */
+function checkInput(stage,inputId,expected,mode){
+  const el=document.getElementById(inputId);
+  let raw=el.value.trim().replace(/\$/g,'').replace(/\s/g,'');
+  // permitir coma como separador decimal o de miles -> normalizar
+  raw=raw.replace(/,/g, mode==='money'||mode==='exact' ? '' : '.');
+  const val=parseFloat(raw);
+  if(isNaN(val)){el.classList.remove('ok');el.classList.add('no');showFeedback(stage,false,'Ingresá un número válido.');return;}
+  let ok;
+  if(mode==='exact') ok = Math.round(val)===expected;
+  else ok = Math.abs(val-expected) <= Math.max(2, expected*0.01); // 1% o 2 unidades de margen
+  if(ok){
+    el.classList.remove('no');el.classList.add('ok');
+    awardXP(stage);unlock(stage);
+    showFeedback(stage,true,'<i class="fa-solid fa-circle-check"></i> ¡Correcto! +'+xpValues[stage]+' XP. Desafío '+(stage+1<=TOTAL_EX?(stage+1)+' desbloqueado.':'… ¡era el último de esta serie!'));
+    celebrate(stage);
+  }else{
+    el.classList.remove('ok');el.classList.add('no');
+    showFeedback(stage,false,'<i class="fa-solid fa-circle-xmark"></i> No es el valor esperado. Revisá tu consulta en DBeaver y volvé a intentar.');
+  }
+}
+
+/* validación de opción múltiple */
+function checkOpt(stage,btn,correct){
+  const grid=btn.parentElement;
+  if(correct){
+    [...grid.querySelectorAll('.opt')].forEach(b=>b.disabled=true);
+    btn.classList.add('ok');
+    // desafío 2 tiene un segundo paso numérico
+    if(stage===2){
+      document.getElementById('num2').style.display='flex';
+      showFeedback(2,true,'<i class="fa-solid fa-circle-check"></i> ¡Bien! <code>DISTINCT</code> elimina repetidos. Ahora ingresá cuántas categorías da la consulta.');
+      return;
+    }
+    awardXP(stage);unlock(stage);
+    showFeedback(stage,true,'<i class="fa-solid fa-circle-check"></i> ¡Correcto! +'+xpValues[stage]+' XP. '+(stage<TOTAL_EX?'Desafío '+(stage+1)+' desbloqueado.':'¡Completaste la misión!'));
+    celebrate(stage);
+  }else{
+    btn.classList.add('no');btn.disabled=true;
+    showFeedback(stage,false,'<i class="fa-solid fa-circle-xmark"></i> No es esa. Ejecutá la consulta y fijate el resultado real.');
+  }
+}
+
+function toggleHint(stage){document.getElementById('h'+stage).classList.toggle('show');}
+
+/* mini celebración */
+function celebrate(stage){
+  if(stage===TOTAL_EX){
+    Swal.fire({icon:'success',title:'¡Misión completada!',html:'<p style="color:#5e7079">Resolviste los 8 desafíos sobre TechVentas.</p><div style="font-family:Fira Code;font-size:2rem;color:#d9971a;margin-top:.4rem;">'+xp+' XP</div>',confirmButtonColor:'#5a9b95',confirmButtonText:'Ver mis logros'}).then(()=>{idx=total-1;render();});
+  }else{
+    const t=document.querySelector('.nav-arrows #nextBtn');
+    if(t){t.classList.add('animate__animated','animate__pulse');setTimeout(()=>t.classList.remove('animate__animated','animate__pulse'),900);}
+  }
+}
+
+/* pantalla final */
+function renderFinal(){
+  document.querySelectorAll('#achievement-map .map-item').forEach(it=>{
+    const m=+it.getAttribute('data-m');
+    it.classList.toggle('done',!!solved[m]);
+  });
+  const count=Object.keys(solved).length;
+  const msg=document.getElementById('final-msg');
+  const title=document.getElementById('final-title');
+  if(count===TOTAL_EX){
+    title.innerHTML='¡Misión TechVentas completada! 🎉';
+    msg.innerHTML='<div class="callout tip" style="margin-top:0;"><i class="fa-solid fa-trophy"></i><div><strong>'+xp+' XP · 8/8 desafíos.</strong> Dominaste COUNT, DISTINCT, SUM sobre vistas, GROUP BY, WHERE, ranking y la visualización en Power BI. ¡A aplicarlo en tu propio proyecto!</div></div>';
+  }else{
+    title.innerHTML='Tu progreso · '+count+'/'+TOTAL_EX+' desafíos';
+    msg.innerHTML='<div class="callout info" style="margin-top:0;"><i class="fa-solid fa-circle-info"></i><div>Llevás <strong>'+xp+' XP</strong>. Volvé a los desafíos pendientes para completar la misión.</div></div>';
+  }
+  document.getElementById('xp').textContent=xp;
+}
+render();
+</script>
+</body>
+</html>
