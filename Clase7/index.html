@@ -31,6 +31,14 @@
     .icon-bubble{width:64px;height:64px;display:grid;place-items:center;border-radius:20px;background:#fff;font-size:1.6rem;margin-bottom:1rem;box-shadow:0 10px 25px rgba(31,41,55,.09)}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:26px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.table-wrap{overflow:auto;border-radius:24px;box-shadow:var(--shadow);background:#fff}.table{margin:0}.table th{background:#e9f8ff;color:#23324b}.code{background:#142033;color:#eaf6ff;border-radius:24px;padding:22px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.95rem}.pill{display:inline-block;border-radius:999px;background:#fff;padding:.45rem .8rem;font-weight:800;margin:.2rem;box-shadow:0 8px 18px rgba(31,41,55,.08)}
     .flow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.flow .node{flex:1;min-width:150px;text-align:center;border-radius:24px;padding:22px;background:#fff;box-shadow:var(--shadow);font-weight:900}.flow .arrow{font-size:1.8rem;color:#6b85a0}.quiz-option{cursor:pointer;border:2px solid transparent}.quiz-option:hover{border-color:#55c7df;transform:translateY(-2px)}.mini{font-size:.95rem;color:#52647c}.badge-soft{background:#fff;border-radius:18px;padding:.8rem 1rem;font-weight:800;box-shadow:0 8px 18px rgba(31,41,55,.08);display:inline-block;margin:.25rem}.checklist li{margin-bottom:.65rem}.small-note{font-size:.98rem;color:#52647c;line-height:1.45}
+
+    .defbtn{border:0;border-radius:999px;background:#fff;color:#22304a;font-weight:900;padding:.42rem .75rem;margin:.25rem;box-shadow:0 8px 18px rgba(31,41,55,.08);display:inline-flex;align-items:center;gap:.35rem}
+    .defbtn:hover{transform:translateY(-2px);background:#f0fbff}
+    .concept-actions{margin-top:.75rem}
+    .step-card{position:relative;overflow:hidden}
+    .step-card::after{content:attr(data-step);position:absolute;right:18px;top:8px;font-size:4.5rem;font-weight:950;opacity:.12}
+    .dataset-link{font-weight:850;color:#244b6a;text-decoration:none}
+    .dataset-link:hover{text-decoration:underline}
     @media (max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.slide{padding-top:72px}.top-label{font-size:.8rem}}
     @media (max-width:720px){.slide{padding:78px 18px 102px}.grid-3,.grid-4{grid-template-columns:1fr}.flow{display:block}.flow .node{margin-bottom:12px}.flow .arrow{display:block;text-align:center;transform:rotate(90deg);margin:4px}.navbtn{width:50px;height:50px}#prev{right:92px}#next{right:28px}#home{left:20px}.counter{left:84px}.top-label{right:18px;top:18px}h1{font-size:2.55rem}h2{font-size:2.1rem}.card-soft{padding:22px}.code{font-size:.82rem}}
   </style>
@@ -49,9 +57,9 @@
     <h1>Data Warehouse</h1>
     <p class="lead col-lg-9">Un <strong>Data Warehouse</strong> es una base de datos analítica pensada para integrar datos históricos de distintas fuentes, organizarlos con criterios de negocio y facilitar consultas, tableros, reportes, ciencia de datos e inteligencia artificial.</p>
     <div class="grid-3 mt-4">
-      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-layer-group"></i></div><h3>Integra</h3><p>Une datos de ventas, clientes, pagos, logística, web, sensores, archivos y sistemas externos.</p></div>
-      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-clock-rotate-left"></i></div><h3>Historiza</h3><p>Conserva la evolución del negocio para comparar períodos, tendencias y comportamientos.</p></div>
-      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-brain"></i></div><h3>Prepara para IA</h3><p>Organiza datasets confiables para predicción, segmentación, recomendación y automatización.</p></div>
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-layer-group"></i></div><h3>Integra</h3><p>Une datos de ventas, clientes, pagos, logística, web, sensores, archivos y sistemas externos.</p><div class="concept-actions"><button class="defbtn" onclick="defConcept('dw')"><i class="fa-solid fa-circle-info"></i>Data Warehouse</button></div></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-clock-rotate-left"></i></div><h3>Historiza</h3><p>Conserva la evolución del negocio para comparar períodos, tendencias y comportamientos.</p><div class="concept-actions"><button class="defbtn" onclick="defConcept('historico')"><i class="fa-solid fa-clock"></i>Histórico</button></div></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-brain"></i></div><h3>Prepara para IA</h3><p>Organiza datasets confiables para predicción, segmentación, recomendación y automatización.</p><div class="concept-actions"><button class="defbtn" onclick="defConcept('dataset')"><i class="fa-solid fa-table"></i>Dataset</button></div></div>
     </div>
   </section>
 
@@ -63,13 +71,13 @@
       <div class="card-soft bg-mint"><h3>Con Data Warehouse</h3><p class="lead">Los datos se integran, limpian, documentan y estructuran. El analista consulta una fuente común y puede construir indicadores, datasets y modelos.</p></div>
     </div>
     <div class="mt-4 flow">
-      <div class="node">Fuentes operativas</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">ETL / ELT</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Data Warehouse</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">BI / IA</div>
+      <div class="node"><button class="defbtn" onclick="defConcept('fuentes')">Fuentes operativas</button></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node"><button class="defbtn" onclick="defConcept('etl')">ETL / ELT</button></div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Data Warehouse</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">BI / IA</div>
     </div>
   </section>
 
   <section class="slide" data-label="OLTP vs OLAP">
     <span class="kicker"><i class="fa-solid fa-scale-balanced"></i> Comparación esencial</span>
-    <h2>OLTP vs OLAP</h2>
+    <h2>OLTP vs OLAP</h2><div class="mb-3"><button class="defbtn" onclick="defConcept('oltp')"><i class="fa-solid fa-cash-register"></i>OLTP</button><button class="defbtn" onclick="defConcept('olap')"><i class="fa-solid fa-chart-column"></i>OLAP</button></div>
     <div class="table-wrap">
       <table class="table table-hover align-middle">
         <thead><tr><th>Aspecto</th><th>OLTP: Base operacional</th><th>OLAP: Data Warehouse</th></tr></thead>
@@ -89,7 +97,7 @@
     <h2>Capas de un Data Warehouse</h2>
     <div class="grid-4">
       <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-plug"></i></div><h3>Fuentes</h3><p>ERP, CRM, archivos CSV, APIs, logs, sensores, bases SQL o NoSQL.</p></div>
-      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-filter"></i></div><h3>Staging</h3><p>Zona temporal para copiar, validar y transformar datos antes de consolidarlos.</p></div>
+      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-filter"></i></div><h3>Staging</h3><p>Zona temporal para copiar, validar y transformar datos antes de consolidarlos.</p><button class="defbtn" onclick="defConcept('staging')"><i class="fa-solid fa-circle-info"></i>Definición</button></div>
       <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-warehouse"></i></div><h3>Warehouse</h3><p>Repositorio integrado, histórico y orientado al análisis del negocio.</p></div>
       <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-chart-line"></i></div><h3>Consumo</h3><p>Dashboards, consultas SQL, notebooks, modelos de IA y reportes.</p></div>
     </div>
@@ -100,8 +108,8 @@
     <span class="kicker"><i class="fa-solid fa-arrows-spin"></i> Movimiento de datos</span>
     <h2>ETL y ELT</h2>
     <div class="grid-2">
-      <div class="card-soft bg-blue"><h3>ETL</h3><p><strong>Extract, Transform, Load.</strong> Primero se extraen los datos, luego se transforman y finalmente se cargan al warehouse. Es útil cuando se quiere controlar la limpieza antes de cargar.</p></div>
-      <div class="card-soft bg-mint"><h3>ELT</h3><p><strong>Extract, Load, Transform.</strong> Primero se cargan los datos y luego se transforman dentro del motor analítico. Es frecuente en soluciones modernas en la nube y grandes volúmenes.</p></div>
+      <div class="card-soft bg-blue"><h3>ETL <button class="defbtn" onclick="defConcept('etl')"><i class="fa-solid fa-circle-info"></i></button></h3><p><strong>Extract, Transform, Load.</strong> Primero se extraen los datos, luego se transforman y finalmente se cargan al warehouse. Es útil cuando se quiere controlar la limpieza antes de cargar.</p></div>
+      <div class="card-soft bg-mint"><h3>ELT <button class="defbtn" onclick="defConcept('elt')"><i class="fa-solid fa-circle-info"></i></button></h3><p><strong>Extract, Load, Transform.</strong> Primero se cargan los datos y luego se transforman dentro del motor analítico. Es frecuente en soluciones modernas en la nube y grandes volúmenes.</p></div>
     </div>
     <div class="code mt-4">-- Ejemplo simple de transformación para análisis
 CREATE VIEW vw_ventas_mensuales AS
@@ -119,10 +127,10 @@ GROUP BY DATE_TRUNC('month', fecha_venta), id_producto;</div>
     <h2>Modelo dimensional</h2>
     <p class="lead col-lg-10">El modelo dimensional organiza los datos para responder preguntas de negocio de forma rápida y comprensible. La decisión más importante es definir el <strong>grano</strong>: qué representa exactamente cada fila de la tabla de hechos.</p>
     <div class="grid-4 mt-3">
-      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-ruler"></i></div><h3>Grano</h3><p>Nivel de detalle de cada fila: una venta, una línea de venta, una visita web, un pago.</p></div>
-      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-table-cells"></i></div><h3>Hechos</h3><p>Eventos medibles: ventas, reservas, pagos, clics, reclamos. Incluyen claves a dimensiones.</p></div>
-      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-tags"></i></div><h3>Dimensiones</h3><p>Contexto del hecho: cliente, producto, fecha, sucursal, canal, promoción.</p></div>
-      <div class="card-soft bg-pink"><div class="icon-bubble"><i class="fa-solid fa-calculator"></i></div><h3>Métricas</h3><p>Valores agregables: cantidad, importe, costo, descuento, duración, conteos.</p></div>
+      <div class="card-soft bg-yellow"><div class="icon-bubble"><i class="fa-solid fa-ruler"></i></div><h3>Grano</h3><p>Nivel de detalle de cada fila: una venta, una línea de venta, una visita web, un pago.</p><button class="defbtn" onclick="defConcept('grano')">Ver definición</button></div>
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-table-cells"></i></div><h3>Hechos</h3><p>Eventos medibles: ventas, reservas, pagos, clics, reclamos. Incluyen claves a dimensiones.</p><button class="defbtn" onclick="defConcept('hechos')">Ver definición</button></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-tags"></i></div><h3>Dimensiones</h3><p>Contexto del hecho: cliente, producto, fecha, sucursal, canal, promoción.</p><button class="defbtn" onclick="defConcept('dimensiones')">Ver definición</button></div>
+      <div class="card-soft bg-pink"><div class="icon-bubble"><i class="fa-solid fa-calculator"></i></div><h3>Métricas</h3><p>Valores agregables: cantidad, importe, costo, descuento, duración, conteos.</p><button class="defbtn" onclick="defConcept('metricas')">Ver definición</button></div>
     </div>
     <div class="grid-2 mt-4">
       <div class="card-soft bg-lav"><h3>Ejemplo</h3><p><strong>fact_ventas</strong>: id_fecha, id_cliente, id_producto, id_sucursal, cantidad, importe_total.</p><p><strong>dim_cliente</strong>: segmento, edad, barrio. <strong>dim_producto</strong>: categoría, marca, precio_lista.</p></div>
@@ -134,14 +142,14 @@ GROUP BY DATE_TRUNC('month', fecha_venta), id_producto;</div>
     <span class="kicker"><i class="fa-solid fa-sitemap"></i> Esquemas comunes</span>
     <h2>Estrella vs Copo de nieve</h2>
     <div class="grid-2">
-      <div class="card-soft bg-lav"><h3>Esquema estrella</h3><p>Una tabla de hechos central conectada directamente con dimensiones. Es simple, legible y suele ser rápido para consultas analíticas.</p><div class="flow mt-3"><div class="node">Dim Cliente</div><div class="node bg-yellow">Hecho Venta</div><div class="node">Dim Producto</div><div class="node">Dim Tiempo</div></div></div>
-      <div class="card-soft bg-blue"><h3>Esquema copo de nieve</h3><p>Las dimensiones se normalizan en varias tablas. Reduce redundancia, pero puede hacer más complejas las consultas y los JOIN.</p><div class="flow mt-3"><div class="node">Producto</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Categoría</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">Hecho</div></div></div>
+      <div class="card-soft bg-lav"><h3>Esquema estrella <button class="defbtn" onclick="defConcept('estrella')"><i class="fa-solid fa-star"></i></button></h3><p>Una tabla de hechos central conectada directamente con dimensiones. Es simple, legible y suele ser rápido para consultas analíticas.</p><div class="flow mt-3"><div class="node">Dim Cliente</div><div class="node bg-yellow">Hecho Venta</div><div class="node">Dim Producto</div><div class="node">Dim Tiempo</div></div></div>
+      <div class="card-soft bg-blue"><h3>Esquema copo de nieve <button class="defbtn" onclick="defConcept('copo')"><i class="fa-solid fa-snowflake"></i></button></h3><p>Las dimensiones se normalizan en varias tablas. Reduce redundancia, pero puede hacer más complejas las consultas y los JOIN.</p><div class="flow mt-3"><div class="node">Producto</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Categoría</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">Hecho</div></div></div>
     </div>
   </section>
 
   <section class="slide" data-label="DW, Data Lake y Lakehouse">
     <span class="kicker"><i class="fa-solid fa-water"></i> Comparaciones modernas</span>
-    <h2>Data Warehouse, Data Lake y Lakehouse</h2>
+    <h2>Data Warehouse, Data Lake y Lakehouse</h2><div class="mb-3"><button class="defbtn" onclick="defConcept('datalake')">Data Lake</button><button class="defbtn" onclick="defConcept('lakehouse')">Lakehouse</button><button class="defbtn" onclick="defConcept('datamart')">Data Mart</button></div>
     <div class="table-wrap">
       <table class="table table-hover align-middle">
         <thead><tr><th>Tipo</th><th>Qué almacena</th><th>Fortaleza</th><th>Riesgo típico</th></tr></thead>
@@ -215,11 +223,17 @@ ORDER BY gasto_total DESC;</div>
       <div class="node bg-blue">SQL analítico</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-yellow">Features</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-mint">Dataset</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-lav">Modelo IA</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node bg-pink">Monitoreo</div>
     </div>
     <div class="grid-3 mt-4">
-      <div class="card-soft bg-blue"><h3>Features</h3><p>Frecuencia de compra, ticket promedio, antigüedad, estacionalidad, reclamos, última interacción.</p></div>
-      <div class="card-soft bg-yellow"><h3>Cuidados</h3><p>Evitar fuga de información: no usar datos que en la vida real no existirían al momento de predecir.</p></div>
-      <div class="card-soft bg-mint"><h3>Monitoreo</h3><p>Comparar predicciones contra resultados reales y detectar cambios de comportamiento o pérdida de precisión.</p></div>
+      <div class="card-soft bg-blue"><h3>Features</h3><p>Frecuencia de compra, ticket promedio, antigüedad, estacionalidad, reclamos, última interacción.</p><button class="defbtn" onclick="defConcept('features')">Ver definición</button></div>
+      <div class="card-soft bg-yellow"><h3>Cuidados</h3><p>Evitar fuga de información: no usar datos que en la vida real no existirían al momento de predecir.</p><button class="defbtn" onclick="defConcept('fuga')">Fuga de información</button></div>
+      <div class="card-soft bg-mint"><h3>Monitoreo</h3><p>Comparar predicciones contra resultados reales y detectar cambios de comportamiento o pérdida de precisión.</p><button class="defbtn" onclick="defConcept('monitoreo')">Ver definición</button></div>
     </div>
-    <div class="card-soft mt-4"><h3>Ejemplos de modelos</h3><span class="pill">Predicción de demanda</span><span class="pill">Churn</span><span class="pill">Recomendadores</span><span class="pill">Detección de fraude</span><span class="pill">Segmentación</span></div>
+    <div class="card-soft mt-4"><h3>Ejemplos de modelos</h3>
+      <button class="defbtn" onclick="defConcept('prediccion_demanda')"><i class="fa-solid fa-chart-line"></i>Predicción de demanda</button>
+      <button class="defbtn" onclick="defConcept('churn')"><i class="fa-solid fa-user-slash"></i>Churn</button>
+      <button class="defbtn" onclick="defConcept('recomendadores')"><i class="fa-solid fa-thumbs-up"></i>Recomendadores</button>
+      <button class="defbtn" onclick="defConcept('fraude')"><i class="fa-solid fa-shield-halved"></i>Detección de fraude</button>
+      <button class="defbtn" onclick="defConcept('segmentacion')"><i class="fa-solid fa-users-viewfinder"></i>Segmentación</button>
+    </div>
   </section>
 
   <section class="slide" data-label="Resumen">
@@ -237,6 +251,97 @@ ORDER BY gasto_total DESC;</div>
     <div class="card-soft bg-pink mt-4"><p class="lead mb-0"><strong>Idea final:</strong> un Data Warehouse transforma datos operativos en conocimiento analítico; ese conocimiento puede convertirse en decisiones, tableros o modelos de IA.</p></div>
   </section>
 
+
+  <section class="slide" data-label="Datasets públicos">
+    <span class="kicker"><i class="fa-solid fa-unlock-keyhole"></i> Datos abiertos para aprender</span>
+    <h2>Datasets públicos</h2>
+    <p class="lead col-lg-10">Un <strong>dataset público</strong> es un conjunto de datos publicado para consulta, descarga y reutilización. En un curso de SQL, Ciencia de Datos e IA permite trabajar con datos reales sin depender de una empresa o sistema privado.</p>
+    <div class="grid-3 mt-3">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-landmark"></i></div><h3>Catálogo Nacional</h3><p>Portal central de Uruguay para encontrar conjuntos de datos de organismos públicos y otras organizaciones.</p><a class="dataset-link" href="https://catalogodatos.gub.uy/" target="_blank">catalogodatos.gub.uy</a></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-city"></i></div><h3>Montevideo</h3><p>Portal de datos abiertos de la Intendencia de Montevideo, útil para movilidad, territorio, servicios y ciudad.</p><a class="dataset-link" href="https://ckan.montevideo.gub.uy/" target="_blank">ckan.montevideo.gub.uy</a></div>
+      <div class="card-soft bg-peach"><div class="icon-bubble"><i class="fa-solid fa-heart-pulse"></i></div><h3>ASSE / Salud</h3><p>Conjuntos publicados por organismos de salud, por ejemplo indicadores asistenciales y datos institucionales.</p><a class="dataset-link" href="https://www.asse.com.uy/categoria/Datos-abiertos-505" target="_blank">Datos abiertos ASSE</a></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4"><h3>¿Cómo elegir un dataset?</h3><ul class="checklist mb-0"><li>Que tenga formato descargable: CSV, XLSX, JSON o API.</li><li>Que incluya fechas, categorías y medidas numéricas.</li><li>Que tenga documentación o diccionario de datos.</li><li>Que pueda relacionarse con otro dataset mediante fecha, zona, código o categoría.</li></ul></div>
+    <button class="btn btn-lg btn-primary mt-4 rounded-pill px-4" onclick="defConcept('dataset_publico')"><i class="fa-solid fa-circle-info me-2"></i>Definición de dataset público</button>
+  </section>
+
+  <section class="slide" data-label="Ejercicio DW">
+    <span class="kicker"><i class="fa-solid fa-screwdriver-wrench"></i> Ejercicio guiado</span>
+    <h2>Mini Data Warehouse con MySQL + Power BI</h2>
+    <p class="lead col-lg-10">Ejercicio de referencia: construir un DW sencillo usando datasets públicos relacionados por <strong>fecha</strong> y <strong>zona</strong>. La idea es practicar el flujo completo sin buscar una solución productiva compleja.</p>
+    <div class="grid-2 mt-3">
+      <div class="card-soft bg-blue"><h3>Dataset A: actividad / servicios</h3><p>Descargar un CSV del Catálogo Nacional o del portal de Montevideo con registros por fecha y zona. Ejemplo: servicios, eventos, inspecciones, trámites, movilidad o reclamos.</p></div>
+      <div class="card-soft bg-mint"><h3>Dataset B: contexto</h3><p>Descargar un segundo CSV relacionado por zona o fecha. Ejemplo: barrios, municipios, población, clima, calendario, feriados o categorización territorial.</p></div>
+    </div>
+    <div class="table-wrap mt-4"><table class="table table-hover align-middle"><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th></tr></thead><tbody>
+      <tr><td>1</td><td>Elegir 1 o 2 datasets públicos con una clave común.</td><td>Archivos CSV/XLSX descargados y documentados.</td></tr>
+      <tr><td>2</td><td>Crear base MySQL <code>dw_uruguay</code> y tablas <code>stg_*</code>.</td><td>Datos crudos cargados sin perder columnas originales.</td></tr>
+      <tr><td>3</td><td>Limpiar fechas, nombres de zona, nulos y duplicados.</td><td>Tablas preparadas para análisis.</td></tr>
+      <tr><td>4</td><td>Crear dimensiones: <code>dim_fecha</code>, <code>dim_zona</code>, <code>dim_categoria</code>.</td><td>Contexto común para cruzar datasets.</td></tr>
+      <tr><td>5</td><td>Crear tabla de hechos: <code>fact_eventos</code> o <code>fact_servicios</code>.</td><td>Métricas como cantidad, importe, duración o conteo.</td></tr>
+      <tr><td>6</td><td>Conectar Power BI a MySQL.</td><td>Modelo cargado para crear visualizaciones.</td></tr>
+      <tr><td>7</td><td>Crear dashboard con filtros por fecha, zona y categoría.</td><td>Reporte BI simple listo para analizar tendencias.</td></tr>
+    </tbody></table></div>
+    <div class="card-soft bg-pink mt-4">
+      <h3><i class="fa-solid fa-lock me-2"></i>Resolución orientativa oculta</h3>
+      <p class="lead mb-3">La guía completa no se muestra directamente en la diapositiva para permitir que el estudiante primero intente resolver el ejercicio.</p>
+      <button class="btn btn-lg btn-primary rounded-pill px-4" onclick="mostrarPasoDW()"><i class="fa-solid fa-eye me-2"></i>Ver paso a paso para resolverlo</button>
+      <button class="btn btn-lg btn-outline-dark rounded-pill px-4 ms-2 mt-2 mt-md-0" onclick="mostrarChecklistDW()"><i class="fa-solid fa-list-check me-2"></i>Ver checklist rápido</button>
+    </div>
+  </section>
+
+  <section class="slide" data-label="SQL ejercicio">
+    <span class="kicker"><i class="fa-solid fa-code"></i> Script base orientativo</span>
+    <h2>Modelo mínimo en MySQL</h2>
+    <div class="code">CREATE DATABASE dw_uruguay;
+USE dw_uruguay;
+
+-- 1) Zona de staging: datos crudos importados desde CSV
+CREATE TABLE stg_eventos (
+  fecha DATE,
+  zona VARCHAR(100),
+  categoria VARCHAR(100),
+  cantidad INT
+);
+
+CREATE TABLE stg_zonas (
+  zona VARCHAR(100),
+  municipio VARCHAR(100),
+  departamento VARCHAR(100)
+);
+
+-- 2) Dimensiones
+CREATE TABLE dim_zona (
+  id_zona INT AUTO_INCREMENT PRIMARY KEY,
+  zona VARCHAR(100),
+  municipio VARCHAR(100),
+  departamento VARCHAR(100)
+);
+
+CREATE TABLE dim_fecha (
+  id_fecha INT PRIMARY KEY,
+  fecha DATE,
+  anio INT,
+  mes INT,
+  dia INT
+);
+
+-- 3) Hechos
+CREATE TABLE fact_eventos (
+  id_evento INT AUTO_INCREMENT PRIMARY KEY,
+  id_fecha INT,
+  id_zona INT,
+  categoria VARCHAR(100),
+  cantidad INT,
+  FOREIGN KEY (id_fecha) REFERENCES dim_fecha(id_fecha),
+  FOREIGN KEY (id_zona) REFERENCES dim_zona(id_zona)
+);</div>
+    <div class="grid-2 mt-4">
+      <div class="card-soft bg-yellow"><h3>Consulta para Power BI</h3><p>Conectar Power BI a MySQL y cargar una vista como <code>vw_eventos_zona_mes</code> con año, mes, zona, categoría y cantidad total.</p></div>
+      <div class="card-soft bg-pink"><h3>Visualizaciones sugeridas</h3><ul class="checklist mb-0"><li>Barras: cantidad por zona.</li><li>Línea: evolución mensual.</li><li>Mapa o tabla: departamento/municipio.</li><li>Segmentador: categoría y período.</li></ul></div>
+    </div>
+  </section>
+
   <section class="slide" data-label="Quiz">
     <span class="kicker"><i class="fa-solid fa-circle-question"></i> Evaluación rápida</span>
     <h2>Quiz: 5 preguntas</h2>
@@ -250,6 +355,205 @@ ORDER BY gasto_total DESC;</div>
 const slides=[...document.querySelectorAll('.slide')];let idx=0;const total=document.getElementById('total'),cur=document.getElementById('current'),label=document.getElementById('sectionLabel'),prog=document.getElementById('progress');total.textContent=slides.length;
 function show(i){idx=(i+slides.length)%slides.length;slides.forEach((s,n)=>{s.classList.toggle('active',n===idx); if(n===idx){s.scrollTop=0;s.classList.remove('animate__animated','animate__fadeIn');void s.offsetWidth;s.classList.add('animate__animated','animate__fadeIn')}});cur.textContent=idx+1;label.textContent=slides[idx].dataset.label||'DATA WAREHOUSE';prog.style.width=((idx+1)/slides.length*100)+'%'}
 document.getElementById('next').onclick=()=>show(idx+1);document.getElementById('prev').onclick=()=>show(idx-1);document.getElementById('home').onclick=()=>show(0);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(idx+1);if(e.key==='ArrowLeft')show(idx-1);if(e.key==='Home')show(0)});show(0);
+
+const definitions={
+  dw:{title:'Data Warehouse',text:'Base de datos analítica que integra datos históricos de distintas fuentes, organizada para consultas, reportes, BI, Ciencia de Datos e IA.'},
+  historico:{title:'Dato histórico',text:'Registro conservado en el tiempo. Permite comparar períodos, detectar tendencias y entrenar modelos con comportamiento pasado.'},
+  dataset:{title:'Dataset',text:'Conjunto de datos organizado en filas y columnas, normalmente preparado para análisis, visualización o entrenamiento de modelos.'},
+  dataset_publico:{title:'Dataset público',text:'Conjunto de datos publicado para que otras personas puedan consultarlo, descargarlo y reutilizarlo. Es ideal para practicar SQL, Power BI e IA con datos reales.'},
+  fuentes:{title:'Fuentes operativas',text:'Sistemas donde nacen los datos: ventas, sensores, formularios, APIs, archivos, bases transaccionales, registros web o sistemas de gestión.'},
+  oltp:{title:'OLTP',text:'Procesamiento transaccional en línea. Está diseñado para registrar operaciones diarias rápidas, como ventas, pagos, altas o reservas.'},
+  olap:{title:'OLAP',text:'Procesamiento analítico en línea. Está diseñado para análisis histórico, agregaciones, tableros, indicadores y consultas multidimensionales.'},
+  etl:{title:'ETL',text:'Extract, Transform, Load: extraer datos, transformarlos antes de cargarlos y finalmente insertarlos en el Data Warehouse.'},
+  elt:{title:'ELT',text:'Extract, Load, Transform: cargar primero los datos en el entorno analítico y transformarlos luego dentro del motor o plataforma de datos.'},
+  staging:{title:'Staging',text:'Área temporal donde se copian los datos crudos para validarlos, limpiarlos y transformarlos antes de consolidarlos en el warehouse.'},
+  grano:{title:'Grano',text:'Nivel de detalle de cada fila de la tabla de hechos. Ejemplo: una fila por venta, por línea de venta, por día o por cliente.'},
+  hechos:{title:'Tabla de hechos',text:'Tabla central del modelo dimensional. Guarda eventos medibles como ventas, reclamos, reservas o clics, junto con claves hacia dimensiones.'},
+  dimensiones:{title:'Dimensiones',text:'Tablas descriptivas que dan contexto al hecho: cliente, producto, fecha, sucursal, canal, zona o categoría.'},
+  metricas:{title:'Métricas',text:'Valores numéricos que se pueden sumar, contar, promediar o comparar: cantidad, importe, costo, duración, unidades, visitas.'},
+  estrella:{title:'Esquema estrella',text:'Modelo dimensional con una tabla de hechos central conectada directamente con varias dimensiones. Es simple y muy usado en BI.'},
+  copo:{title:'Esquema copo de nieve',text:'Variante donde las dimensiones se normalizan en subtablas. Reduce redundancia, pero aumenta la cantidad de JOIN.'},
+  datalake:{title:'Data Lake',text:'Repositorio amplio para datos crudos, estructurados y no estructurados. Es flexible, pero necesita gobierno para no volverse desordenado.'},
+  lakehouse:{title:'Lakehouse',text:'Arquitectura que combina la flexibilidad del Data Lake con capacidades analíticas similares al Data Warehouse.'},
+  datamart:{title:'Data Mart',text:'Subconjunto del Data Warehouse orientado a un área específica, como ventas, marketing, finanzas o gestión académica.'},
+  features:{title:'Features',text:'Variables construidas desde los datos para alimentar modelos de IA. Ejemplo: gasto promedio, frecuencia de compra o días desde la última interacción.'},
+  fuga:{title:'Fuga de información',text:'Error que ocurre cuando el dataset usa información que no estaría disponible al momento real de predecir. Produce modelos artificialmente buenos pero poco útiles.'},
+  monitoreo:{title:'Monitoreo de modelo',text:'Seguimiento posterior al despliegue para comparar predicciones con resultados reales y detectar pérdida de precisión o cambios en los datos.'},
+  prediccion_demanda:{title:'Predicción de demanda',text:'Modelo que estima cuántas unidades o servicios se necesitarán en el futuro, usando historia, fechas, clima, eventos o estacionalidad.'},
+  churn:{title:'Churn',text:'Modelo que estima la probabilidad de que un cliente, estudiante o usuario abandone un servicio, curso o plataforma.'},
+  recomendadores:{title:'Recomendadores',text:'Modelos que sugieren productos, contenidos o acciones según historial, similitud entre usuarios o comportamiento previo.'},
+  fraude:{title:'Detección de fraude',text:'Modelos que identifican operaciones atípicas o sospechosas comparándolas con patrones históricos normales.'},
+  segmentacion:{title:'Segmentación',text:'Técnicas que agrupan personas, productos o comportamientos similares para entender perfiles y diseñar acciones específicas.'}
+};
+function defConcept(key){const d=definitions[key]; if(!d)return; Swal.fire({title:d.title,text:d.text,icon:'info',confirmButtonText:'Entendido',confirmButtonColor:'#55c7df',background:'#fffdf9',color:'#22304a'});}
+
+
+function mostrarPasoDW(){
+  Swal.fire({
+    title:'Resolución paso a paso: Mini DW con MySQL + Power BI',
+    width:'min(1000px, 96vw)',
+    html:`
+      <div style="text-align:left; max-height:70vh; overflow:auto; padding-right:8px">
+        <div class="mb-3 p-3 rounded-4" style="background:#e9f8ff">
+          <strong>Objetivo:</strong> construir un Data Warehouse mínimo para analizar eventos, servicios o reclamos por fecha, zona y categoría, usando datasets públicos de Uruguay.
+        </div>
+
+        <h4>1. Elegir los datasets</h4>
+        <p>Seleccionar un dataset principal con registros de actividad, por ejemplo servicios, eventos, trámites, reclamos o inspecciones. Luego elegir un dataset complementario con contexto territorial, por ejemplo barrios, municipios o departamentos.</p>
+        <ul>
+          <li><strong>Dataset A:</strong> debe tener fecha, zona o ubicación, categoría y una medida o conteo.</li>
+          <li><strong>Dataset B:</strong> debe permitir enriquecer la zona: municipio, departamento, barrio o región.</li>
+        </ul>
+
+        <h4>2. Revisar el diccionario de datos</h4>
+        <p>Antes de importar, identificar qué significa cada columna, cuáles son obligatorias, qué formato tienen las fechas y qué campos pueden funcionar como claves de relación.</p>
+        <div class="code" style="white-space:pre-wrap">Ejemplo de columnas esperadas:
+fecha | zona | categoria | cantidad
+zona  | municipio | departamento</div>
+
+        <h4>3. Crear la base y las tablas de staging</h4>
+        <p>En MySQL, crear una base para el ejercicio y tablas <code>stg_</code> donde se cargan los datos crudos. En esta etapa no conviene eliminar columnas todavía.</p>
+        <div class="code" style="white-space:pre-wrap">CREATE DATABASE dw_uruguay;
+USE dw_uruguay;
+
+CREATE TABLE stg_eventos (
+  fecha DATE,
+  zona VARCHAR(100),
+  categoria VARCHAR(100),
+  cantidad INT
+);
+
+CREATE TABLE stg_zonas (
+  zona VARCHAR(100),
+  municipio VARCHAR(100),
+  departamento VARCHAR(100)
+);</div>
+
+        <h4>4. Importar los CSV</h4>
+        <p>Importar los archivos desde MySQL Workbench, DBeaver o el asistente de importación utilizado en clase. Validar que la cantidad de filas importadas coincida con el archivo original.</p>
+        <ul>
+          <li>Verificar separador: coma, punto y coma o tabulación.</li>
+          <li>Verificar codificación: UTF-8 para evitar errores con tildes y ñ.</li>
+          <li>Verificar formato de fecha: <code>YYYY-MM-DD</code> o convertirlo luego.</li>
+        </ul>
+
+        <h4>5. Limpiar y normalizar datos</h4>
+        <p>Unificar mayúsculas/minúsculas, quitar espacios de más, revisar nulos y detectar duplicados.</p>
+        <div class="code" style="white-space:pre-wrap">UPDATE stg_eventos
+SET zona = TRIM(UPPER(zona)),
+    categoria = TRIM(UPPER(categoria));
+
+UPDATE stg_zonas
+SET zona = TRIM(UPPER(zona)),
+    municipio = TRIM(UPPER(municipio)),
+    departamento = TRIM(UPPER(departamento));</div>
+
+        <h4>6. Crear dimensiones</h4>
+        <p>Las dimensiones describen el contexto del hecho. Para este ejercicio alcanza con fecha, zona y categoría.</p>
+        <div class="code" style="white-space:pre-wrap">CREATE TABLE dim_zona (
+  id_zona INT AUTO_INCREMENT PRIMARY KEY,
+  zona VARCHAR(100),
+  municipio VARCHAR(100),
+  departamento VARCHAR(100)
+);
+
+INSERT INTO dim_zona (zona, municipio, departamento)
+SELECT DISTINCT zona, municipio, departamento
+FROM stg_zonas;
+
+CREATE TABLE dim_categoria (
+  id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+  categoria VARCHAR(100)
+);
+
+INSERT INTO dim_categoria (categoria)
+SELECT DISTINCT categoria
+FROM stg_eventos;</div>
+
+        <h4>7. Crear la tabla de hechos</h4>
+        <p>La tabla de hechos guarda los eventos medibles y se conecta con las dimensiones mediante claves.</p>
+        <div class="code" style="white-space:pre-wrap">CREATE TABLE fact_eventos (
+  id_evento INT AUTO_INCREMENT PRIMARY KEY,
+  fecha DATE,
+  id_zona INT,
+  id_categoria INT,
+  cantidad INT,
+  FOREIGN KEY (id_zona) REFERENCES dim_zona(id_zona),
+  FOREIGN KEY (id_categoria) REFERENCES dim_categoria(id_categoria)
+);
+
+INSERT INTO fact_eventos (fecha, id_zona, id_categoria, cantidad)
+SELECT e.fecha, z.id_zona, c.id_categoria, e.cantidad
+FROM stg_eventos e
+JOIN dim_zona z ON z.zona = e.zona
+JOIN dim_categoria c ON c.categoria = e.categoria;</div>
+
+        <h4>8. Crear una vista para Power BI</h4>
+        <p>La vista simplifica el consumo desde Power BI, evitando que el estudiante deba construir todos los JOIN en la herramienta.</p>
+        <div class="code" style="white-space:pre-wrap">CREATE VIEW vw_eventos_zona_mes AS
+SELECT
+  YEAR(f.fecha) AS anio,
+  MONTH(f.fecha) AS mes,
+  z.departamento,
+  z.municipio,
+  z.zona,
+  c.categoria,
+  SUM(f.cantidad) AS cantidad_total
+FROM fact_eventos f
+JOIN dim_zona z ON z.id_zona = f.id_zona
+JOIN dim_categoria c ON c.id_categoria = f.id_categoria
+GROUP BY YEAR(f.fecha), MONTH(f.fecha), z.departamento, z.municipio, z.zona, c.categoria;</div>
+
+        <h4>9. Conectar Power BI</h4>
+        <ol>
+          <li>Abrir Power BI Desktop.</li>
+          <li>Elegir <strong>Obtener datos → MySQL database</strong>.</li>
+          <li>Indicar servidor, base <code>dw_uruguay</code> y credenciales.</li>
+          <li>Cargar la vista <code>vw_eventos_zona_mes</code>.</li>
+          <li>Crear gráficos: barras por zona, línea por mes, tabla por categoría y segmentadores.</li>
+        </ol>
+
+        <h4>10. Validar el resultado</h4>
+        <p>Comparar totales del CSV original contra totales del DW. Si no coinciden, revisar importación, joins, zonas sin correspondencia o categorías con espacios/tildes diferentes.</p>
+        <div class="p-3 rounded-4" style="background:#fff0b8"><strong>Resultado esperado:</strong> un dashboard simple que permita responder: ¿en qué zonas hay más eventos?, ¿qué categorías predominan?, ¿cómo cambia la cantidad por mes?</div>
+      </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Cerrar guía',
+    confirmButtonColor:'#55c7df',
+    background:'#fffdf9',
+    color:'#22304a'
+  });
+}
+
+function mostrarChecklistDW(){
+  Swal.fire({
+    title:'Checklist rápido del ejercicio',
+    width:'min(760px, 95vw)',
+    html:`
+      <div style="text-align:left">
+        <ol>
+          <li>Descargué 1 o 2 datasets públicos relacionados.</li>
+          <li>Identifiqué fecha, zona, categoría y una métrica.</li>
+          <li>Creé la base <code>dw_uruguay</code>.</li>
+          <li>Cargué datos crudos en tablas <code>stg_</code>.</li>
+          <li>Limpié nombres de zona, fechas, nulos y duplicados.</li>
+          <li>Creé dimensiones: zona, categoría y/o fecha.</li>
+          <li>Creé la tabla de hechos.</li>
+          <li>Creé una vista para Power BI.</li>
+          <li>Conecté Power BI a MySQL.</li>
+          <li>Armé al menos 3 visualizaciones y validé totales.</li>
+        </ol>
+      </div>
+    `,
+    icon:'success',
+    confirmButtonText:'Entendido',
+    confirmButtonColor:'#55c7df',
+    background:'#fffdf9',
+    color:'#22304a'
+  });
+}
+
 const questions=[
  {q:'¿Cuál es el objetivo principal de un Data Warehouse?',opts:['Registrar transacciones diarias','Integrar datos históricos para análisis','Reemplazar todos los sistemas operativos'],a:1},
  {q:'¿Qué tipo de sistema se asocia más con consultas analíticas?',opts:['OLTP','OLAP','DNS'],a:1},
