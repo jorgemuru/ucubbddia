@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelado Dimensional · Granularidad, Hechos y Dimensiones</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0f1419; --bg-2:#151b23; --panel:#1a222c; --panel-2:#212b37; --line:#2c3846;
+    --paper:#e8edf2; --ink-soft:#93a2b3;
+    --lens:#f5c451;       /* ámbar lente/microscopio */
+    --lens-dim:#c99a2e;
+    --fact:#ff6b6b;       /* hechos = rojo-coral */
+    --fact-dim:#c94d4d;
+    --dim:#4dc3d9;        /* dimensiones = cian */
+    --dim-deep:#2d8ea3;
+    --grain:#a78bfa;      /* granularidad = violeta */
+    --good:#5dd39e; --bad:#ff7a85;
+    --s-key:#c792ea; --s-str:#a5e075; --s-num:#f78c6c; --s-com:#5a6b7d; --s-fn:#4dc3d9;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{background:var(--bg);color:var(--paper);font-family:'Inter',system-ui,sans-serif;overflow:hidden;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Sora',sans-serif;}
+
+  .deck{height:100vh;width:100vw;position:relative;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:clamp(1.3rem,3.5vw,3rem) clamp(1.3rem,5vw,5.5rem);overflow-y:auto;}
+  .slide.active{display:flex;}
+  .slide-inner{margin:auto;width:100%;max-width:1040px;}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.4rem;background:rgba(15,20,25,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-size:.8rem;}
+  .topbar .brand{font-family:'Sora';font-weight:600;color:var(--paper);display:flex;align-items:center;gap:.5rem;}
+  .topbar .brand i{color:var(--lens);}
+  .progress-track{flex:1;margin:0 1.4rem;height:3px;background:var(--panel-2);border-radius:99px;overflow:hidden;max-width:520px;}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--dim),var(--lens));transition:width .4s cubic-bezier(.4,0,.2,1);}
+  .counter{font-family:'IBM Plex Mono';color:var(--ink-soft);white-space:nowrap;}
+
+  .nav-arrows{position:fixed;bottom:1.3rem;right:1.3rem;z-index:30;display:flex;gap:.5rem;}
+  .nav-arrows button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--paper);cursor:pointer;font-size:1rem;transition:.18s;}
+  .nav-arrows button:hover:not(:disabled){background:var(--lens);border-color:var(--lens);color:#0f1419;transform:translateY(-2px);}
+  .nav-arrows button:disabled{opacity:.35;cursor:not-allowed;}
+  .hint{position:fixed;bottom:1.6rem;left:1.4rem;z-index:30;color:var(--ink-soft);font-size:.74rem;font-family:'IBM Plex Mono';}
+  .hint kbd{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.7rem;}
+
+  /* cover */
+  .cover{text-align:center;}
+  .lens-badge{width:96px;height:96px;margin:0 auto 1.5rem;position:relative;display:flex;align-items:center;justify-content:center;}
+  .lens-badge .ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--line);}
+  .lens-badge .ring.r2{inset:14px;border-color:var(--lens-dim);}
+  .lens-badge .ring.r3{inset:28px;border-color:var(--lens);}
+  .lens-badge i{position:relative;font-size:2rem;color:var(--lens);z-index:2;}
+  .cover .eyebrow{font-family:'IBM Plex Mono';color:var(--dim);letter-spacing:.16em;text-transform:uppercase;font-size:.8rem;margin-bottom:1rem;}
+  .cover h1{font-family:'Sora';font-weight:700;font-size:clamp(2rem,6vw,4rem);line-height:1.04;margin:0 0 1rem;letter-spacing:-.02em;}
+  .cover h1 .hl{color:var(--lens);}
+  .cover p{color:var(--ink-soft);font-size:clamp(1rem,2vw,1.2rem);max-width:620px;margin:0 auto;line-height:1.55;}
+  .steps-preview{display:flex;gap:.5rem;justify-content:center;margin-top:2rem;flex-wrap:wrap;}
+  .sp{display:inline-flex;align-items:center;gap:.5rem;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:.4rem .95rem;font-size:.82rem;font-family:'IBM Plex Mono';color:var(--ink-soft);}
+  .sp b{color:var(--lens);}
+
+  .sec-kicker{font-family:'IBM Plex Mono';font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:.7rem;}
+  .sec-title{font-family:'Sora';font-weight:600;font-size:clamp(1.4rem,3.6vw,2.4rem);line-height:1.12;letter-spacing:-.01em;margin-bottom:1rem;}
+  .lead{font-size:clamp(.98rem,1.8vw,1.14rem);line-height:1.62;color:#c4cfdb;max-width:820px;}
+  .lead strong{color:var(--paper);}
+  .lead code,.inlinecode{font-family:'IBM Plex Mono';background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:.05rem .4rem;font-size:.88em;color:var(--dim);}
+
+  .kimball-step{display:inline-flex;align-items:center;gap:.7rem;background:var(--lens);color:#0f1419;border-radius:99px;padding:.4rem 1.1rem .4rem .5rem;font-family:'Sora';font-weight:600;font-size:.9rem;margin-bottom:1.1rem;}
+  .kimball-step .num{background:#0f1419;color:var(--lens);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+
+  .callout{border-radius:13px;padding:1rem 1.2rem;font-size:.93rem;line-height:1.52;margin-top:1.1rem;display:flex;gap:.7rem;align-items:flex-start;}
+  .callout i{margin-top:.15rem;font-size:1.1rem;}
+  .callout.grain{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.35);} .callout.grain i{color:var(--grain);}
+  .callout.fact{background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.3);} .callout.fact i{color:var(--fact);}
+  .callout.dim{background:rgba(77,195,217,.09);border:1px solid rgba(77,195,217,.3);} .callout.dim i{color:var(--dim);}
+  .callout.warn{background:rgba(245,196,81,.09);border:1px solid rgba(245,196,81,.3);} .callout.warn i{color:var(--lens);}
+
+  .grid-2{display:grid;gap:1.1rem;grid-template-columns:1fr;align-items:start;}
+  @media(min-width:900px){.grid-2{grid-template-columns:1fr 1fr;}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:1.15rem 1.35rem;}
+  .card h5{font-family:'Sora';font-weight:600;font-size:1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+
+  /* zoom levels visual (granularidad) */
+  .zoom-levels{display:grid;gap:.7rem;margin-top:1rem;}
+  .zl{display:flex;gap:.9rem;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;transition:.2s;}
+  .zl .mag{font-family:'IBM Plex Mono';font-weight:600;font-size:.78rem;color:var(--grain);background:rgba(167,139,250,.12);border-radius:6px;padding:.15rem .5rem;white-space:nowrap;}
+  .zl .zt{font-size:.92rem;line-height:1.4;}
+  .zl .zt b{color:var(--paper);}
+  .zl.best{border-color:var(--grain);box-shadow:0 0 0 1px var(--grain);}
+  .zl.best .zt::after{content:' ✓ grano elegido';color:var(--grain);font-size:.78rem;font-family:'IBM Plex Mono';}
+
+  /* checklist decisiones */
+  .decide-list{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem;}
+  .decide-list li{display:flex;gap:.8rem;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;font-size:.93rem;line-height:1.45;}
+  .decide-list li .q{font-family:'IBM Plex Mono';font-weight:600;color:var(--dim);white-space:nowrap;}
+  .decide-list li .a{color:#c4cfdb;}
+  .decide-list li .a b{color:var(--paper);}
+
+  /* code */
+  .code{background:#0b0f14;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:1rem;}
+  .code-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem .9rem;background:var(--panel);border-bottom:1px solid var(--line);}
+  .code-bar .dot{width:11px;height:11px;border-radius:50%;}
+  .code-bar .fn{font-family:'IBM Plex Mono';font-size:.76rem;color:var(--ink-soft);margin-left:.5rem;}
+  .code pre{margin:0;padding:.9rem 1.15rem;overflow-x:auto;font-family:'IBM Plex Mono';font-size:.8rem;line-height:1.6;color:var(--paper);}
+  .tk-key{color:var(--s-key);font-weight:500;}.tk-str{color:var(--s-str);}.tk-num{color:var(--s-num);}.tk-com{color:var(--s-com);font-style:italic;}.tk-fn{color:var(--s-fn);}
+  .tk-fact{color:var(--fact);font-weight:600;}.tk-dim{color:var(--dim);font-weight:600;}
+
+  /* origin table (caso) */
+  .otable{width:100%;border-collapse:collapse;font-size:.74rem;margin-top:.8rem;}
+  .otable th{background:var(--panel-2);color:var(--paper);text-align:left;padding:.4rem .55rem;font-family:'IBM Plex Mono';font-size:.68rem;font-weight:600;border-bottom:2px solid var(--line);white-space:nowrap;}
+  .otable td{padding:.32rem .55rem;border-bottom:1px solid var(--line);font-family:'IBM Plex Mono';color:var(--ink-soft);white-space:nowrap;}
+  .otable .hl-fact{color:var(--fact);}
+  .otable .hl-dim{color:var(--dim);}
+
+  /* star result */
+  .star-legend{display:flex;gap:1.3rem;flex-wrap:wrap;font-size:.8rem;color:var(--ink-soft);margin-top:.6rem;font-family:'IBM Plex Mono';}
+  .star-legend span{display:inline-flex;align-items:center;gap:.4rem;}
+  .sw{width:14px;height:14px;border-radius:4px;}
+  svg .lbl{font-family:'Sora';font-weight:600;font-size:12px;}
+  svg .lbl-sm{font-family:'IBM Plex Mono';font-size:9px;fill:#93a2b3;}
+  svg .b-fact{fill:rgba(255,107,107,.14);stroke:var(--fact);}
+  svg .b-dim{fill:rgba(77,195,217,.12);stroke:var(--dim);}
+
+  /* quiz */
+  .quiz-badge{display:inline-flex;align-items:center;gap:.5rem;border-radius:99px;padding:.34rem .9rem;font-family:'IBM Plex Mono';font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;background:rgba(77,195,217,.12);color:var(--dim);border:1px solid rgba(77,195,217,.35);}
+  .btn-go{border:none;border-radius:11px;font-weight:600;padding:.7rem 1.6rem;font-size:1rem;color:#0f1419;background:var(--dim);}
+  .ex-badge{display:inline-flex;align-items:center;gap:.5rem;border-radius:99px;padding:.34rem .9rem;font-family:'IBM Plex Mono';font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;background:rgba(245,196,81,.12);color:var(--lens);border:1px solid rgba(245,196,81,.35);}
+
+  .end-big{font-family:'Sora';font-weight:700;font-size:clamp(1.8rem,5.5vw,3.4rem);line-height:1.08;letter-spacing:-.02em;}
+
+  ::-webkit-scrollbar{width:9px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px;}
+  .swal2-popup{font-family:'Inter',sans-serif !important;border-radius:18px !important;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><i class="fa-solid fa-magnifying-glass-chart"></i> Modelado Dimensional</span>
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+  <span class="counter"><span id="cur">01</span> / <span id="total">00</span></span>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0 · PORTADA -->
+  <section class="slide active">
+    <div class="slide-inner cover">
+      <div class="lens-badge"><span class="ring"></span><span class="ring r2"></span><span class="ring r3"></span><i class="fa-solid fa-magnifying-glass"></i></div>
+      <div class="eyebrow">Bases de datos corporativas · Data Warehousing</div>
+      <h1>El arte de elegir<br>el <span class="hl">nivel de detalle</span></h1>
+      <p>Antes de escribir una sola línea de SQL, un data warehouse se <em>decide</em>. Granularidad, tabla de hechos y dimensiones: cómo tomar esas decisiones bien, con el método de los 4 pasos y un caso que construimos juntos.</p>
+      <div class="steps-preview">
+        <span class="sp"><b>1</b> Proceso</span>
+        <span class="sp"><b>2</b> Grano</span>
+        <span class="sp"><b>3</b> Dimensiones</span>
+        <span class="sp"><b>4</b> Hechos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 · EL PROBLEMA -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">Por qué esto es difícil</div>
+      <h2 class="sec-title">El error más común: empezar por las tablas</h2>
+      <p class="lead">Mucha gente abre el editor SQL y empieza a crear tablas por intuición. El resultado suele ser un modelo que no responde las preguntas del negocio, o que da números <strong>mal sumados</strong>. El modelado dimensional invierte el orden: primero se <em>piensa</em>, después se construye.</p>
+      <div class="callout warn"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>La pregunta que todo lo ordena:</strong> "¿qué proceso de negocio quiero medir?" No "¿qué tablas necesito?". Medimos <em>eventos</em> que ocurren: una venta, un préstamo, una llamada, un envío.</div></div>
+      <div class="callout dim"><i class="fa-solid fa-book"></i><div>Usaremos el método de <strong>Ralph Kimball</strong>, el estándar de la industria: cuatro pasos, siempre en el mismo orden.</div></div>
+    </div>
+  </section>
+
+  <!-- 2 · LOS 4 PASOS -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">La brújula</div>
+      <h2 class="sec-title">Los 4 pasos de Kimball</h2>
+      <p class="lead">Siempre en este orden. Saltarse uno —o cambiarlos de lugar— es la fuente de casi todos los errores de diseño.</p>
+      <div class="decide-list">
+        <li><span class="q">Paso 1</span><span class="a"><b>Elegir el proceso de negocio.</b> ¿Qué evento medimos? (ventas, préstamos, reservas…)</span></li>
+        <li><span class="q">Paso 2</span><span class="a"><b>Declarar el grano.</b> ¿Qué representa <em>una fila</em> de la tabla de hechos? Es la decisión más importante.</span></li>
+        <li><span class="q">Paso 3</span><span class="a"><b>Identificar las dimensiones.</b> ¿Cómo describimos ese evento? (quién, qué, cuándo, dónde…)</span></li>
+        <li><span class="q">Paso 4</span><span class="a"><b>Identificar los hechos.</b> ¿Qué números medimos en cada evento? (importe, cantidad, duración…)</span></li>
+      </div>
+      <div class="callout grain"><i class="fa-solid fa-arrow-down-1-9"></i><div>Fijate que el <strong>grano (paso 2)</strong> va antes que las dimensiones y los hechos. Todo lo demás depende de él.</div></div>
+    </div>
+  </section>
+
+  <!-- 3 · GRANULARIDAD concepto -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="kimball-step"><span class="num">2</span> Granularidad</div>
+      <h2 class="sec-title">¿Qué representa <span style="color:var(--grain)">una fila</span>?</h2>
+      <p class="lead">La <strong>granularidad</strong> (o "grano") es el nivel de detalle de la tabla de hechos. Es la respuesta a: <em>"¿una fila de esta tabla es…?"</em>. Pensalo como el zoom de un microscopio: podés mirar muy de cerca (mucho detalle) o muy de lejos (ya resumido).</p>
+      <div class="zoom-levels">
+        <div class="zl"><span class="mag">🔬 fino</span><div class="zt"><b>Una fila = una línea de una factura</b> (este producto, en esta venta)</div></div>
+        <div class="zl best"><span class="mag">🔍 medio</span><div class="zt"><b>Una fila = una venta completa</b> (un ticket)</div></div>
+        <div class="zl"><span class="mag">🌐 grueso</span><div class="zt"><b>Una fila = ventas totales por día</b> (ya sumado)</div></div>
+      </div>
+      <div class="callout grain"><i class="fa-solid fa-lightbulb"></i><div><strong>Regla de oro:</strong> elegí el grano <em>más fino</em> que el negocio pueda necesitar. Siempre podés sumar hacia arriba (de líneas a totales), pero <strong>nunca podés "des-sumar"</strong> lo que ya viene agregado.</div></div>
+    </div>
+  </section>
+
+  <!-- 4 · GRANULARIDAD por qué importa -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">Por qué el grano lo decide todo</div>
+      <h2 class="sec-title">Un grano fino te deja responder más preguntas</h2>
+      <div class="grid-2">
+        <div class="card" style="border-color:var(--fact-dim);">
+          <h5><i class="fa-solid fa-xmark" style="color:var(--bad)"></i> Grano grueso (por día)</h5>
+          <p style="font-size:.9rem;color:var(--ink-soft);line-height:1.5;margin:0;">Guardás "el 5/3 se vendieron $12.000". Ya no podés saber <em>qué productos</em> ni <em>a qué clientes</em>. Perdiste el detalle para siempre.</p>
+        </div>
+        <div class="card" style="border-color:var(--dim-deep);">
+          <h5><i class="fa-solid fa-check" style="color:var(--good)"></i> Grano fino (por línea)</h5>
+          <p style="font-size:.9rem;color:var(--ink-soft);line-height:1.5;margin:0;">Guardás cada línea. Podés responder "¿cuánto vendió el producto X?", "¿qué compró el cliente Y?", <em>y también</em> el total del día sumando.</p>
+        </div>
+      </div>
+      <div class="callout grain"><i class="fa-solid fa-ruler-combined"></i><div>Un buen grano se enuncia como una <strong>frase clara</strong>: "una fila representa <em>un préstamo individual de un libro por un socio</em>". Si no lo podés decir en una frase, todavía no lo definiste.</div></div>
+    </div>
+  </section>
+
+  <!-- 5 · QUIZ granularidad -->
+  <section class="slide" data-quiz="0">
+    <div class="slide-inner">
+      <div class="quiz-badge"><i class="fa-solid fa-circle-question"></i> Quiz · Granularidad</div>
+      <h2 class="display" style="font-weight:600;font-size:clamp(1.4rem,3.6vw,2.2rem);margin-bottom:.5rem;">¿Entendiste el grano?</h2>
+      <p style="color:var(--ink-soft);font-size:.95rem;margin-bottom:1.3rem;">Tres preguntas antes de seguir con las dimensiones.</p>
+      <button class="btn-go" onclick="startQuiz(0)"><i class="fa-solid fa-play"></i> Comenzar</button>
+      <div id="quiz0-result" class="mono" style="margin-top:1.3rem;color:var(--ink-soft);"></div>
+    </div>
+  </section>
+
+  <!-- 6 · DIMENSIONES concepto -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="kimball-step"><span class="num">3</span> Dimensiones</div>
+      <h2 class="sec-title">El <span style="color:var(--dim)">contexto</span> del evento</h2>
+      <p class="lead">Una vez fijado el grano, preguntamos: <em>"¿cómo describimos este evento?"</em>. Las dimensiones son los <strong>adjetivos</strong> del hecho: responden <strong>quién, qué, cuándo, dónde, cómo</strong>. Son las que usarás para <em>filtrar</em> y <em>agrupar</em> en los reportes.</p>
+      <div class="decide-list">
+        <li><span class="q">quién</span><span class="a">el socio, el cliente, el vendedor → <code class="inlinecode">dim_socio</code></span></li>
+        <li><span class="q">qué</span><span class="a">el libro, el producto, el servicio → <code class="inlinecode">dim_libro</code></span></li>
+        <li><span class="q">cuándo</span><span class="a">la fecha, con jerarquía año/mes/día → <code class="inlinecode">dim_tiempo</code></span></li>
+        <li><span class="q">dónde</span><span class="a">la sucursal, la ciudad, la región → <code class="inlinecode">dim_sucursal</code></span></li>
+      </div>
+      <div class="callout dim"><i class="fa-solid fa-magnifying-glass"></i><div><strong>Truco práctico:</strong> mirá cómo hablan los usuarios del negocio. Si dicen "quiero ver préstamos <em>por sucursal</em> y <em>por mes</em>", esas frases —"por X"— son tus dimensiones.</div></div>
+    </div>
+  </section>
+
+  <!-- 7 · CÓMO ELEGIR DIMENSIONES -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">El criterio de decisión</div>
+      <h2 class="sec-title">¿Es dimensión o es medida?</h2>
+      <p class="lead">La duda más frecuente. Un truco simple para clasificar cada columna del origen:</p>
+      <div class="grid-2">
+        <div class="card" style="border-color:var(--dim-deep);">
+          <h5><i class="fa-solid fa-tags" style="color:var(--dim)"></i> Es dimensión si…</h5>
+          <p style="font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin:0;">Sirve para <b>filtrar o agrupar</b>. Suele ser texto o categoría. Responde "¿por cuáles quiero ver los datos?". <em>Ej: categoría, ciudad, vendedor, mes.</em></p>
+        </div>
+        <div class="card" style="border-color:var(--fact-dim);">
+          <h5><i class="fa-solid fa-calculator" style="color:var(--fact)"></i> Es medida (hecho) si…</h5>
+          <p style="font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin:0;">Se puede <b>sumar o promediar</b>. Casi siempre es un número. Responde "¿qué quiero calcular?". <em>Ej: importe, cantidad, duración, multa.</em></p>
+        </div>
+      </div>
+      <div class="callout warn"><i class="fa-solid fa-circle-question"></i><div>Caso borde: un número que <strong>no se suma</strong> suele ser dimensión, no medida. El "número de talla" (42) o un código postal son números, pero no tiene sentido sumarlos → van en una dimensión.</div></div>
+    </div>
+  </section>
+
+  <!-- 8 · CUÁNDO agregar/no una dimensión -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">Cuándo sí, cuándo no</div>
+      <h2 class="sec-title">¿Cuántas dimensiones necesito?</h2>
+      <p class="lead">Ni pocas (te quedás corto de análisis) ni de más (ruido). Guías para decidir:</p>
+      <div class="decide-list">
+        <li><span class="q">SÍ</span><span class="a"><b>Si el negocio pregunta "por" ese atributo.</b> "Ventas por región" → necesitás dim_region.</span></li>
+        <li><span class="q">SÍ</span><span class="a"><b>Si aporta contexto para filtrar/segmentar.</b> Aunque hoy no lo pidan, si es barato incluirlo y da flexibilidad.</span></li>
+        <li><span class="q">NO</span><span class="a"><b>Si nadie va a analizar por ese campo.</b> Un "comentario libre" del cajero no es dimensión: no se agrupa por él.</span></li>
+        <li><span class="q">NO</span><span class="a"><b>Si es una medida disfrazada.</b> Si lo vas a sumar, va en la tabla de hechos.</span></li>
+      </div>
+      <div class="callout dim"><i class="fa-solid fa-calendar-days"></i><div><strong>La dimensión tiempo casi nunca falta.</strong> Prácticamente todo análisis corporativo se mira "por período", así que <code class="inlinecode">dim_tiempo</code> se incluye por defecto.</div></div>
+    </div>
+  </section>
+
+  <!-- 9 · HECHOS concepto -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="kimball-step"><span class="num">4</span> Tabla de hechos</div>
+      <h2 class="sec-title">El corazón: las <span style="color:var(--fact)">medidas</span></h2>
+      <p class="lead">La tabla de hechos guarda los <strong>números que se miden</strong> en cada evento, más una clave hacia cada dimensión. Es larga y "flaca": muchísimas filas, pocas columnas.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h5><i class="fa-solid fa-plus" style="color:var(--fact)"></i> Aditiva</h5>
+          <p style="font-size:.88rem;color:var(--ink-soft);line-height:1.5;margin:0;">Se suma por <b>cualquier</b> dimensión. Ej: <code class="inlinecode">importe</code>. Es la mejor clase de medida.</p>
+        </div>
+        <div class="card">
+          <h5><i class="fa-solid fa-plus-minus" style="color:var(--lens)"></i> Semi-aditiva</h5>
+          <p style="font-size:.88rem;color:var(--ink-soft);line-height:1.5;margin:0;">Se suma por algunas dims pero no por tiempo. Ej: <code class="inlinecode">saldo</code> de cuenta (no sumás saldos de días distintos).</p>
+        </div>
+      </div>
+      <div class="callout fact"><i class="fa-solid fa-key"></i><div>Además de las medidas, la tabla de hechos lleva una <strong>clave foránea (FK)</strong> hacia cada dimensión. Esas FKs son las "patas" que conectan la estrella.</div></div>
+    </div>
+  </section>
+
+  <!-- 10 · QUIZ dimensiones/hechos -->
+  <section class="slide" data-quiz="1">
+    <div class="slide-inner">
+      <div class="quiz-badge"><i class="fa-solid fa-circle-question"></i> Quiz · Dimensiones y hechos</div>
+      <h2 class="display" style="font-weight:600;font-size:clamp(1.4rem,3.6vw,2.2rem);margin-bottom:.5rem;">Clasificá bien</h2>
+      <p style="color:var(--ink-soft);font-size:.95rem;margin-bottom:1.3rem;">Cuatro preguntas para distinguir dimensión de medida.</p>
+      <button class="btn-go" onclick="startQuiz(1)"><i class="fa-solid fa-play"></i> Comenzar</button>
+      <div id="quiz1-result" class="mono" style="margin-top:1.3rem;color:var(--ink-soft);"></div>
+    </div>
+  </section>
+
+  <!-- 11 · CASO PRÁCTICO intro -->
+  <section class="slide">
+    <div class="slide-inner" style="text-align:center;">
+      <div class="ex-badge" style="margin:0 auto 1rem;"><i class="fa-solid fa-book-open-reader"></i> Caso práctico</div>
+      <h2 class="display" style="font-weight:700;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.05;">La biblioteca municipal</h2>
+      <p style="color:var(--ink-soft);max-width:600px;margin:1rem auto 0;font-size:1.05rem;line-height:1.55;">Vamos a modelar el data warehouse de una biblioteca que quiere analizar sus <strong style="color:var(--paper)">préstamos</strong>. Aplicamos los 4 pasos, uno por uno, con un dominio que todos conocemos.</p>
+    </div>
+  </section>
+
+  <!-- 12 · CASO el origen -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">Punto de partida</div>
+      <h2 class="sec-title">Lo que la biblioteca anota hoy</h2>
+      <p class="lead">Cada vez que alguien retira un libro, el sistema registra una fila como estas. Este es nuestro <strong>origen</strong> (el sistema operativo). Nuestra misión: convertirlo en un modelo estrella.</p>
+      <div style="overflow-x:auto;">
+        <table class="otable">
+          <thead><tr>
+            <th>id</th><th class="hl-dim">libro</th><th class="hl-dim">socio</th><th class="hl-dim">bibliotecario</th><th class="hl-dim">sucursal</th><th class="hl-dim">f_prestamo</th><th class="hl-fact">dias</th><th class="hl-fact">dias_retraso</th><th class="hl-fact">multa</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="hl-dim">Cien años de soledad</td><td class="hl-dim">Ana Lopez</td><td class="hl-dim">Bib. Carla</td><td class="hl-dim">Central</td><td class="hl-dim">2024-03-01</td><td class="hl-fact">9</td><td class="hl-fact">0</td><td class="hl-fact">0</td></tr>
+            <tr><td>2</td><td class="hl-dim">El principito</td><td class="hl-dim">Luis Gomez</td><td class="hl-dim">Bib. Diego</td><td class="hl-dim">Norte</td><td class="hl-dim">2024-03-02</td><td class="hl-fact">18</td><td class="hl-fact">3</td><td class="hl-fact">45</td></tr>
+            <tr><td>3</td><td class="hl-dim">1984</td><td class="hl-dim">Ana Lopez</td><td class="hl-dim">Bib. Carla</td><td class="hl-dim">Central</td><td class="hl-dim">2024-03-05</td><td class="hl-fact">7</td><td class="hl-fact">0</td><td class="hl-fact">0</td></tr>
+            <tr><td>4</td><td class="hl-dim">Rayuela</td><td class="hl-dim">Sofia Ruiz</td><td class="hl-dim">Bib. Carla</td><td class="hl-dim">Sur</td><td class="hl-dim">2024-03-05</td><td class="hl-fact">20</td><td class="hl-fact">5</td><td class="hl-fact">75</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="star-legend">
+        <span><span class="sw" style="background:rgba(77,195,217,.2);border:1.5px solid var(--dim)"></span> candidatas a dimensión (texto, describen)</span>
+        <span><span class="sw" style="background:rgba(255,107,107,.2);border:1.5px solid var(--fact)"></span> candidatas a medida (números, se suman)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · CASO paso 1 y 2 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="grid-2">
+        <div>
+          <div class="kimball-step"><span class="num">1</span> Proceso</div>
+          <p class="lead" style="font-size:1rem;">El proceso de negocio es <strong>el préstamo de libros</strong>. Eso es lo que la biblioteca quiere medir y mejorar (¿qué se lee más? ¿qué sucursal presta más? ¿cuántas multas?).</p>
+        </div>
+        <div>
+          <div class="kimball-step"><span class="num">2</span> Grano</div>
+          <p class="lead" style="font-size:1rem;">Declaramos el grano: <strong style="color:var(--grain)">una fila = un préstamo individual de un libro por un socio</strong>. Es el nivel más fino posible acá.</p>
+        </div>
+      </div>
+      <div class="callout grain"><i class="fa-solid fa-check-double"></i><div>Con este grano fino podremos responder desde "¿cuántos préstamos hubo?" hasta "¿qué libro específico prestó tal bibliotecario en tal sucursal?". Y también sumar hacia arriba para totales por mes o por sucursal.</div></div>
+    </div>
+  </section>
+
+  <!-- 14 · CASO paso 3 dimensiones -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="kimball-step"><span class="num">3</span> Dimensiones del caso</div>
+      <h2 class="sec-title">¿Cómo describimos un préstamo?</h2>
+      <p class="lead">Miramos las columnas de texto del origen y las convertimos en dimensiones. Cada una responde una pregunta del negocio:</p>
+      <div class="decide-list">
+        <li><span class="q">qué</span><span class="a"><code class="inlinecode">dim_libro</code> → título, autor, género. Responde "¿qué se presta más?"</span></li>
+        <li><span class="q">quién</span><span class="a"><code class="inlinecode">dim_socio</code> → nombre, tipo de socio. Responde "¿quién lee más?"</span></li>
+        <li><span class="q">quién atiende</span><span class="a"><code class="inlinecode">dim_bibliotecario</code> → quién registró el préstamo.</span></li>
+        <li><span class="q">dónde</span><span class="a"><code class="inlinecode">dim_sucursal</code> → sede de la biblioteca. "¿Qué sucursal presta más?"</span></li>
+        <li><span class="q">cuándo</span><span class="a"><code class="inlinecode">dim_tiempo</code> → año, mes, día. "¿En qué meses hay más actividad?"</span></li>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 · CASO paso 4 hechos -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="kimball-step"><span class="num">4</span> Hechos del caso</div>
+      <h2 class="sec-title">¿Qué medimos en cada préstamo?</h2>
+      <p class="lead">Las columnas numéricas que tienen sentido sumar o promediar se vuelven medidas de <code class="inlinecode">fact_prestamos</code>:</p>
+      <div class="decide-list">
+        <li><span class="q">cantidad_prestamos</span><span class="a">Siempre <b>1</b> por fila (un "contador" para sumar cuántos préstamos hubo).</span></li>
+        <li><span class="q">dias_prestamo</span><span class="a">Cuántos días duró. Se puede <b>promediar</b> (duración media).</span></li>
+        <li><span class="q">dias_retraso</span><span class="a">Días de atraso en la devolución. Aditiva.</span></li>
+        <li><span class="q">multa_importe</span><span class="a">Dinero cobrado por retraso. <b>Aditiva</b> por cualquier dimensión.</span></li>
+      </div>
+      <div class="callout fact"><i class="fa-solid fa-lightbulb"></i><div>Agregar <code class="inlinecode">cantidad_prestamos = 1</code> parece redundante, pero facilita muchísimo Power BI: sumás esa columna y tenés el conteo total, filtrable por cualquier dimensión.</div></div>
+    </div>
+  </section>
+
+  <!-- 16 · CASO el modelo resultante -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="sec-kicker">El resultado</div>
+      <h2 class="sec-title">La estrella de la biblioteca</h2>
+      <div class="grid-2">
+        <div>
+          <svg viewBox="0 0 340 300" style="width:100%;height:auto;">
+            <line x1="170" y1="150" x2="75" y2="52" stroke="#3a4756" stroke-width="1.4"/>
+            <line x1="170" y1="150" x2="265" y2="52" stroke="#3a4756" stroke-width="1.4"/>
+            <line x1="170" y1="150" x2="40" y2="150" stroke="#3a4756" stroke-width="1.4"/>
+            <line x1="170" y1="150" x2="75" y2="248" stroke="#3a4756" stroke-width="1.4"/>
+            <line x1="170" y1="150" x2="265" y2="248" stroke="#3a4756" stroke-width="1.4"/>
+            <!-- fact -->
+            <rect class="b-fact" x="118" y="118" width="104" height="64" rx="9" stroke-width="2"/>
+            <text class="lbl" x="170" y="142" text-anchor="middle" fill="#ff8f8f">fact_prestamos</text>
+            <text class="lbl-sm" x="170" y="158" text-anchor="middle">dias · multa</text>
+            <text class="lbl-sm" x="170" y="170" text-anchor="middle">+ 5 FKs</text>
+            <!-- dims -->
+            <rect class="b-dim" x="18" y="30" width="108" height="42" rx="8" stroke-width="1.5"/>
+            <text class="lbl" x="72" y="55" text-anchor="middle" fill="#7ad3e5" font-size="11">dim_libro</text>
+            <rect class="b-dim" x="214" y="30" width="112" height="42" rx="8" stroke-width="1.5"/>
+            <text class="lbl" x="270" y="55" text-anchor="middle" fill="#7ad3e5" font-size="11">dim_socio</text>
+            <rect class="b-dim" x="-6" y="128" width="90" height="44" rx="8" stroke-width="1.5"/>
+            <text class="lbl-sm" x="39" y="148" text-anchor="middle" fill="#e8edf2" font-size="10">dim_</text>
+            <text class="lbl-sm" x="39" y="160" text-anchor="middle" fill="#e8edf2" font-size="10">bibliotecario</text>
+            <rect class="b-dim" x="18" y="228" width="108" height="42" rx="8" stroke-width="1.5"/>
+            <text class="lbl" x="72" y="253" text-anchor="middle" fill="#7ad3e5" font-size="11">dim_sucursal</text>
+            <rect class="b-dim" x="214" y="228" width="112" height="42" rx="8" stroke-width="1.5"/>
+            <text class="lbl" x="270" y="253" text-anchor="middle" fill="#7ad3e5" font-size="11">dim_tiempo</text>
+          </svg>
+          <div class="star-legend">
+            <span><span class="sw" style="background:rgba(255,107,107,.2);border:1.5px solid var(--fact)"></span> hechos</span>
+            <span><span class="sw" style="background:rgba(77,195,217,.2);border:1.5px solid var(--dim)"></span> dimensiones</span>
+          </div>
+        </div>
+        <div>
+          <div class="code">
+            <div class="code-bar"><span class="dot" style="background:#ff6b6b"></span><span class="dot" style="background:#f5c451"></span><span class="dot" style="background:#4dc3d9"></span><span class="fn">fact_prestamos.sql</span></div>
+            <pre><code><span class="tk-key">CREATE TABLE</span> <span class="tk-fact">fact_prestamos</span> (
+  prestamo_id     <span class="tk-key">INT PRIMARY KEY</span>,
+  libro_key       <span class="tk-key">INT</span>,   <span class="tk-com">-- FK dim_libro</span>
+  socio_key       <span class="tk-key">INT</span>,   <span class="tk-com">-- FK dim_socio</span>
+  biblio_key      <span class="tk-key">INT</span>,   <span class="tk-com">-- FK dim_bibliotecario</span>
+  sucursal_key    <span class="tk-key">INT</span>,   <span class="tk-com">-- FK dim_sucursal</span>
+  tiempo_key      <span class="tk-key">INT</span>,   <span class="tk-com">-- FK dim_tiempo</span>
+  cantidad_prestamos <span class="tk-key">INT</span>,      <span class="tk-com">-- =1</span>
+  dias_prestamo   <span class="tk-key">INT</span>,          <span class="tk-com">-- medida</span>
+  dias_retraso    <span class="tk-key">INT</span>,          <span class="tk-com">-- medida</span>
+  multa_importe   <span class="tk-key">DECIMAL</span>(<span class="tk-num">8</span>,<span class="tk-num">2</span>)   <span class="tk-com">-- medida</span>
+);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 · QUIZ final caso -->
+  <section class="slide" data-quiz="2">
+    <div class="slide-inner">
+      <div class="quiz-badge" style="background:rgba(245,196,81,.12);color:var(--lens);border-color:rgba(245,196,81,.35);"><i class="fa-solid fa-trophy"></i> Quiz final · el caso completo</div>
+      <h2 class="display" style="font-weight:600;font-size:clamp(1.4rem,3.6vw,2.2rem);margin-bottom:.5rem;">Aplicá los 4 pasos</h2>
+      <p style="color:var(--ink-soft);font-size:.95rem;margin-bottom:1.3rem;">Cuatro preguntas sobre el caso de la biblioteca.</p>
+      <button class="btn-go" style="background:var(--lens);" onclick="startQuiz(2)"><i class="fa-solid fa-play"></i> Comenzar</button>
+      <div id="quiz2-result" class="mono" style="margin-top:1.3rem;color:var(--ink-soft);"></div>
+    </div>
+  </section>
+
+  <!-- 18 · DESAFÍO para el estudiante -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="ex-badge"><i class="fa-solid fa-pen-ruler"></i> Tu turno · para pensar</div>
+      <h2 class="sec-title">Modelá vos: el gimnasio</h2>
+      <p class="lead">Un gimnasio quiere analizar los <strong>check-ins</strong> de sus socios (cada vez que alguien entra a entrenar). El sistema anota: socio, fecha y hora de entrada, sede, actividad (sala, spinning, pileta), duración de la sesión en minutos, y si usó o no un casillero.</p>
+      <div class="decide-list">
+        <li><span class="q">Paso 1</span><span class="a">¿Cuál es el proceso de negocio?</span></li>
+        <li><span class="q">Paso 2</span><span class="a">Enunciá el grano en una frase. ("Una fila = …")</span></li>
+        <li><span class="q">Paso 3</span><span class="a">¿Qué dimensiones identificás? (pista: hay al menos 4)</span></li>
+        <li><span class="q">Paso 4</span><span class="a">¿Qué medidas van en la tabla de hechos?</span></li>
+      </div>
+      <div class="callout warn"><i class="fa-solid fa-comments"></i><div>Trabajalo en grupo y discutan: ¿"actividad" es dimensión o medida? ¿"duración" es aditiva o semi-aditiva? ¿el casillero (sí/no) dónde va?</div></div>
+    </div>
+  </section>
+
+  <!-- 19 · CIERRE -->
+  <section class="slide">
+    <div class="slide-inner" style="text-align:center;">
+      <div class="lens-badge" style="margin-bottom:1.2rem;"><span class="ring"></span><span class="ring r2"></span><span class="ring r3"></span><i class="fa-solid fa-star" style="color:var(--lens)"></i></div>
+      <div class="end-big">Primero <span style="color:var(--grain)">el grano</span>,<br>después <span style="color:var(--dim)">el contexto</span>,<br>después <span style="color:var(--fact)">la medida</span>.</div>
+      <p style="color:var(--ink-soft);max-width:600px;margin:1.3rem auto 0;font-size:1.05rem;line-height:1.55;">El modelado dimensional no es memorizar sintaxis: es tomar cuatro decisiones en orden. Elegí el proceso, declará el grano lo más fino posible, describilo con dimensiones y medilo con hechos. El SQL viene solo después.</p>
+      <div class="mono" style="margin-top:1.8rem;color:var(--ink-soft);font-size:.78rem;">Método de los 4 pasos · Ralph Kimball · "The Data Warehouse Toolkit"</div>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> navegar · <kbd>Inicio</kbd> volver</div>
+<div class="nav-arrows">
+  <button id="prevBtn" onclick="go(-1)"><i class="fa-solid fa-arrow-left"></i></button>
+  <button id="nextBtn" onclick="go(1)"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let idx=0;const total=slides.length;
+document.getElementById('total').textContent=String(total).padStart(2,'0');
+function render(){
+  slides.forEach((s,i)=>{
+    s.classList.toggle('active',i===idx);
+    if(i===idx){const inner=s.querySelector('.slide-inner');if(inner){inner.classList.remove('animate__animated','animate__fadeInUp');void inner.offsetWidth;inner.classList.add('animate__animated','animate__fadeInUp');}}
+  });
+  document.getElementById('cur').textContent=String(idx+1).padStart(2,'0');
+  document.getElementById('progress').style.width=(idx/(total-1)*100)+'%';
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===total-1;
+}
+function go(d){const n=idx+d;if(n>=0&&n<total){idx=n;render();}}
+document.addEventListener('keydown',e=>{
+  if(Swal.isVisible())return;
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='textarea'||tag==='input')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1);
+  if(e.key==='Home'){idx=0;render();}
+  if(e.key==='End'){idx=total-1;render();}
+});
+render();
+
+const quizzes=[
+  // Granularidad
+  [
+    {q:'¿Qué es la granularidad de una tabla de hechos?',
+     opts:['El nivel de detalle: qué representa UNA fila','La cantidad de columnas','El tamaño en disco'],ans:0,
+     why:'El grano define qué representa cada fila. Es la decisión de diseño más importante.'},
+    {q:'¿Por qué conviene el grano MÁS FINO posible?',
+     opts:['Ocupa menos espacio','Podés sumar hacia arriba, pero nunca "des-sumar" lo ya agregado','Es más rápido de escribir'],ans:1,
+     why:'Del detalle siempre obtenés los totales; pero de un total no recuperás el detalle perdido.'},
+    {q:'"Una fila = ventas totales por día" es un grano…',
+     opts:['Fino','Grueso (ya agregado)','Imposible'],ans:1,
+     why:'Ya viene sumado por día: perdiste el detalle de productos y clientes. Es un grano grueso.'}
+  ],
+  // Dimensiones y hechos
+  [
+    {q:'La columna "ciudad" en una venta es…',
+     opts:['Una medida','Una dimensión (sirve para agrupar/filtrar)','Una clave primaria'],ans:1,
+     why:'Es texto que describe y por el que querés agrupar ("ventas por ciudad"): dimensión.'},
+    {q:'La columna "importe" es…',
+     opts:['Una dimensión','Una medida (se suma)','Una fecha'],ans:1,
+     why:'Es un número que se suma y promedia: medida, va en la tabla de hechos.'},
+    {q:'Un código postal es un número. ¿Dónde va?',
+     opts:['En la tabla de hechos, porque es número','En una dimensión: no tiene sentido sumarlo','Se descarta'],ans:1,
+     why:'No todo número es medida. Si no se suma, es dimensión. El truco: "¿tiene sentido sumarlo?".'},
+    {q:'¿Por qué la dimensión tiempo casi nunca falta?',
+     opts:['Porque MySQL la exige','Porque casi todo análisis se mira "por período"','Porque ocupa poco'],ans:1,
+     why:'Tendencias, comparaciones mes a mes, estacionalidad… casi todo es temporal.'}
+  ],
+  // Caso biblioteca
+  [
+    {q:'En la biblioteca, ¿cuál es el grano elegido?',
+     opts:['Un préstamo individual de un libro por un socio','Total de préstamos por mes','Un socio'],ans:0,
+     why:'El grano más fino: una fila por cada préstamo concreto. Permite todos los análisis.'},
+    {q:'"multa_importe" en el caso es…',
+     opts:['Una dimensión','Una medida aditiva','Una clave foránea'],ans:1,
+     why:'Es dinero que se suma por cualquier dimensión: medida aditiva de fact_prestamos.'},
+    {q:'"sucursal" en el caso es…',
+     opts:['Una medida','Una dimensión (dim_sucursal)','Un hecho'],ans:1,
+     why:'Describe DÓNDE ocurrió el préstamo y sirve para agrupar: dimensión.'},
+    {q:'¿Para qué sirve guardar "cantidad_prestamos = 1"?',
+     opts:['Para nada, es redundante','Para sumar esa columna y obtener el conteo, filtrable por dimensión','Para ordenar'],ans:1,
+     why:'Un "1" por fila permite que SUM(cantidad_prestamos) dé el total de préstamos en cualquier corte.'}
+  ]
+];
+const quizDone=[false,false,false];
+async function startQuiz(qi){
+  const set=quizzes[qi];let score=0;
+  for(let i=0;i<set.length;i++){
+    const item=set[i];const inputOptions={};
+    item.opts.forEach((o,k)=>inputOptions[k]=o);
+    const {value}=await Swal.fire({
+      title:`Pregunta ${i+1} de ${set.length}`,
+      html:`<div style="font-size:1.02rem;line-height:1.5;margin-bottom:.4rem;">${item.q}</div>`,
+      input:'radio',inputOptions,
+      inputValidator:v=>(v===undefined||v==='')?'Elegí una opción':undefined,
+      confirmButtonText:'Responder',confirmButtonColor:'#4dc3d9',
+      background:'#1a222c',color:'#e8edf2',allowOutsideClick:false,
+      showClass:{popup:'animate__animated animate__fadeInUp animate__faster'}
+    });
+    if(Number(value)===item.ans){
+      score++;
+      await Swal.fire({icon:'success',title:'¡Bien!',text:item.why,confirmButtonColor:'#5dd39e',background:'#1a222c',color:'#e8edf2',timer:3000,timerProgressBar:true});
+    }else{
+      await Swal.fire({icon:'error',title:'Casi',html:`<p style="margin-bottom:.5rem;">Respuesta correcta:<br><strong>${item.opts[item.ans]}</strong></p><p style="color:#93a2b3;font-size:.9rem;">${item.why}</p>`,confirmButtonColor:'#ff6b6b',background:'#1a222c',color:'#e8edf2'});
+    }
+  }
+  const pct=Math.round(score/set.length*100);
+  let icon='success',title='¡Excelente!';
+  if(pct<50){icon='warning';title='A repasar';}
+  else if(pct<80){icon='info';title='¡Bien encaminado!';}
+  await Swal.fire({icon,title,html:`<div style="font-family:'IBM Plex Mono';font-size:2.4rem;color:#f5c451;">${score}/${set.length}</div><p style="color:#93a2b3;">${pct}% de aciertos</p>`,confirmButtonText:'Seguir',confirmButtonColor:'#4dc3d9',background:'#1a222c',color:'#e8edf2'});
+  quizDone[qi]=true;
+  document.getElementById('quiz'+qi+'-result').innerHTML=`<i class="fa-solid fa-circle-check" style="color:#5dd39e;"></i> Completado · ${score}/${set.length} (${pct}%)`;
+}
+</script>
+</body>
+</html>
