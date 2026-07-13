@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Protección de Datos y Ciberseguridad en Uruguay</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --ink:#243047; --muted:#64748b; --bg:#fffaf8; --blue:#c7ecff; --mint:#cdf7e7;
+      --lav:#ddd2ff; --peach:#ffd8c7; --yellow:#fff1b8; --rose:#ffd7e9; --sky:#dff7ff;
+      --line:#e6edf5; --shadow:0 18px 42px rgba(30,41,59,.12); --accent:#6db6d8;
+      --danger:#ffb4ad; --ok:#bff1d3;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--ink); background:linear-gradient(135deg,#fffdf8,#f3fbff);}
+    body{overflow:hidden}.deck{height:100vh;width:100vw;position:relative;overflow:hidden}.slide{display:none;height:100vh;overflow-y:auto;padding:54px clamp(20px,6vw,88px) 118px;scroll-behavior:smooth}.slide.active{display:block}.slide::-webkit-scrollbar{width:10px}.slide::-webkit-scrollbar-thumb{background:#bdd9e8;border-radius:30px}
+    .top-label{position:fixed;right:5vw;top:26px;font-weight:900;letter-spacing:.08em;color:#536d89;z-index:30}.progress-line{position:fixed;left:0;bottom:0;height:8px;background:linear-gradient(90deg,#6db6d8,#ddd2ff,#cdf7e7);width:0;z-index:45;transition:.35s}.navbtn{position:fixed;bottom:28px;z-index:50;width:56px;height:56px;border:0;border-radius:50%;background:#fff;box-shadow:var(--shadow);color:var(--ink);font-size:1.12rem}.navbtn:hover{transform:translateY(-2px)}#prev{right:108px}#next{right:34px}#home{left:34px}.counter{position:fixed;bottom:44px;left:108px;z-index:50;font-weight:900;color:var(--muted)}
+    .kicker{display:inline-flex;gap:.6rem;align-items:center;background:#fff;border-radius:999px;padding:.62rem 1rem;box-shadow:var(--shadow);font-weight:900;color:#486584;margin-bottom:1.15rem}.tag{display:inline-block;border-radius:999px;background:#fff;padding:.45rem .82rem;font-weight:850;margin:.18rem;box-shadow:0 8px 18px rgba(30,41,59,.08)}
+    h1{font-size:clamp(2.45rem,5.5vw,5.05rem);font-weight:950;letter-spacing:-.055em;line-height:.98;margin-bottom:1.2rem}h2{font-size:clamp(2rem,4.1vw,4rem);font-weight:950;letter-spacing:-.045em;line-height:1.02;margin-bottom:1.25rem}h3{font-weight:900;letter-spacing:-.025em}.lead{font-size:clamp(1.05rem,1.55vw,1.35rem);line-height:1.55;color:#405168}.mini{font-size:.96rem;color:#53647c;line-height:1.42}
+    .card-soft{border:0;border-radius:28px;padding:26px;box-shadow:var(--shadow);height:100%;background:#fff}.bg-blue{background:var(--blue)}.bg-mint{background:var(--mint)}.bg-lav{background:var(--lav)}.bg-peach{background:var(--peach)}.bg-yellow{background:var(--yellow)}.bg-rose{background:var(--rose)}.bg-sky{background:var(--sky)}.bg-danger-soft{background:var(--danger)}.bg-ok{background:var(--ok)}
+    .icon-bubble{width:62px;height:62px;border-radius:20px;background:#fff;display:grid;place-items:center;font-size:1.55rem;box-shadow:0 10px 24px rgba(30,41,59,.1);margin-bottom:1rem}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.flow{display:flex;align-items:center;justify-content:space-between;gap:13px;flex-wrap:wrap}.node{background:#fff;border-radius:22px;padding:18px 20px;text-align:center;min-width:150px;flex:1;box-shadow:var(--shadow);font-weight:900}.arrow{font-size:1.7rem;color:#7296af}.table-wrap{overflow:auto;border-radius:24px;box-shadow:var(--shadow);background:#fff}.table{margin:0}.table th{background:#e7f6fd;color:#21314a}.table td,.table th{vertical-align:middle}.code{background:#152238;color:#eaf6ff;border-radius:24px;padding:20px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}.source-link{font-size:.9rem;display:inline-flex;align-items:center;gap:.4rem;margin:.2rem .25rem .2rem 0;padding:.42rem .7rem;border-radius:999px;background:#fff;color:#274963;text-decoration:none;font-weight:800;box-shadow:0 7px 16px rgba(30,41,59,.08)}.source-link:hover{color:#0a5e86;transform:translateY(-1px)}.defbtn{border:0;border-radius:999px;padding:.45rem .75rem;background:#fff;color:#25435d;font-weight:850;box-shadow:0 8px 18px rgba(30,41,59,.1);margin:.2rem}.defbtn:hover{transform:translateY(-2px)}.warning{border-left:8px solid #f59e0b}.danger{border-left:8px solid #ef4444}.okline{border-left:8px solid #22c55e}.checklist li{margin-bottom:.58rem}.quiz-option{cursor:pointer;border:2px solid transparent}.quiz-option:hover{border-color:#60b6d8;transform:translateY(-2px)}
+    @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.slide{padding-top:76px}.top-label{font-size:.8rem}}
+    @media(max-width:720px){.slide{padding:78px 18px 110px}.grid-3,.grid-4{grid-template-columns:1fr}.flow{display:block}.node{margin-bottom:12px}.arrow{display:block;text-align:center;transform:rotate(90deg);margin:6px}.navbtn{width:50px;height:50px}#prev{right:92px}#next{right:26px}#home{left:20px}.counter{left:84px}.top-label{right:18px;top:18px}h1{font-size:2.48rem}h2{font-size:2.05rem}.card-soft{padding:22px}.code{font-size:.8rem}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="top-label" id="sectionLabel">DATOS + CIBERSEGURIDAD</div>
+  <div class="progress-line" id="progress"></div>
+  <button class="navbtn" id="home" title="Inicio"><i class="fa-solid fa-house"></i></button>
+  <button class="navbtn" id="prev" title="Anterior"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="navbtn" id="next" title="Siguiente"><i class="fa-solid fa-arrow-right"></i></button>
+  <div class="counter"><span id="current">1</span> / <span id="total"></span></div>
+
+  <section class="slide active" data-label="Introducción">
+    <span class="kicker"><i class="fa-solid fa-shield-halved"></i> SQL para Analistas de Ciencia de Datos e IA</span>
+    <h1>Protección de datos en Uruguay y fundamentos de ciberseguridad</h1>
+    <p class="lead col-lg-10">Una base de datos no solo debe ser útil para consultar, analizar o entrenar modelos de IA: también debe ser legal, segura, trazable y respetuosa de los derechos de las personas.</p>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-scale-balanced"></i></div><h3>Marco legal</h3><p>Ley 18.331, decretos reglamentarios, derechos de titulares y obligaciones de responsables.</p></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-database"></i></div><h3>Bases de datos</h3><p>Registro, responsable, encargado, seguridad, finalidad y minimización.</p></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-lock"></i></div><h3>Ciberseguridad</h3><p>ISO 27000, gestión de riesgos, controles, incidentes y prevención de ataques.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Idea central">
+    <span class="kicker"><i class="fa-solid fa-user-shield"></i> Datos personales</span>
+    <h2>¿Qué protegemos?</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-peach"><h3>Dato personal</h3><p class="lead">Información que identifica o puede hacer identificable a una persona: nombre, cédula, dirección, correo, imagen, voz, ubicación, historial académico, historia clínica, etc.</p><button class="defbtn" onclick="def('Dato personal','Cualquier información relativa a una persona identificada o identificable. En bases de datos e IA, también importa la combinación de datos: varios datos aparentemente simples pueden identificar a alguien al cruzarse.')">Ver definición</button></div>
+      <div class="card-soft bg-mint"><h3>Tratamiento</h3><p class="lead">Toda operación sobre datos: recolectar, registrar, organizar, conservar, consultar, modificar, comunicar, transferir o eliminar.</p><button class="defbtn" onclick="def('Tratamiento de datos','No es solo guardar datos: también consultarlos con SQL, exportarlos a Power BI, compartirlos por correo o usarlos como dataset para IA.')">Ver definición</button></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4 warning"><p class="lead mb-0"><strong>Idea clave:</strong> en analítica e IA, el riesgo aumenta cuando se combinan fuentes, se reidentifican personas o se usan datos para decisiones automatizadas.</p></div>
+  </section>
+
+  <section class="slide" data-label="Datos sensibles">
+    <span class="kicker"><i class="fa-solid fa-triangle-exclamation"></i> Ley 18.331 · Datos sensibles</span>
+    <h2>Datos sensibles: definición y tratamiento</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-rose warning">
+        <h3>¿Qué son?</h3>
+        <p class="lead">Según la Ley 18.331, son datos personales que revelan aspectos especialmente protegidos de una persona, como origen racial o étnico, preferencias políticas, convicciones religiosas o morales, afiliación sindical, salud o vida sexual.</p>
+        <button class="defbtn" onclick="def('Datos sensibles según Ley 18.331','La ley los ubica en una categoría de mayor protección porque su uso indebido puede generar discriminación, daño reputacional, exclusión, fraude o afectación directa de derechos fundamentales.')">Ver definición</button>
+        <a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008/4"><i class="fa-solid fa-link"></i> Art. 4 IMPO</a>
+      </div>
+      <div class="card-soft bg-yellow">
+        <h3>Regla general de tratamiento</h3>
+        <p class="lead">Nadie puede ser obligado a proporcionar datos sensibles. Su tratamiento requiere consentimiento expreso y escrito del titular, salvo excepciones legalmente previstas.</p>
+        <button class="defbtn" onclick="def('Tratamiento de datos sensibles','Antes de recolectarlos o usarlos en SQL, BI o IA se debe justificar la finalidad, verificar base legal o consentimiento expreso y escrito, limitar accesos, documentar medidas de seguridad y evitar exposición innecesaria.')">Ver cuidados</button>
+        <a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008/18"><i class="fa-solid fa-link"></i> Art. 18 IMPO</a>
+      </div>
+    </div>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-heart-pulse"></i></div><h3>Ejemplos</h3><p>Historia clínica, diagnósticos, tratamientos, discapacidad, datos biométricos asociados a salud, afiliación sindical o convicciones religiosas.</p></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-database"></i></div><h3>En bases de datos</h3><p>Separar accesos, cifrar cuando corresponda, registrar auditoría, aplicar mínimo privilegio y evitar que dashboards expongan datos identificables.</p></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-brain"></i></div><h3>En IA</h3><p>No usar datos sensibles como variables sin una justificación fuerte. Evaluar sesgos, finalidad, proporcionalidad, anonimización y riesgo de reidentificación.</p></div>
+    </div>
+    <div class="card-soft bg-danger-soft mt-4 danger">
+      <p class="lead mb-0"><strong>Mayor riesgo:</strong> una filtración de datos sensibles puede tener consecuencias más graves que una filtración común: discriminación, daño psicológico, extorsión, exclusión laboral, afectación sanitaria o vulneración de derechos.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Ley 18.331">
+    <span class="kicker"><i class="fa-solid fa-gavel"></i> Ley N° 18.331</span>
+    <h2>Protección de Datos Personales y Habeas Data</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-blue"><h3>Reseña</h3><p>La Ley 18.331 reconoce el derecho a la protección de datos personales y regula el tratamiento de datos en bases públicas y privadas. Define principios, derechos de las personas, obligaciones y el órgano de control.</p><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008"><i class="fa-solid fa-link"></i> Texto en IMPO</a></div>
+      <div class="card-soft bg-mint"><h3>Principios clave</h3><span class="tag">Legalidad</span><span class="tag">Veracidad</span><span class="tag">Finalidad</span><span class="tag">Consentimiento informado</span><span class="tag">Seguridad</span><span class="tag">Reserva</span><span class="tag">Responsabilidad</span></div>
+    </div>
+    <div class="grid-3 mt-4">
+      <div class="card-soft bg-lav"><h3>Para SQL</h3><p>Define qué datos pueden recolectarse y para qué finalidad.</p></div>
+      <div class="card-soft bg-rose"><h3>Para BI</h3><p>Limita la exposición de datos personales en reportes y dashboards.</p></div>
+      <div class="card-soft bg-yellow"><h3>Para IA</h3><p>Exige evaluar finalidad, proporcionalidad, seguridad y riesgos de tratamiento.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Registro">
+    <span class="kicker"><i class="fa-solid fa-address-book"></i> Registro de bases de datos</span>
+    <h2>Artículos vinculados al registro</h2>
+    <div class="table-wrap">
+      <table class="table table-hover">
+        <thead><tr><th>Artículo / norma</th><th>Idea principal</th><th>Aplicación práctica</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ley 18.331, art. 6</strong></td><td>La formación de bases de datos es lícita cuando están debidamente inscriptas y respetan los principios de la ley.</td><td>Una base de estudiantes, clientes o pacientes debe existir con finalidad legítima y reglas claras.</td></tr>
+          <tr><td><strong>Ley 18.331, art. 28</strong></td><td>Personas físicas o jurídicas privadas que creen, modifiquen o supriman bases personales no domésticas deben registrarse conforme al régimen legal.</td><td>Una empresa, ONG, institución educativa o app debe analizar si su base debe inscribirse.</td></tr>
+          <tr><td><strong>Ley 18.331, art. 29</strong></td><td>Toda base de datos pública o privada debe inscribirse en el Registro habilitado por el órgano de control.</td><td>La inscripción incluye identificación de la base, responsable, naturaleza de datos, tratamiento y medidas de seguridad.</td></tr>
+          <tr><td><strong>Decreto 414/009, arts. 15 a 20</strong></td><td>Reglamenta actos inscribibles, contenido, plazo, inscripción provisoria, fecha y actualización del registro.</td><td>El responsable debe mantener actualizados los datos registrados y comunicar actualizaciones.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3"><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008/29"><i class="fa-solid fa-link"></i> Art. 29 IMPO</a><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/decretos/414-2009"><i class="fa-solid fa-link"></i> Decreto 414/009 IMPO</a></div>
+  </section>
+
+  <section class="slide" data-label="Responsable">
+    <span class="kicker"><i class="fa-solid fa-user-tie"></i> Responsable de la base</span>
+    <h2>Responsable, encargado y deberes</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-mint"><h3>Responsable</h3><p>Persona física o jurídica que decide sobre la finalidad, contenido y uso de una base o tratamiento.</p><button class="defbtn" onclick="def('Responsable de la base de datos','Es quien decide por qué se tratan los datos, qué datos se recolectan, cuánto tiempo se conservan, quién accede y qué medidas de seguridad se aplican.')">Definición</button></div>
+      <div class="card-soft bg-blue"><h3>Encargado</h3><p>Quien trata datos por cuenta del responsable, por ejemplo un proveedor de hosting, software, soporte o analítica.</p><button class="defbtn" onclick="def('Encargado del tratamiento','No define la finalidad principal; procesa datos siguiendo instrucciones del responsable. Debe aplicar seguridad y confidencialidad según contrato y normativa.')">Definición</button></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4"><h3>Obligaciones frecuentes del responsable</h3><ul class="checklist"><li>Informar finalidad, identidad del responsable y forma de ejercer derechos.</li><li>Inscribir y actualizar bases cuando corresponda.</li><li>Aplicar medidas de seguridad y confidencialidad.</li><li>Atender derechos de acceso, rectificación, actualización, inclusión o supresión.</li><li>Comunicar vulneraciones cuando correspondan según Decreto 64/020.</li></ul></div>
+  </section>
+
+  <section class="slide" data-label="Decretos">
+    <span class="kicker"><i class="fa-solid fa-file-signature"></i> Reglamentación</span>
+    <h2>Decretos 414/009 y 64/020</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-lav"><h3>Decreto 414/009</h3><p>Reglamenta la Ley 18.331. Desarrolla aspectos de consentimiento, principios, derechos, régimen registral y funcionamiento de la URCDP.</p><p class="mini"><strong>Foco del curso:</strong> Registro de Bases de Datos Personales, contenido de inscripción y actualización.</p><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/decretos/414-2009"><i class="fa-solid fa-link"></i> IMPO Decreto 414/009</a></div>
+      <div class="card-soft bg-peach"><h3>Decreto 64/020</h3><p>Reglamenta nuevas disposiciones de protección de datos: alcance territorial, responsabilidad proactiva, vulneraciones de seguridad, evaluación de impacto, privacidad por diseño y delegado de protección de datos.</p><p class="mini"><strong>Foco del curso:</strong> seguridad, incidentes y gestión preventiva.</p><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/decretos/64-2020"><i class="fa-solid fa-link"></i> IMPO Decreto 64/020</a></div>
+    </div>
+    <button class="defbtn mt-4" onclick="def('Responsabilidad proactiva','No alcanza con reaccionar ante problemas: la organización debe demostrar que planificó, documentó y aplicó medidas adecuadas para proteger datos personales.')">¿Qué es responsabilidad proactiva?</button>
+  </section>
+
+  <section class="slide" data-label="Incidentes de datos">
+    <span class="kicker"><i class="fa-solid fa-triangle-exclamation"></i> Vulneraciones</span>
+    <h2>Vulneraciones de seguridad y datos personales</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-danger-soft danger"><h3>¿Qué puede pasar?</h3><ul class="checklist"><li>Acceso no autorizado a bases de datos.</li><li>Filtración de cédulas, correos, teléfonos o credenciales.</li><li>Cifrado o pérdida de disponibilidad por ransomware.</li><li>Alteración de registros o eliminación accidental.</li><li>Publicación indebida en dashboards o planillas.</li></ul></div>
+      <div class="card-soft bg-ok okline"><h3>Respuesta esperada</h3><ol class="checklist"><li>Contener el incidente.</li><li>Preservar evidencias.</li><li>Evaluar impacto en titulares.</li><li>Comunicar a URCDP si corresponde.</li><li>Corregir causa raíz y documentar.</li></ol></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4"><p class="lead mb-0">El Decreto 64/020 prevé comunicación de vulneraciones de seguridad que involucren datos personales, incluyendo un plazo máximo de 72 horas desde que el responsable conoce el incidente.</p></div>
+  </section>
+
+  <section class="slide" data-label="Instituciones">
+    <span class="kicker"><i class="fa-solid fa-building-shield"></i> Ecosistema institucional</span>
+    <h2>AGESIC, CERTuy y URCDP</h2>
+    <div class="grid-3">
+      <div class="card-soft bg-blue"><div class="icon-bubble"><i class="fa-solid fa-landmark"></i></div><h3>AGESIC</h3><p>Agencia de Gobierno Electrónico y Sociedad de la Información y del Conocimiento. Impulsa políticas digitales, gobierno digital, datos, IA, ciberseguridad y ciudadanía digital.</p><a class="source-link" target="_blank" href="https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/"><i class="fa-solid fa-link"></i> Sitio oficial</a></div>
+      <div class="card-soft bg-mint"><div class="icon-bubble"><i class="fa-solid fa-headset"></i></div><h3>CERTuy</h3><p>Centro Nacional de Respuesta a Incidentes de Seguridad Informática. Monitorea, previene, coordina y responde a incidentes de ciberseguridad.</p><a class="source-link" target="_blank" href="https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/tramites-y-servicios/servicios/certuy"><i class="fa-solid fa-link"></i> CERTuy</a></div>
+      <div class="card-soft bg-lav"><div class="icon-bubble"><i class="fa-solid fa-user-lock"></i></div><h3>URCDP</h3><p>Unidad Reguladora y de Control de Datos Personales. Órgano de control creado por la Ley 18.331, con autonomía técnica, encargado de custodiar el cumplimiento de la normativa.</p><a class="source-link" target="_blank" href="https://www.gub.uy/unidad-reguladora-control-datos-personales/"><i class="fa-solid fa-link"></i> URCDP</a></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="ISO 27000">
+    <span class="kicker"><i class="fa-solid fa-certificate"></i> Normas ISO/IEC 27000</span>
+    <h2>Marco internacional de seguridad de la información</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-blue"><h3>Familia ISO/IEC 27000</h3><p>Conjunto de normas para gestionar la seguridad de la información. Su foco es proteger activos como información financiera, propiedad intelectual, datos de empleados y datos de terceros.</p><a class="source-link" target="_blank" href="https://www.iso.org/standard/iso-iec-27000-family"><i class="fa-solid fa-link"></i> ISO 27000 family</a></div>
+      <div class="card-soft bg-mint"><h3>SGSI / ISMS</h3><p>Sistema de Gestión de Seguridad de la Información: políticas, procesos, roles, controles y mejora continua para gestionar riesgos.</p><button class="defbtn" onclick="def('SGSI / ISMS','Un sistema de gestión: no es solo instalar antivirus. Incluye gobierno, evaluación de riesgos, controles, auditoría, capacitación, respuesta a incidentes y mejora continua.')">Ver definición</button></div>
+    </div>
+    <div class="flow mt-4"><div class="node">Identificar activos</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Evaluar riesgos</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Aplicar controles</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Medir y mejorar</div></div>
+  </section>
+
+  <section class="slide" data-label="Iteraciones ISO">
+    <span class="kicker"><i class="fa-solid fa-layer-group"></i> 27001, 27002, 27005...</span>
+    <h2>Principales normas de la familia</h2>
+    <div class="table-wrap">
+      <table class="table table-hover">
+        <thead><tr><th>Norma</th><th>Uso principal</th><th>Aplicación práctica</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ISO/IEC 27000</strong></td><td>Conceptos y vocabulario.</td><td>Lenguaje común para seguridad de la información.</td></tr>
+          <tr><td><strong>ISO/IEC 27001</strong></td><td>Requisitos para implementar y certificar un SGSI.</td><td>Define controles, alcance, riesgos, auditoría y mejora continua.</td></tr>
+          <tr><td><strong>ISO/IEC 27002</strong></td><td>Guía de buenas prácticas y controles de seguridad.</td><td>Ayuda a elegir controles: accesos, criptografía, operaciones, proveedores.</td></tr>
+          <tr><td><strong>ISO/IEC 27005</strong></td><td>Gestión de riesgos de seguridad de la información.</td><td>Identificar amenazas, vulnerabilidades, impacto y tratamiento del riesgo.</td></tr>
+          <tr><td><strong>ISO/IEC 27017 / 27018</strong></td><td>Controles para nube y protección de información personal en nube pública.</td><td>Muy útil si la base, BI o IA usan servicios cloud.</td></tr>
+          <tr><td><strong>ISO/IEC 27701</strong></td><td>Extensión de privacidad para gestión de información personal.</td><td>Conecta seguridad con protección de datos personales.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Amenazas">
+    <span class="kicker"><i class="fa-solid fa-bug"></i> Métodos de ciberataque</span>
+    <h2>Ataques más utilizados y consecuencias</h2>
+    <div class="grid-3">
+      <div class="card-soft bg-danger-soft"><h3>Ransomware</h3><p>Cifra o bloquea sistemas y exige rescate. Es de los más graves por paralizar servicios críticos y provocar pérdida de datos.</p><button class="defbtn" onclick="def('Ransomware','Malware que cifra archivos o sistemas y exige pago. La prevención combina backups, parches, MFA, segmentación, EDR y simulacros de respuesta.')">Prevención</button></div>
+      <div class="card-soft bg-peach"><h3>Phishing</h3><p>Engaña al usuario para entregar credenciales, instalar malware o aprobar pagos. Muy común como puerta de entrada.</p><button class="defbtn" onclick="def('Phishing','Correos, mensajes o sitios falsos. Prevención: capacitación, MFA, filtros antiphishing, verificación de enlaces, reportes internos y políticas de doble control.')">Prevención</button></div>
+      <div class="card-soft bg-yellow"><h3>Explotación de vulnerabilidades</h3><p>Aprovecha software desactualizado, configuraciones débiles o servicios expuestos.</p><button class="defbtn" onclick="def('Vulnerabilidades','Fallas técnicas o de configuración. Prevención: gestión de parches, inventario de activos, escaneo, hardening, pentesting y mínima exposición pública.')">Prevención</button></div>
+      <div class="card-soft bg-rose"><h3>Credenciales filtradas</h3><p>Uso de contraseñas reutilizadas o robadas para acceder a sistemas.</p><button class="defbtn" onclick="def('Credenciales filtradas','Se previene con MFA, contraseñas robustas, gestores, detección de accesos anómalos, bloqueo por intentos y rotación ante incidentes.')">Prevención</button></div>
+      <div class="card-soft bg-blue"><h3>DDoS</h3><p>Satura servicios hasta dejarlos inaccesibles. Afecta disponibilidad y continuidad.</p><button class="defbtn" onclick="def('DDoS','Ataque de denegación de servicio distribuido. Prevención: CDN, WAF, mitigación de tráfico, rate limiting, monitoreo y planes de continuidad.')">Prevención</button></div>
+      <div class="card-soft bg-mint"><h3>Insider / error humano</h3><p>Acciones internas intencionales o accidentales: borrar, publicar o compartir datos indebidamente.</p><button class="defbtn" onclick="def('Error humano e insider','Prevención: mínimo privilegio, segregación de funciones, auditoría, capacitación, DLP y revisiones de permisos.')">Prevención</button></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Ataques graves">
+    <span class="kicker"><i class="fa-solid fa-skull-crossbones"></i> Mayor impacto</span>
+    <h2>Los más graves por sus consecuencias</h2>
+    <div class="grid-4">
+      <div class="card-soft bg-danger-soft danger"><h3>Ransomware en salud</h3><p>Puede interrumpir atención, agendas, estudios o sistemas clínicos.</p></div>
+      <div class="card-soft bg-danger-soft danger"><h3>Filtración masiva</h3><p>Expone cédulas, correos, teléfonos, credenciales, datos financieros o salud.</p></div>
+      <div class="card-soft bg-danger-soft danger"><h3>Compromiso de identidad</h3><p>Permite suplantación, fraude, phishing dirigido y extorsión.</p></div>
+      <div class="card-soft bg-danger-soft danger"><h3>Infraestructura crítica</h3><p>Afecta energía, telecomunicaciones, salud, transporte o servicios estatales.</p></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4"><h3>Regla de priorización</h3><p class="lead mb-0">El riesgo aumenta cuando se combinan: datos sensibles + alta cantidad de titulares + sistemas críticos + indisponibilidad + obligación legal de notificar + daño reputacional.</p></div>
+  </section>
+
+  <section class="slide" data-label="Prevención">
+    <span class="kicker"><i class="fa-solid fa-shield-virus"></i> Controles básicos</span>
+    <h2>Prevención resumida</h2>
+    <div class="grid-3">
+      <div class="card-soft bg-mint"><h3>Personas</h3><ul class="checklist"><li>Capacitación antiphishing.</li><li>Políticas de contraseñas y MFA.</li><li>Canales simples para reportar incidentes.</li><li>Responsables claros de seguridad y datos.</li></ul></div>
+      <div class="card-soft bg-blue"><h3>Procesos</h3><ul class="checklist"><li>Inventario de activos y bases de datos.</li><li>Gestión de parches.</li><li>Backups probados.</li><li>Plan de respuesta a incidentes.</li><li>Registro de accesos y auditoría.</li></ul></div>
+      <div class="card-soft bg-lav"><h3>Tecnología</h3><ul class="checklist"><li>Antimalware / EDR.</li><li>Firewalls, WAF y segmentación.</li><li>Cifrado en tránsito y reposo.</li><li>Control de privilegios.</li><li>Monitoreo y alertas.</li></ul></div>
+    </div>
+    <div class="code mt-4">-- En bases de datos: ejemplo de mínimos controles
+CREATE USER 'analista_bi'@'%' IDENTIFIED BY '********';
+GRANT SELECT ON dw_ventas.* TO 'analista_bi'@'%';
+-- Evitar permisos innecesarios: no dar DROP, DELETE o UPDATE si solo consulta.</div>
+  </section>
+
+  <section class="slide" data-label="Casos Uruguay">
+    <span class="kicker"><i class="fa-solid fa-location-dot"></i> Situaciones reales</span>
+    <h2>Ejemplos uruguayos</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-peach"><h3>1) Ransomware WannaCry / 2017</h3><p>La ola global de ransomware también llegó a Uruguay. AGESIC activó protocolos y difundió recomendaciones para evitar infecciones y propagación.</p><p class="mini"><strong>Lección:</strong> parches, backups, segmentación y actualización de sistemas son críticos.</p><a class="source-link" target="_blank" href="https://www.180.com.uy/articulo/68364_agesic-trabaja-para-evitar-infecciones-con-malware-que-afecto-decenas-de-paises"><i class="fa-solid fa-link"></i> Nota 180</a></div>
+      <div class="card-soft bg-rose"><h3>2) Ataque a TuID / Antel, 2026</h3><p>Antel informó un ataque al Sistema de Autenticación y la aplicación de protocolos de seguridad. Según su comunicado, la investigación determinó que no se vulneraron claves de autenticación de TuID ni datos especialmente protegidos.</p><p class="mini"><strong>Lección:</strong> los sistemas de identidad requieren monitoreo, gestión de vulnerabilidades, respuesta rápida y comunicación pública clara.</p><a class="source-link" target="_blank" href="https://www.antel.com.uy/institucional/sala-de-prensa/comunicados/comunicado"><i class="fa-solid fa-link"></i> Comunicado Antel</a></div>
+    </div>
+    <div class="card-soft bg-yellow mt-4"><p class="lead mb-0">Otros incidentes reportados en prensa incluyen ataques a sitios de organismos y plataformas vinculadas a servicios públicos; conviene tratarlos como material de discusión sobre disponibilidad, continuidad y protección de datos.</p></div>
+  </section>
+
+  <section class="slide" data-label="Datos + IA">
+    <span class="kicker"><i class="fa-solid fa-brain"></i> IA responsable</span>
+    <h2>Cuando la base alimenta modelos de IA</h2>
+    <div class="grid-3">
+      <div class="card-soft bg-blue"><h3>Antes</h3><p>Definir finalidad, base legal, datos mínimos y responsable del tratamiento.</p><button class="defbtn" onclick="def('Minimización','Recolectar y usar solo los datos necesarios para la finalidad definida. En IA, más datos no siempre significa mejor modelo.')">Minimización</button></div>
+      <div class="card-soft bg-mint"><h3>Durante</h3><p>Anonimizar o seudonimizar cuando sea posible, controlar accesos y documentar datasets.</p><button class="defbtn" onclick="def('Seudonimización vs anonimización','Seudonimizar reduce identificación directa, pero puede reidentificarse con información adicional. Anonimizar busca impedir la identificación, aunque debe evaluarse el riesgo de reidentificación.')">Ver diferencia</button></div>
+      <div class="card-soft bg-lav"><h3>Después</h3><p>Monitorear sesgos, accesos, explicabilidad, cambios de finalidad y conservación.</p><button class="defbtn" onclick="def('Fuga de información','En IA, ocurre cuando el modelo usa información que no estaría disponible al momento real de predecir o que viola la finalidad original del tratamiento.')">Fuga de información</button></div>
+    </div>
+    <div class="flow mt-4"><div class="node">Base legal</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Dataset seguro</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Modelo auditado</div><div class="arrow"><i class="fa-solid fa-arrow-right"></i></div><div class="node">Decisión responsable</div></div>
+  </section>
+
+  <section class="slide" data-label="Checklist">
+    <span class="kicker"><i class="fa-solid fa-list-check"></i> Guía práctica</span>
+    <h2>Checklist para una base de datos segura y legal</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-mint"><h3>Protección de datos</h3><ul class="checklist"><li>¿La finalidad está claramente definida?</li><li>¿Se informa al titular?</li><li>¿La base debe registrarse ante URCDP?</li><li>¿Hay responsable y encargado identificados?</li><li>¿Se respetan derechos de acceso/rectificación/supresión?</li><li>¿Hay procedimiento ante vulneraciones?</li></ul></div>
+      <div class="card-soft bg-blue"><h3>Ciberseguridad</h3><ul class="checklist"><li>¿Hay MFA para usuarios críticos?</li><li>¿Los permisos siguen mínimo privilegio?</li><li>¿Los backups se prueban?</li><li>¿Se aplican parches?</li><li>¿Se registran accesos y cambios?</li><li>¿Existe plan de respuesta a incidentes?</li></ul></div>
+    </div>
+    <button class="btn btn-dark btn-lg rounded-pill mt-4" onclick="Swal.fire({title:'Mini actividad',html:'Tomá una base de datos de ejemplo: <b>Estudiantes, Clientes o Pacientes</b>.<br><br>1) Identificá datos personales y sensibles.<br>2) Definí responsable y finalidad.<br>3) Indicá si requiere registro.<br>4) Proponé 5 controles de seguridad.<br>5) Diseñá un procedimiento breve ante filtración.',icon:'question',confirmButtonColor:'#6db6d8'})"><i class="fa-solid fa-pencil me-2"></i>Ver actividad</button>
+  </section>
+
+  <section class="slide" data-label="Fuentes">
+    <span class="kicker"><i class="fa-solid fa-book"></i> Fuentes y enlaces útiles</span>
+    <h2>Links para ampliar</h2>
+    <div class="grid-2">
+      <div class="card-soft bg-yellow"><h3>Normativa</h3><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008">Ley 18.331 · IMPO</a><br><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008/4">Art. 4 · Definiciones y datos sensibles</a><br><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/leyes/18331-2008/18">Art. 18 · Tratamiento de datos sensibles</a><br><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/decretos/414-2009">Decreto 414/009 · IMPO</a><br><a class="source-link" target="_blank" href="https://www.impo.com.uy/bases/decretos/64-2020">Decreto 64/020 · IMPO</a><br><a class="source-link" target="_blank" href="https://www.gub.uy/unidad-reguladora-control-datos-personales/">URCDP</a></div>
+      <div class="card-soft bg-sky"><h3>Ciberseguridad</h3><a class="source-link" target="_blank" href="https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/">AGESIC</a><br><a class="source-link" target="_blank" href="https://www.gub.uy/centro-nacional-respuesta-incidentes-seguridad-informatica/">CERTuy</a><br><a class="source-link" target="_blank" href="https://www.iso.org/standard/iso-iec-27000-family">ISO/IEC 27000 family</a><br><a class="source-link" target="_blank" href="https://www.gub.uy/centro-nacional-respuesta-incidentes-seguridad-informatica/comunicacion/publicaciones/reportar-incidente">Reportar incidente a CERTuy</a></div>
+    </div>
+    <div class="card-soft bg-lav mt-4"><p class="lead mb-0"><strong>Cierre:</strong> proteger datos no es solo cumplir una ley. Es cuidar personas, continuidad institucional, confianza pública y calidad de las decisiones basadas en datos.</p></div>
+  </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let idx=0;const total=document.getElementById('total'),cur=document.getElementById('current'),label=document.getElementById('sectionLabel'),prog=document.getElementById('progress');total.textContent=slides.length;
+function show(i){idx=(i+slides.length)%slides.length;slides.forEach((s,n)=>{s.classList.toggle('active',n===idx);if(n===idx){s.scrollTop=0;s.classList.remove('animate__animated','animate__fadeIn');void s.offsetWidth;s.classList.add('animate__animated','animate__fadeIn')}});cur.textContent=idx+1;label.textContent=slides[idx].dataset.label||'DATOS + CIBERSEGURIDAD';prog.style.width=((idx+1)/slides.length*100)+'%';}
+document.getElementById('next').onclick=()=>show(idx+1);document.getElementById('prev').onclick=()=>show(idx-1);document.getElementById('home').onclick=()=>show(0);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')show(idx+1);if(e.key==='ArrowLeft')show(idx-1);if(e.key==='Home')show(0)});show(0);
+function def(title, text){Swal.fire({title, html:text, icon:'info', confirmButtonText:'Entendido', confirmButtonColor:'#6db6d8', background:'#fffdf9', color:'#243047'});}
+</script>
+</body>
+</html>
